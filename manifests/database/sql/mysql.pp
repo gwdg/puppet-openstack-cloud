@@ -315,7 +315,7 @@ class cloud::database::sql::mysql (
       user       => "${galera_clustercheck_dbuser}@localhost",
     }
 
-    Database_user<<| |>>
+    Mysql_user<<| |>>
   } else {
     # NOTE(sileht): Only the master must create the password
     # into the database, slave nodes must just use the password.
