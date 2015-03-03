@@ -115,9 +115,26 @@ class cloud(
   $purge_firewall_rules = false,
   $firewall_pre_extras  = {},
   $firewall_post_extras = {},
+
+  # Additional stuff
+  $manage_root_password = false,
+  $production           = false,
+  $ntp_servers          = [],
+
 ) {
 
   include ::stdlib
+
+  # Setup apt-cacher-ng (only for vagrant for now)
+  if ! $production {
+    class {'::apt':
+      proxy_host => 'puppetmaster.cloud.gwdg.de',
+      proxy_port => '3142',
+      
+      # Prevent cycles in conjunction with apt::ppa
+ #   } -> Package<||>
+    }
+  }
 
   if ! ($::osfamily in [ 'RedHat', 'Debian' ]) {
     fail("OS family unsuppored yet (${::osfamily}), module puppet-openstack-cloud only support RedHat or Debian")
@@ -155,7 +172,11 @@ This node is under the control of Puppet ${::puppetversion}.
   include ::sudo::configs
 
   # NTP
-  include ::ntp
+  class { '::ntp':
+    servers     => $ntp_servers,
+    restrict    => ['127.0.0.1'],
+#    interfaces  => ['127.0.0.1', ip_for_network(hiera('openstack::network::management'))],
+  }
 
   # Security Limits
   include ::limits
@@ -173,11 +194,13 @@ This node is under the control of Puppet ${::puppetversion}.
   }
 
   # Strong root password for all servers
-  user { 'root':
-    ensure   => 'present',
-    gid      => '0',
-    password => $root_password,
-    uid      => '0',
+  if $manage_root_password {
+    user { 'root':
+      ensure   => 'present',
+      gid      => '0',
+      password => $root_password,
+      uid      => '0',
+    }
   }
 
   $cron_service_name = $::osfamily ? {
