@@ -162,10 +162,10 @@ This node is under the control of Puppet ${::puppetversion}.
   }
 
   # DNS
-  class { 'dnsclient':
-    nameservers => $dns_ips,
-    domain      => $site_domain
-  }
+#  class { 'dnsclient':
+#    nameservers => $dns_ips,
+#    domain      => $site_domain
+#  }
 
   # Sudo
   include ::sudo
