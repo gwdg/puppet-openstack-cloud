@@ -167,9 +167,9 @@ This node is under the control of Puppet ${::puppetversion}.
 #    domain      => $site_domain
 #  }
 
-  # Sudo
-  include ::sudo
-  include ::sudo::configs
+  # SUDO (don't use for now)
+#  include ::sudo
+#  include ::sudo::configs
 
   # NTP
   class { '::ntp':
