@@ -307,7 +307,7 @@ class cloud::database::sql::mysql (
       password_hash => mysql_password($galera_clustercheck_dbpassword),
       require       => File['/root/.my.cnf']
     }
-    mysql_grant { "${galera_clustercheck_dbuser}@localhost/monitoring":
+    mysql_grant { "${galera_clustercheck_dbuser}@localhost/monitoring.*":
       ensure     => 'present',
       options    => ['GRANT'],
       privileges => ['ALL'],
