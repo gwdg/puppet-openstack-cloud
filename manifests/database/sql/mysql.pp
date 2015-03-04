@@ -241,6 +241,8 @@ class cloud::database::sql::mysql (
   # Specific to the Galera master node
   if $::hostname == $galera_master_name {
 
+#    Mysql_user <| |> -> File['/root/.my.cnf'] 
+
     $mysql_root_password_real = $mysql_root_password
 
     # OpenStack DB
@@ -316,6 +318,7 @@ class cloud::database::sql::mysql (
     }
 
     Mysql_user<<| |>>
+
   } else {
     # NOTE(sileht): Only the master must create the password
     # into the database, slave nodes must just use the password.
@@ -408,7 +411,7 @@ class cloud::database::sql::mysql (
         owner   => 'root',
         group   => 'root',
         mode    => '0600',
-        require => Exec['clean-mysql-binlog'],
+        require => [ Exec['clean-mysql-binlog'], Mysql_user['debian-sys-maint@localhost'] ],
       }
     } # Debian
     default: {
