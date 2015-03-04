@@ -327,6 +327,7 @@ class cloud::database::sql::mysql (
       content => "[client]\nuser=root\nhost=localhost\npassword=${mysql_root_password}\n",
       owner   => 'root',
       mode    => '0600',
+      require => [ Class['mysql::server'], Class['mysql::client'] ],
     }
   }
 
