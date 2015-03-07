@@ -532,6 +532,9 @@ class cloud::loadbalancer(
   $galera_ip                        = ['127.0.0.1'],
   $galera_slave                     = false,
   $firewall_settings                = {},
+
+  $haproxy_ensure                   = 'present',
+
 ){
 
   include cloud::params
@@ -556,7 +559,8 @@ class cloud::loadbalancer(
   # Ensure Keepalived is started before HAproxy to avoid binding errors.
   class { 'keepalived': } ->
   class { 'haproxy':
-    service_manage => true
+    service_manage  => true,
+    package_ensure  => $haproxy_ensure,
   }
 
   keepalived::vrrp_script { 'haproxy':
