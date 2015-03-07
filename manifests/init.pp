@@ -186,7 +186,7 @@ This node is under the control of Puppet ${::puppetversion}.
   if $::operatingsystem == 'Ubuntu' {
 
     # Add cloud archive for Juno
-    apt::ppa { 'cloud-archive:juno': } -> Class['rabbitmq']
+    apt::ppa { 'cloud-archive:juno': }
 
   }
 
