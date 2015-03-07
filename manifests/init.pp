@@ -161,13 +161,13 @@ This node is under the control of Puppet ${::puppetversion}.
 ";
   }
 
-  # DNS
+  # DNS (does not work with resolvconf on ubuntu)
 #  class { 'dnsclient':
 #    nameservers => $dns_ips,
 #    domain      => $site_domain
 #  }
 
-  # SUDO (don't use for now)
+  # SUDO (don't use for now, kills vagrant)
 #  include ::sudo
 #  include ::sudo::configs
 
@@ -181,6 +181,14 @@ This node is under the control of Puppet ${::puppetversion}.
   # Security Limits
   include ::limits
   create_resources('limits::limits', $limits)
+
+  # Some Ubuntu specific stuff
+  if $::operatingsystem == 'Ubuntu' {
+
+    # Add cloud archive for Juno
+    apt::ppa { 'cloud-archive:juno': } -> Class['rabbitmq']
+
+  }
 
   # SELinux
   if $::osfamily == 'RedHat' {
