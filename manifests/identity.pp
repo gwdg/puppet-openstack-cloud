@@ -413,6 +413,10 @@
 #   Should be an hash.
 #   Default to {}
 #
+# [*keystone_master_name*]
+#   Hostname of the keystone master node from which ssl certs are copied (needed 
+#   for HA).
+#
 class cloud::identity (
   $swift_enabled                = true,
   $cinder_enabled               = true,
@@ -511,6 +515,8 @@ class cloud::identity (
   $ks_token_expiration          = 3600,
   $token_driver                 = 'keystone.token.persistence.backends.sql.Token',
   $firewall_settings            = {},
+
+  $keystone_master_name         = undef,
 ){
 
   $encoded_user     = uriescape($keystone_db_user)
@@ -604,6 +610,61 @@ class cloud::identity (
       auth_pass => $ks_swift_dispersion_password
     }
   }
+
+  # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)
+
+    
+  if $::hostname == $keystone_master_name {
+
+    sshkeys::create_ssh_key { 'keystone':
+      ssh_keytype   => 'rsa',
+      require       => Package['keystone']
+    }
+
+    sshkeys::set_authorized_key { 'keystone':
+      local_user  => 'keystone',
+      remote_user => 'keystone@controller1.cloud.gwdg.de',
+    }
+
+    # Restrict keystone account to just scp
+    package { 'rssh': }
+
+    exec { 'keystone-change-shell-to-rssh':
+      command   => "/usr/bin/chsh -s /usr/bin/rssh keystone",
+      require   => Package['rssh'],
+    }
+
+    exec { 'enable-rssh-scp': 
+      command   => "/bin/sed -i 's/#allowscp/allowscp/g' /etc/rssh.conf",
+      require   => Package['rssh'],
+    }
+
+  } else {
+
+    file { '/var/lib/keystone/.ssh':
+      ensure  => directory,
+      mode    => '0700',
+      owner   => 'keystone',
+      group   => 'keystone',
+      require => Package['keystone'],
+    }
+
+    sshkeys::set_private_key { 'keystone':
+      local_user    => 'keystone',
+      remote_user   => "keystone@controller1.cloud.gwdg.de",
+      require       => File['/var/lib/keystone/.ssh'],
+    }
+
+    # Copy files
+    exec { 'keystone-copy-ssl-certs':
+      command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
+      creates   => '/etc/keystone/ssl/synced_from_master',
+      user      => 'keystone',
+      require   => Sshkeys::Set_private_key['keystone'],
+      notify    => Service['keystone']
+    }
+  }
+
 
   class {'ceilometer::keystone::auth':
     admin_address     => $ks_ceilometer_admin_host,
