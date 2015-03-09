@@ -131,10 +131,11 @@ class cloud::image::registry(
     log_facility        => $log_facility,
   }
 
-  glance_registry_config {
+  # FIXME (Piotr): Puppet complains about redeclaration, so drop the line
+#  glance_registry_config {
     # TODO(EmilienM) Drop this line when https://review.openstack.org/#/c/133521/ been merged.
-    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
-  }
+#    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
+#  }
 
   exec {'glance_db_sync':
     command => 'glance-manage db_sync',

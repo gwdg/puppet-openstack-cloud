@@ -217,10 +217,13 @@ class cloud::image::api(
   #   rabbit_userid   => 'glance',
   #   rabbit_host     => $rabbit_host,
   # }
+
+
   glance_api_config {
     'DEFAULT/notifier_driver':          value => 'noop';
     # TODO(EmilienM) Drop this line when https://review.openstack.org/#/c/133521/ has been merged.
-    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
+    # FIXME (Piotr): Puppet complains about redeclaration, so drop the line
+#    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
   }
 
   if ($backend == 'rbd') {
