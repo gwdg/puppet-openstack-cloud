@@ -253,23 +253,29 @@ class cloud::image::api(
     # There is no NFS backend in Glance.
     # We mount the NFS share in filesystem_store_datadir to fake the
     # backend.
-    if $nfs_device {
-      class { 'glance::backend::file':
+    #
+    # FIXME (Piotr): We use the nfs module to mount nfs shares elsewhere, so disable it here
+    #
+#    if $nfs_device {
+
+    class { 'glance::backend::file':
         filesystem_store_datadir => $filesystem_store_datadir
-      }
-      $nfs_mount = {
-        "${filesystem_store_datadir}" => {
-          'ensure'  => 'mounted',
-          'fstype'  => 'nfs',
-          'device'  => $nfs_device,
-          'options' => $nfs_options
-        }
-      }
-      ensure_resource('class', 'nfs', {})
-      create_resources('types::mount', $nfs_mount)
-    } else {
-      fail('When running NFS backend, you need to provide nfs_device parameter.')
     }
+
+#      $nfs_mount = {
+#        "${filesystem_store_datadir}" => {
+#          'ensure'  => 'mounted',
+#          'fstype'  => 'nfs',
+#          'device'  => $nfs_device,
+#          'options' => $nfs_options
+#        }
+#      }
+#      ensure_resource('class', 'nfs', {})
+#      create_resources('types::mount', $nfs_mount)
+#    } else {
+#      fail('When running NFS backend, you need to provide nfs_device parameter.')
+#    }
+
   } else {
     fail("${backend} is not a Glance supported backend.")
   }
