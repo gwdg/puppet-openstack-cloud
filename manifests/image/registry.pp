@@ -141,7 +141,8 @@ class cloud::image::registry(
     command => 'glance-manage db_sync',
     user    => 'glance',
     path    => '/usr/bin',
-    unless  => "/usr/bin/mysql glance -h ${glance_db_host} -u ${encoded_glance_user} -p${encoded_glance_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql glance -h ${glance_db_host} -u ${encoded_glance_user} -p${encoded_glance_password} -e \"show tables\" | /bin/grep Tables",
+    require => Package['glance-common']
   }
 
   if $::cloud::manage_firewall {
