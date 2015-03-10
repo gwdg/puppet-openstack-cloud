@@ -631,7 +631,7 @@ class cloud::identity (
 
     exec { 'keystone-change-shell-to-rssh':
       command   => "/usr/bin/chsh -s /usr/bin/rssh keystone",
-      require   => Package['rssh'],
+      require   => [ Package['rssh'], User['keystone'] ],
     }
 
     exec { 'enable-rssh-scp': 
