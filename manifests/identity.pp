@@ -657,7 +657,7 @@ class cloud::identity (
 
     # Copy files
     exec { 'keystone-copy-ssl-certs':
-      command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
+      command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}.cloud.gwdg.de:/etc/keystone/ssl /etc/keystone/",
       creates   => '/etc/keystone/ssl/synced_from_master',
       user      => 'keystone',
       require   => Sshkeys::Set_private_key['keystone'],
