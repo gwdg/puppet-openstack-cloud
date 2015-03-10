@@ -126,7 +126,8 @@ class cloud::volume(
     command => 'cinder-manage db sync',
     path    => '/usr/bin',
     user    => 'cinder',
-    unless  => "/usr/bin/mysql cinder -h ${cinder_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql cinder -h ${cinder_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+    require => Package['cinder-common'],
   }
 
 }
