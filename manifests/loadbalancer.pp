@@ -533,7 +533,9 @@ class cloud::loadbalancer(
   $galera_slave                     = false,
   $firewall_settings                = {},
 
+  # New settings
   $haproxy_ensure                   = 'present',
+  $keepalived_preempt_delay         = undef,
 
 ){
 
@@ -574,6 +576,7 @@ class cloud::loadbalancer(
     state         => $keepalived_state,
     track_script  => ['haproxy'],
     priority      => $keepalived_priority,
+    preempt_delay => $keepalived_preempt_delay,
     auth_type     => $keepalived_auth_type,
     auth_pass     => $keepalived_auth_pass,
     notify_master => $::cloud::params::start_haproxy_service,
@@ -596,6 +599,7 @@ class cloud::loadbalancer(
         state         => $keepalived_state,
         track_script  => ['haproxy'],
         priority      => $keepalived_priority,
+        preempt_delay => $keepalived_preempt_delay,
         auth_type     => $keepalived_auth_type,
         auth_pass     => $keepalived_auth_pass,
         notify_master => $::cloud::params::start_haproxy_service,
