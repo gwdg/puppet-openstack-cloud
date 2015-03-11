@@ -158,14 +158,15 @@ class cloud::compute(
     log_dir             => $log_dir,
     log_facility        => $log_facility,
     use_syslog          => $use_syslog,
-    nova_shell          => '/bin/bash',
+#    nova_shell          => '/bin/bash',
   }
 
-  if $nova_db_use_slave {
-    nova_config {'database/slave_connection': value => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:3307/nova?charset=utf8" }
-  } else {
-    nova_config {'database/slave_connection': ensure => absent }
-  }
+#  FIXME: already handled in nova::db
+#  if $nova_db_use_slave {
+#   nova_config {'database/slave_connection': value => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:3307/nova?charset=utf8" }
+#  } else {
+#    nova_config {'database/slave_connection': ensure => absent }
+#  }
 
   class { 'nova::network::neutron':
       neutron_admin_password => $neutron_password,
@@ -192,7 +193,8 @@ class cloud::compute(
     command => 'nova-manage db sync',
     user    => 'nova',
     path    => '/usr/bin',
-    unless  => "/usr/bin/mysql nova -h ${nova_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql nova -h ${nova_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+    require => Package['nova-common'],
   }
 
 }
