@@ -168,6 +168,9 @@ class cloud::compute(
 #    nova_config {'database/slave_connection': ensure => absent }
 #  }
 
+  # Make sure python-memcached is installed (needed for nova-api and seems to be missng from the dependencies)
+  package { 'python-memcache': } -> Package['nova-common']
+
   class { 'nova::network::neutron':
       neutron_admin_password => $neutron_password,
       neutron_admin_auth_url => "${neutron_protocol}://${neutron_endpoint}:35357/v2.0",
