@@ -55,6 +55,11 @@
 #   Should be an hash.
 #   Default to {}
 #
+# [*rabbitmq_master_name*]
+# #   (required) Name of the rabbitmq master node.
+# #   Defaults to $::hostname
+#
+#
 class cloud::messaging(
   $erlang_cookie,
   $cluster_node_type = 'disc',
@@ -64,6 +69,9 @@ class cloud::messaging(
   $rabbitmq_ip       = $::ipaddress,
   $rabbitmq_port     = '5672',
   $firewall_settings = {},
+
+  # New stuff
+  $rabbitmq_master_name = 'controller1',
 ){
 
   # we ensure having an array
@@ -144,7 +152,9 @@ class cloud::messaging(
       server_names      => $::hostname,
       ipaddresses       => $rabbitmq_ip,
       ports             => $rabbitmq_port,
-      options           => 'check inter 5s rise 2 fall 3'
+      options           => 
+#        'check inter 5s rise 2 fall 3',
+        inline_template('check inter 5s rise 2 fall 3 <% if @hostname != @rabbitmq_master_name -%>backup<% end %>')
     }
   }
 
