@@ -712,9 +712,12 @@ class cloud::loadbalancer(
     ip                => $rabbitmq,
     port              => $rabbitmq_port,
     options           => {
-      'mode'    => 'tcp',
-      'option'  => ['tcpka', 'tcplog', 'forwardfor'],
-      'balance' => 'roundrobin',
+      'mode'            => 'tcp',
+      'option'          => ['tcpka', 'tcplog', 'forwardfor', 'clitcpka'],
+      # Timeouts must be > /proc/sys/net/ipv4/tcp_keepalive_time (= 2h on Ubuntu 14.04), to allow for client tcp to send keepalives
+      'timeout server'  => '180m',
+      'timeout client'  => '180m',
+      'balance'         => 'roundrobin',
     },
     bind_options      => $rabbitmq_bind_options,
     firewall_settings => $firewall_settings,
