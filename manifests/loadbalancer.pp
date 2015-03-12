@@ -520,6 +520,7 @@ class cloud::loadbalancer(
   $ks_swift_public_port             = 8080,
   $ks_trove_public_port             = 8779,
   $rabbitmq_port                    = 5672,
+
   $horizon_port                     = 80,
   $horizon_ssl_port                 = 443,
   $spice_port                       = 6082,
@@ -536,6 +537,7 @@ class cloud::loadbalancer(
   # New settings
   $haproxy_ensure                   = 'present',
   $keepalived_preempt_delay         = undef,
+  $rabbitmq_management_port         = 15672,
 
 ){
 
@@ -685,6 +687,7 @@ class cloud::loadbalancer(
     bind_options      => $spice_bind_options,
     firewall_settings => $firewall_settings,
   }
+
   cloud::loadbalancer::binding { 'novnc_cluster':
     ip                => $novnc,
     port              => $novnc_port,
@@ -698,6 +701,7 @@ class cloud::loadbalancer(
     bind_options      => $novnc_bind_options,
     firewall_settings => $firewall_settings,
   }
+
   cloud::loadbalancer::binding { 'rabbitmq_cluster':
     ip                => $rabbitmq,
     port              => $rabbitmq_port,
@@ -709,12 +713,26 @@ class cloud::loadbalancer(
     bind_options      => $rabbitmq_bind_options,
     firewall_settings => $firewall_settings,
   }
+
+  cloud::loadbalancer::binding { 'rabbitmq_management_cluster':
+    ip                => $rabbitmq,
+    port              => $rabbitmq_management_port,
+    options           => {
+      'mode'    => 'tcp',
+      'option'  => ['tcpka', 'tcplog', 'forwardfor'],
+      'balance' => 'roundrobin',
+    },
+    bind_options      => $rabbitmq_bind_options,
+    firewall_settings => $firewall_settings,
+  }
+
   cloud::loadbalancer::binding { 'trove_api_cluster':
     ip                => $trove_api,
     port              => $ks_trove_public_port,
     bind_options      => $trove_bind_options,
     firewall_settings => $firewall_settings,
   }
+
   cloud::loadbalancer::binding { 'glance_api_cluster':
     ip                => $glance_api,
     options           => {
@@ -728,6 +746,7 @@ class cloud::loadbalancer(
     bind_options      => $glance_api_bind_options,
     firewall_settings => $firewall_settings,
   }
+
   cloud::loadbalancer::binding { 'glance_registry_cluster':
     ip                => $glance_registry,
     port              => $ks_glance_registry_internal_port,

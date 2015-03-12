@@ -56,22 +56,26 @@
 #   Default to {}
 #
 # [*rabbitmq_master_name*]
-# #   (required) Name of the rabbitmq master node.
-# #   Defaults to $::hostname
+#   (required) Name of the rabbitmq master node.
+#   Defaults to $::hostname
 #
+# [*rabbitmq_management_port*]
+#   (required) Port for the rabbitmq management api / webui.
+#   Defaults to 15672
 #
 class cloud::messaging(
   $erlang_cookie,
-  $cluster_node_type = 'disc',
-  $rabbit_names      = $::hostname,
-  $rabbit_password   = 'rabbitpassword',
-  $haproxy_binding   = false,
-  $rabbitmq_ip       = $::ipaddress,
-  $rabbitmq_port     = '5672',
-  $firewall_settings = {},
+  $cluster_node_type        = 'disc',
+  $rabbit_names             = $::hostname,
+  $rabbit_password          = 'rabbitpassword',
+  $haproxy_binding          = false,
+  $rabbitmq_ip              = $::ipaddress,
+  $rabbitmq_port            = '5672',
+  $rabbitmq_management_port = '15672',
+  $firewall_settings        = {},
 
   # New stuff
-  $rabbitmq_master_name = 'controller1',
+  $rabbitmq_master_name     = 'controller1',
 ){
 
   # we ensure having an array
@@ -141,7 +145,7 @@ class cloud::messaging(
       extras => $firewall_settings,
     }
     cloud::firewall::rule{ '100 allow rabbitmq management access':
-      port   => '55672',
+      port   => $rabbitmq_management_port,
       extras => $firewall_settings,
     }
   }
@@ -153,6 +157,16 @@ class cloud::messaging(
       ipaddresses       => $rabbitmq_ip,
       ports             => $rabbitmq_port,
       options           => 
+#        'check inter 5s rise 2 fall 3',
+        inline_template('check inter 5s rise 2 fall 3 <% if @hostname != @rabbitmq_master_name -%>backup<% end %>')
+    }
+
+    @@haproxy::balancermember{"${::fqdn}-rabbitmq-management":
+      listening_service => 'rabbitmq_management_cluster',
+      server_names      => $::hostname,
+      ipaddresses       => $rabbitmq_ip,
+      ports             => $rabbitmq_management_port,
+      options           =>
 #        'check inter 5s rise 2 fall 3',
         inline_template('check inter 5s rise 2 fall 3 <% if @hostname != @rabbitmq_master_name -%>backup<% end %>')
     }

@@ -41,6 +41,8 @@ monitor fail if spice_dead
 <%- if @rabbitmq -%>
 acl rabbitmq_dead nbsrv(rabbitmq_cluster) lt 1
 monitor fail if rabbitmq_dead
+acl rabbitmq_management_dead nbsrv(rabbitmq_management_cluster) lt 1
+monitor fail if rabbitmq_management_dead
 <%- end -%>
 <%- if @glance_api -%>
 acl glance_api_dead nbsrv(glance_api_cluster) lt 1
