@@ -78,6 +78,9 @@ class cloud::volume(
   $nova_endpoint_type         = 'publicURL'
 ) {
 
+  # Make sure the client is installed on all cinder nodes
+  include ::cinder::client
+
   # Disable twice logging if syslog is enabled
   if $use_syslog {
     $log_dir = false
