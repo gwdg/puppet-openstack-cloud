@@ -23,7 +23,7 @@
 #   (optional) The IP address of the server running the console proxy client
 #   Defaults to '127.0.0.1'
 #
-# [*libvirt_type*]
+# [*libvirt_virt_type*]
 #   (optional) Libvirt domain type. Options are: kvm, lxc, qemu, uml, xen
 #   Replaces libvirt_type
 #   Defaults to 'kvm'
@@ -129,7 +129,7 @@
 #
 class cloud::compute::hypervisor(
   $server_proxyclient_address = '127.0.0.1',
-  $libvirt_type               = 'kvm',
+  $libvirt_virt_type          = 'kvm',
   $ks_nova_public_proto       = 'http',
   $ks_nova_public_host        = '127.0.0.1',
   $nova_ssh_private_key       = undef,
@@ -160,8 +160,8 @@ class cloud::compute::hypervisor(
   include 'cloud::network'
   include 'cloud::network::vswitch'
 
-  if $libvirt_type == 'kvm' and ! $::vtx {
-    fail('libvirt_type is set to KVM and VTX seems to be disabled on this node.')
+  if $libvirt_virt_type == 'kvm' and ! $::vtx {
+    fail('libvirt_virt_type is set to KVM and VTX seems to be disabled on this node.')
   }
 
   if $nfs_enabled {
@@ -381,7 +381,7 @@ Host *
   }
 
   class { 'nova::compute::libvirt':
-    libvirt_type            => $libvirt_type,
+    libvirt_virt_type       => $libvirt_virt_type,
     # Needed to support migration but we still use Spice:
     vncserver_listen        => '0.0.0.0',
     migration_support       => true,
