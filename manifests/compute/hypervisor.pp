@@ -180,7 +180,8 @@ class cloud::compute::hypervisor(
           }
         }
         ensure_resource('class', 'nfs', {})
-        create_resources('types::mount', $nfs_mount)
+#        create_resources('types::mount', $nfs_mount)
+        create_resources('mount', $nfs_mount)
 
         # Not using /var/lib/nova/instances may cause side effects.
         if $filesystem_store_datadir != '/var/lib/nova/instances' {
@@ -262,7 +263,9 @@ Host *
     vncproxy_protocol             => $ks_console_public_proto,
     vncproxy_port                 => $novnc_port,
     virtio_nic                    => false,
-    neutron_enabled               => true
+    neutron_enabled               => true,
+    # FIXME: set default_availability_zone here
+    default_availability_zone     => $::cloud::compute::availability_zone,
   }
 
   if $::osfamily == 'RedHat' {
