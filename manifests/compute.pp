@@ -119,8 +119,12 @@ class cloud::compute(
   $neutron_password         = 'neutronpassword',
   $neutron_region_name      = 'RegionOne',
   $memcache_servers         = ['127.0.0.1:11211'],
+  # Is set in cloud::compute::hypervisor through nova::compute
   $availability_zone        = 'RegionOne',
-  $cinder_endpoint_type     = 'publicURL'
+  $cinder_endpoint_type     = 'publicURL',
+
+  # Create / upgrade nova db. Only necessary on controller node(s)
+  $db_sync                  = false,
 ) {
 
   if !defined(Resource['nova_config']) {
@@ -193,12 +197,13 @@ class cloud::compute(
   # TODO(Goneri)
   # We have to do this only on the primary node of the galera cluster to avoid race condition
   # https://github.com/enovance/puppet-openstack-cloud/issues/156
-  exec {'nova_db_sync':
-    command => 'nova-manage db sync',
-    user    => 'nova',
-    path    => '/usr/bin',
-    unless  => "/usr/bin/mysql nova -h ${nova_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
-    require => Package['nova-common'],
+  if $db_sync {
+    exec {'nova_db_sync':
+      command => 'nova-manage db sync',
+      user    => 'nova',
+      path    => '/usr/bin',
+      unless  => "/usr/bin/mysql nova -h ${nova_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+      require => Package['nova-common'],
+    }
   }
-
 }
