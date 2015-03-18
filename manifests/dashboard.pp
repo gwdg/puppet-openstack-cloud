@@ -125,6 +125,9 @@ class cloud::dashboard(
   $vhost_extra_params        = {},
   $neutron_extra_options     = {},
   $firewall_settings         = {},
+
+  # New parameters
+  $lb_eth                    = '127.0.0.1',
 ) {
 
   # We build the param needed for horizon class
@@ -185,7 +188,7 @@ class cloud::dashboard(
   @@haproxy::balancermember{"${::fqdn}-horizon":
     listening_service => 'horizon_cluster',
     server_names      => $::hostname,
-    ipaddresses       => $api_eth,
+    ipaddresses       => $lb_eth,
     ports             => $horizon_port,
     options           => "check inter 2000 rise 2 fall 5 cookie ${::hostname}"
   }
@@ -202,7 +205,7 @@ class cloud::dashboard(
     @@haproxy::balancermember{"${::fqdn}-horizon-ssl":
       listening_service => 'horizon_ssl_cluster',
       server_names      => $::hostname,
-      ipaddresses       => $api_eth,
+      ipaddresses       => $lb_eth,
       ports             => $horizon_ssl_port,
       options           => "check inter 2000 rise 2 fall 5 cookie ${::hostname}"
     }
