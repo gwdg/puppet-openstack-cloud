@@ -1,6 +1,6 @@
 class cloud::role::infra inherits ::cloud::role::base {
 
-  class { '::cloud': }                      ->
-  class { '::cloud::role::aptly': }         ->
-  class { '::cloud::role::dns_forwarder': }
+  class { '::cloud': }                          ->
+  class { '::cloud::profile::aptly': }          ->
+  class { '::cloud::profile::dns_forwarder': }
 }
