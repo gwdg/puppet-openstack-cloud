@@ -1,0 +1,3 @@
+class cloud::role::base {
+
+}
