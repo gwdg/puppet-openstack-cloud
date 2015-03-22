@@ -139,14 +139,20 @@ class cloud(
 
   include ::stdlib
 
+#  Apt::Ppa <| |> -> Package <| title != 'software-properties-common' |>
+
+  Apt::Source <| |> -> Package <| |>
+
   # Setup apt-cacher-ng (only for vagrant for now)
   if ! $production {
     class {'::apt':
-      proxy_host => 'puppetmaster.cloud.gwdg.de',
-      proxy_port => '3142',
-      
-      # Prevent cycles in conjunction with apt::ppa
- #   } -> Package<||>
+#      proxy_host => 'puppetmaster.cloud.gwdg.de',
+#      proxy_port => '3142',
+
+      # Purge all repos not managed by puppet
+      purge_sources_list    => true,
+      purge_sources_list_d  => true,
+      fancy_progress        => true,
     }
   }
 
@@ -160,19 +166,8 @@ class cloud(
     '/etc/motd':
       ensure  => file,
       mode    => '0644',
-      content => "
-############################################################################
-# ${motd_title} #
-############################################################################
-#                                                                          #
-#                         *** RESTRICTED ACCESS ***                        #
-#  Only the authorized users may access this system.                       #
-#  Any attempted unauthorized access or any action affecting this computer #
-#  system is punishable by the law of local country.                       #
-#                                                                          #
-############################################################################
-This node is under the control of Puppet ${::puppetversion}.
-";
+      content => template('cloud/motd.txt'),
+# ${motd_title} # This node is under the control of Puppet ${::puppetversion} #
   }
 
   # DNS (does not work with resolvconf on ubuntu)
@@ -197,12 +192,12 @@ This node is under the control of Puppet ${::puppetversion}.
   create_resources('limits::limits', $limits)
 
   # Some Ubuntu specific stuff
-  if $::operatingsystem == 'Ubuntu' {
+#  if $::operatingsystem == 'Ubuntu' {
 
     # Add cloud archive for Juno
-    apt::ppa { 'cloud-archive:juno': }
+#    apt::ppa { 'cloud-archive:juno': }
 
-  }
+#  }
 
   # sysctl values
   include ::sysctl::base
