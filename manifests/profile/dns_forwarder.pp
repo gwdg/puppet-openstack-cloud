@@ -1,26 +1,35 @@
 #
-class cloud::profile::dns_forwarder {
+class cloud::profile::dns_forwarder(
+
+  $forwarders   = [],
+  $zones        = {},
+  $records      = {},
+
+) {
 
   include dns::server
 
   # Forwarders
   dns::server::options { '/etc/bind/named.conf.options':
-    forwarders => ['134.76.10.46', '134.76.33.21'],
+    forwarders => $forwarders,
   }
+
+  create_resources('dns::zone', $zones)
+
 
   # Forward Zone
-  dns::zone { 'cloud.gwdg.de':
-    soa         => 'ns1.cloud.gwdg.de',
-    soa_email   => 'admin.cloud.gwdg.de',
-    nameservers => ['ns1'],
-  }
+#  dns::zone { 'cloud.gwdg.de':
+#    soa         => 'ns1.cloud.gwdg.de',
+#    soa_email   => 'admin.cloud.gwdg.de',
+#    nameservers => ['ns1'],
+#  }
 
   # Reverse Zone
-  dns::zone { '254.1.10.IN-ADDR.ARPA':
-    soa         => 'ns1.cloud.gwdg.de',
-    soa_email   => 'admin.cloud.gwdg.de',
-    nameservers => ['ns1'],
-  }
+#  dns::zone { '254.1.10.IN-ADDR.ARPA':
+#   soa         => 'ns1.cloud.gwdg.de',
+#    soa_email   => 'admin.cloud.gwdg.de',
+#    nameservers => ['ns1'],
+#  }
 
   # A Records:
   dns::record::a {
