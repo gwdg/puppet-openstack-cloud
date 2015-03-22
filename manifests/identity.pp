@@ -623,7 +623,7 @@ class cloud::identity (
 
     sshkeys::set_authorized_key { 'keystone':
       local_user  => 'keystone',
-      remote_user => 'keystone@controller1.cloud.gwdg.de',
+      remote_user => "keystone@${keystone_master_name}.${::domain}",
     }
 
     # Restrict keystone account to just scp
@@ -651,13 +651,13 @@ class cloud::identity (
 
     sshkeys::set_private_key { 'keystone':
       local_user    => 'keystone',
-      remote_user   => "keystone@controller1.cloud.gwdg.de",
+      remote_user   => "keystone@${keystone_master_name}.${::domain}",
       require       => File['/var/lib/keystone/.ssh'],
     }
 
     # Copy files
     exec { 'keystone-copy-ssl-certs':
-      command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}.cloud.gwdg.de:/etc/keystone/ssl /etc/keystone/",
+      command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
       creates   => '/etc/keystone/ssl/synced_from_master',
       user      => 'keystone',
       require   => Sshkeys::Set_private_key['keystone'],
