@@ -611,9 +611,7 @@ class cloud::identity (
     }
   }
 
-  # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)
-
-    
+  # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)  
   if $::hostname == $keystone_master_name {
 
     sshkeys::create_ssh_key { 'keystone':
@@ -664,7 +662,6 @@ class cloud::identity (
       notify    => Service['keystone']
     }
   }
-
 
   class {'ceilometer::keystone::auth':
     admin_address     => $ks_ceilometer_admin_host,
