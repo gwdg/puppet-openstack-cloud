@@ -139,21 +139,27 @@ class cloud(
 
   include ::stdlib
 
+  # Apt setup
 #  Apt::Ppa <| |> -> Package <| title != 'software-properties-common' |>
 
   Apt::Source <| |> -> Package <| |>
 
-  # Setup apt-cacher-ng (only for vagrant for now)
-  if ! $production {
-    class {'::apt':
-#      proxy_host => 'puppetmaster.cloud.gwdg.de',
-#      proxy_port => '3142',
+  # Activate Force-Yes "true", so that downgrades from aptly work in puppet
+  file { '/etc/apt/apt.conf.d/99aptly':
+    content => 'APT::Get::Force-Yes "true";',
+  }
+  File['/etc/apt/apt.conf.d/99aptly'] -> Package <| |>
 
-      # Purge all repos not managed by puppet
-      purge_sources_list    => true,
-      purge_sources_list_d  => true,
-      fancy_progress        => true,
-    }
+  class {'::apt':
+
+    # For apt-cacher-ng
+#   proxy_host => 'puppetmaster.cloud.gwdg.de',
+#   proxy_port => '3142',
+
+    # Purge all repos not managed by puppet
+    purge_sources_list    => true,
+    purge_sources_list_d  => true,
+    fancy_progress        => true,
   }
 
   if ! ($::osfamily in [ 'RedHat', 'Debian' ]) {
