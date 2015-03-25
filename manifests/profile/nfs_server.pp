@@ -1,5 +1,9 @@
 #
-class cloud::profile::nfs_server {
+class cloud::profile::nfs_server (
+
+  $server = '',
+  $clients = [], 
+) {
 
   include ::nfs::server
 
@@ -7,8 +11,8 @@ class cloud::profile::nfs_server {
   nfs::server::export { '/storage/instances':
     nfstag  => 'instances',
     ensure  => 'mounted',
-    server  => '10.1.200.6',
-    clients => ['10.1.200.0/24(rw,insecure,async,no_root_squash)'],
+    server  => $server,
+    clients => $clients,
     mount   => '/var/lib/nova/instances',
   }
 
@@ -16,8 +20,8 @@ class cloud::profile::nfs_server {
   nfs::server::export { '/storage/images':
     nfstag  => 'images',
     ensure  => 'mounted',
-    server  => '10.1.200.6',
-    clients => ['10.1.200.0/24(rw,insecure,async,no_root_squash)'],
+    server  => $server,
+    clients => $clients,
     mount   => '/var/lib/glance/images',
   }
 
@@ -25,8 +29,8 @@ class cloud::profile::nfs_server {
   nfs::server::export { '/storage/image-cache':
     nfstag  => 'image-cache',
     ensure  => 'mounted',
-    server  => '10.1.200.6',
-    clients => ['10.1.200.0/24(rw,insecure,async,no_root_squash)'],
+    server  => $server,
+    clients => $clients,
     mount   => '/var/lib/glance/image-cache',
   }
 
@@ -34,8 +38,8 @@ class cloud::profile::nfs_server {
   nfs::server::export { '/storage/volumes':
     nfstag  => 'cinder',
     ensure  => 'mounted',
-    server  => '10.1.200.6',
-    clients => ['10.1.200.0/24(rw,insecure,async,no_root_squash)'],
+    server  => $server,
+    clients => $clients,
 #   mount   => '/var/lib/nova/instances',
   }
 }
