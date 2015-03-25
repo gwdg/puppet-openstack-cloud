@@ -171,17 +171,17 @@ class cloud::compute::hypervisor(
       # backend.
       if $nfs_device {
         nova_config { 'DEFAULT/instances_path': value => $filesystem_store_datadir; }
-        $nfs_mount = {
-          "${filesystem_store_datadir}" => {
-            'ensure'  => 'mounted',
-            'fstype'  => 'nfs',
-            'device'  => $nfs_device,
-            'options' => $nfs_options
-          }
-        }
-        ensure_resource('class', 'nfs', {})
+#        $nfs_mount = {
+#          "${filesystem_store_datadir}" => {
+#            'ensure'  => 'mounted',
+#            'fstype'  => 'nfs',
+#            'device'  => $nfs_device,
+#            'options' => $nfs_options
+#          }
+#        }
+#        ensure_resource('class', 'nfs', {})
 #        create_resources('types::mount', $nfs_mount)
-        create_resources('mount', $nfs_mount)
+#        create_resources('mount', $nfs_mount)
 
         # Not using /var/lib/nova/instances may cause side effects.
         if $filesystem_store_datadir != '/var/lib/nova/instances' {
