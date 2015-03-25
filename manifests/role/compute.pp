@@ -12,6 +12,7 @@ class cloud::role::compute inherits ::cloud::role::base {
 
     class { '::cloud': }                                ->
     class { '::cloud::network::l3': }                   ->
+    class { '::cloud::network::metadata': }             ->
     class { '::cloud::compute::hypervisor': }           ->
 
     class { '::cloud::auth_file': }
