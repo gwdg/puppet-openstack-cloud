@@ -6,9 +6,9 @@ class cloud::role::compute inherits ::cloud::role::base {
 
     # Mount shared storage for live migrations
     Nfs::Client::Mount <<| nfstag == 'instances' |>> {  
-        ensure  => 'mounted',
-        options => '_netdev,vers=3',
-        before  => Package['nova-common'],
+        ensure      => 'mounted',
+        options     => '_netdev,vers=3',
+        require     => Package['nova-common'],
     } ->
 
     file { '/var/lib/nova/instances':
@@ -17,6 +17,9 @@ class cloud::role::compute inherits ::cloud::role::base {
       recurse   => true,
       notify    => Service['nova-compute'],
     }
+
+    # Use fixe uids / gids for nova user
+    User['nova'] -> Package['nova-common']
 
     class { '::cloud': }                                ->
     class { '::cloud::network::l3': }                   ->
