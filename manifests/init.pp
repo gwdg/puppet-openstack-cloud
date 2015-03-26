@@ -134,6 +134,8 @@ class cloud(
   $manage_root_password = false,
   $production           = false,
   $ntp_servers          = [],
+  $groups               = {},
+  $users                = {},
 
 ) {
 
@@ -141,6 +143,10 @@ class cloud(
 
   # Apt setup
 #  Apt::Ppa <| |> -> Package <| title != 'software-properties-common' |>
+
+  Package {
+    provider => 'apt',    
+  }
 
   Apt::Source <| |> -> Package <| |>
 
@@ -161,6 +167,13 @@ class cloud(
     purge_sources_list_d  => true,
     fancy_progress        => true,
   }
+
+  # Create users / groups whose uids / gids need to be in sync on different systems
+#  Group <| |>   -> User <| |>
+#  User <| |>    -> Package <| |>
+
+  create_resources(group,   $groups)
+  create_resources(user,    $users)
 
   if ! ($::osfamily in [ 'RedHat', 'Debian' ]) {
     fail("OS family unsuppored yet (${::osfamily}), module puppet-openstack-cloud only support RedHat or Debian")
