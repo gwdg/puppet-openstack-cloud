@@ -145,7 +145,8 @@ class cloud(
 #  Apt::Ppa <| |> -> Package <| title != 'software-properties-common' |>
 
   Package {
-    provider => 'apt',    
+    provider        => 'apt',    
+    install_options => ['--no-install-recommends'],
   }
 
   Apt::Source <| |> -> Package <| |>
