@@ -8,7 +8,7 @@ class cloud::profile::aptly {
     purge_configs   => true,
   }
 
-  apache::vhost { 'puppetmaster.cloud.gwg.de':
+  apache::vhost { 'puppetmaster.dev.cloud.gwg.de':
     port          => '80',
     docroot       => '/var/lib/aptly/public',
   }
