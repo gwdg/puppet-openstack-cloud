@@ -85,6 +85,17 @@ class cloud::messaging(
   Class['rabbitmq'] -> Rabbitmq_user <<| |>>
   Class['rabbitmq'] -> Rabbitmq_user_permissions <<| |>>
 
+  # Differentiate between master and slave nodes to allow automatic cluster join
+  if $::hostname != $rabbitmq_master_name {
+    $clustername                = "rabbit@${rabbitmq_master_name}.${::domain}"
+    $sleep_after_state_change   = "5"
+    exec { 'join-rabbitmq-cluster':
+      command   => "/usr/sbin/rabbitmqctl stop_app; /bin/sleep ${sleep_after_state_change}; /usr/sbin/rabbitmqctl join_cluster rabbit@${rabbitmq_master_name}; /usr/sbin/rabbitmqctl start_app; /bin/sleep ${sleep_after_state_change}",
+      unless    => "/usr/sbin/rabbitmqctl -q cluster_status | grep '{cluster_name,<<\"${clustername}\">>}'",
+      require   => Class['rabbitmq'],
+    }
+  }
+
   # Packaging issue: https://bugzilla.redhat.com/show_bug.cgi?id=1033305
   if $::osfamily == 'RedHat' {
     $package_provider = 'yum'
