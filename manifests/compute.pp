@@ -36,6 +36,10 @@
 #   (optional) Password to connect to nova database
 #   Defaults to 'novapassword'
 #
+# [*nova_db_idle_timeout*]
+#   (optional) Timeout before idle SQL connections are reaped.
+#   Defaults to 5000
+#
 # [*rabbit_hosts*]
 #   (optional) List of RabbitMQ servers. Should be an array.
 #   Defaults to ['127.0.0.1:5672']
@@ -105,6 +109,7 @@ class cloud::compute(
   $nova_db_use_slave        = false,
   $nova_db_user             = 'nova',
   $nova_db_password         = 'novapassword',
+  $nova_db_idle_timeout     = 5000,
   $rabbit_hosts             = ['127.0.0.1:5672'],
   $rabbit_password          = 'rabbitpassword',
   $ks_glance_internal_host  = '127.0.0.1',
@@ -119,12 +124,8 @@ class cloud::compute(
   $neutron_password         = 'neutronpassword',
   $neutron_region_name      = 'RegionOne',
   $memcache_servers         = ['127.0.0.1:11211'],
-  # Is set in cloud::compute::hypervisor through nova::compute
   $availability_zone        = 'RegionOne',
-  $cinder_endpoint_type     = 'publicURL',
-
-  # Create / upgrade nova db. Only necessary on controller node(s)
-  $db_sync                  = false,
+  $cinder_endpoint_type     = 'publicURL'
 ) {
 
   if !defined(Resource['nova_config']) {
@@ -150,30 +151,27 @@ class cloud::compute(
   $encoded_password = uriescape($nova_db_password)
 
   class { 'nova':
-    database_connection => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}/nova?charset=utf8",
-    mysql_module        => '2.2',
-    rabbit_userid       => 'nova',
-    rabbit_hosts        => $rabbit_hosts,
-    rabbit_password     => $rabbit_password,
-    glance_api_servers  => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
-    memcached_servers   => $memcache_servers,
-    verbose             => $verbose,
-    debug               => $debug,
-    log_dir             => $log_dir,
-    log_facility        => $log_facility,
-    use_syslog          => $use_syslog,
-#    nova_shell          => '/bin/bash',
+    database_connection   => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}/nova?charset=utf8",
+    database_idle_timeout => $nova_db_idle_timeout,
+    mysql_module          => '2.2',
+    rabbit_userid         => 'nova',
+    rabbit_hosts          => $rabbit_hosts,
+    rabbit_password       => $rabbit_password,
+    glance_api_servers    => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
+    memcached_servers     => $memcache_servers,
+    verbose               => $verbose,
+    debug                 => $debug,
+    log_dir               => $log_dir,
+    log_facility          => $log_facility,
+    use_syslog            => $use_syslog,
+    nova_shell            => '/bin/bash',
   }
 
-#  FIXME: already handled in nova::db
-#  if $nova_db_use_slave {
-#   nova_config {'database/slave_connection': value => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:3307/nova?charset=utf8" }
-#  } else {
-#    nova_config {'database/slave_connection': ensure => absent }
-#  }
-
-  # Make sure python-memcached is installed (needed for nova-api and seems to be missng from the dependencies)
-  package { 'python-memcache': } -> Package['nova-common']
+  if $nova_db_use_slave {
+    nova_config {'database/slave_connection': value => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:3307/nova?charset=utf8" }
+  } else {
+    nova_config {'database/slave_connection': ensure => absent }
+  }
 
   class { 'nova::network::neutron':
       neutron_admin_password => $neutron_password,
@@ -184,8 +182,7 @@ class cloud::compute(
 
   nova_config {
     'DEFAULT/resume_guests_state_on_host_boot': value => true;
-    # FIXME: this is already set in ::nova::compute
-#    'DEFAULT/default_availability_zone':        value => $availability_zone;
+    'DEFAULT/default_availability_zone':        value => $availability_zone;
     'DEFAULT/servicegroup_driver':              value => 'mc';
     'DEFAULT/glance_num_retries':               value => '10';
     'DEFAULT/cinder_catalog_info':              value => "volume:cinder:${cinder_endpoint_type}";
@@ -197,13 +194,11 @@ class cloud::compute(
   # TODO(Goneri)
   # We have to do this only on the primary node of the galera cluster to avoid race condition
   # https://github.com/enovance/puppet-openstack-cloud/issues/156
-  if $db_sync {
-    exec {'nova_db_sync':
-      command => 'nova-manage db sync',
-      user    => 'nova',
-      path    => '/usr/bin',
-      unless  => "/usr/bin/mysql nova -h ${nova_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
-      require => Package['nova-common'],
-    }
+  exec {'nova_db_sync':
+    command => 'nova-manage db sync',
+    user    => 'nova',
+    path    => '/usr/bin',
+    unless  => "/usr/bin/mysql nova -h ${nova_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
   }
+
 }
