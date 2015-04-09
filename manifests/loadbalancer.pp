@@ -485,6 +485,10 @@
 #         *_db_idle_timeout for all services to be a little less
 #         than this timeout.
 #
+# [*api_timeout*]
+#   (optional) Timeout for API services connections
+#   Defaults to '90m'.
+#
 # [*vip_public_ip*]
 #  (optional) Array or string for public VIP
 #  Should be part of keepalived_public_ips
@@ -603,6 +607,7 @@ class cloud::loadbalancer(
   $sensu_api_port                   = 4568,
   $redis_port                       = 6379,
   $galera_timeout                   = '90m',
+  $api_timeout                      = '90m',
   $vip_public_ip                    = ['127.0.0.1'],
   $vip_internal_ip                  = false,
   $vip_monitor_ip                   = false,
@@ -618,6 +623,14 @@ class cloud::loadbalancer(
 ){
 
   include cloud::params
+
+  $common_tcp_options = {
+    'mode'           => 'tcp',
+    'option'         => ['tcpka', 'tcplog', 'forwardfor'],
+    'balance'        => 'source',
+    'timeout server' => $api_timeout,
+    'timeout client' => $api_timeout,
+  }
 
   if $keepalived_vrrp_interface {
     $keepalived_vrrp_interface_real = $keepalived_vrrp_interface
@@ -716,6 +729,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'keystone_api_cluster':
     ip                => $keystone_api,
     port              => $ks_keystone_public_port,
+    options           => $common_tcp_options,
     bind_options      => $keystone_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -723,6 +737,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'keystone_api_admin_cluster':
     ip                => $keystone_api_admin,
     port              => $ks_keystone_admin_port,
+    options           => $common_tcp_options,
     bind_options      => $keystone_admin_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -738,6 +753,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'nova_api_cluster':
     ip                => $nova_api,
     port              => $ks_nova_public_port,
+    options           => $common_tcp_options,
     bind_options      => $nova_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -745,6 +761,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'ec2_api_cluster':
     ip                => $ec2_api,
     port              => $ks_ec2_public_port,
+    options           => $common_tcp_options,
     bind_options      => $ec2_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -752,6 +769,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'metadata_api_cluster':
     ip                => $metadata_api,
     port              => $ks_metadata_public_port,
+    options           => $common_tcp_options,
     bind_options      => $metadata_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -780,13 +798,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'spice_cluster':
     ip                => $spice,
     port              => $spice_port,
-    options           => {
-      'mode'           => 'tcp',
-      'option'         => ['tcpka', 'tcplog', 'forwardfor'],
-      'balance'        => 'source',
-      'timeout server' => '120m',
-      'timeout client' => '120m',
-    },
+    options           => $common_tcp_options,
     bind_options      => $spice_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -794,13 +806,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'novnc_cluster':
     ip                => $novnc,
     port              => $novnc_port,
-    options           => {
-      'mode'           => 'tcp',
-      'option'         => ['tcpka', 'tcplog', 'forwardfor'],
-      'balance'        => 'source',
-      'timeout server' => '120m',
-      'timeout client' => '120m',
-    },
+    options           => $common_tcp_options,
     bind_options      => $novnc_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -814,6 +820,8 @@ class cloud::loadbalancer(
       # Timeouts must be > /proc/sys/net/ipv4/tcp_keepalive_time (= 2h on Ubuntu 14.04), to allow for client tcp to send keepalives
       'timeout server'  => '180m',
       'timeout client'  => '180m',
+      'timeout server'  => $api_timeout,
+      'timeout client'  => $api_timeout,
       'balance'         => 'roundrobin',
     },
     bind_options      => $rabbitmq_bind_options,
@@ -824,9 +832,11 @@ class cloud::loadbalancer(
     ip                => $rabbitmq,
     port              => $rabbitmq_management_port,
     options           => {
-      'mode'    => 'tcp',
-      'option'  => ['tcpka', 'tcplog', 'forwardfor'],
-      'balance' => 'roundrobin',
+      'mode'            => 'tcp',
+      'option'          => ['tcpka', 'tcplog', 'forwardfor'],
+      'balance'         => 'roundrobin',
+      'timeout server'  => $api_timeout,
+      'timeout client'  => $api_timeout,
     },
     bind_options      => $rabbitmq_bind_options,
     firewall_settings => $firewall_settings,
@@ -835,19 +845,14 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'trove_api_cluster':
     ip                => $trove_api,
     port              => $ks_trove_public_port,
+    options           => $common_tcp_options,
     bind_options      => $trove_bind_options,
     firewall_settings => $firewall_settings,
   }
 
   cloud::loadbalancer::binding { 'glance_api_cluster':
     ip                => $glance_api,
-    options           => {
-      'mode'           => 'tcp',
-      'balance'        => 'source',
-      'option'         => ['tcpka', 'tcplog', 'forwardfor'],
-      'timeout server' => '120m',
-      'timeout client' => '120m',
-    },
+    options           => $common_tcp_options,
     port              => $ks_glance_api_public_port,
     bind_options      => $glance_api_bind_options,
     firewall_settings => $firewall_settings,
@@ -856,6 +861,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'glance_registry_cluster':
     ip                => $glance_registry,
     port              => $ks_glance_registry_internal_port,
+    options           => $common_tcp_options,
     bind_options      => $glance_registry_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -863,6 +869,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'neutron_api_cluster':
     ip                => $neutron_api,
     port              => $ks_neutron_public_port,
+    options           => $common_tcp_options,
     bind_options      => $neutron_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -870,6 +877,7 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'cinder_api_cluster':
     ip                => $cinder_api,
     port              => $ks_cinder_public_port,
+    options           => $common_tcp_options,
     bind_options      => $cinder_bind_options,
     firewall_settings => $firewall_settings,
   }
@@ -877,30 +885,33 @@ class cloud::loadbalancer(
   cloud::loadbalancer::binding { 'ceilometer_api_cluster':
     ip                => $ceilometer_api,
     port              => $ks_ceilometer_public_port,
+    options           => $common_tcp_options,
     bind_options      => $ceilometer_bind_options,
     firewall_settings => $firewall_settings,
   }
 
   if 'ssl' in $heat_api_bind_options {
-    $heat_api_options = {
-    'reqadd'  => 'X-Forwarded-Proto:\ https if { ssl_fc }' }
+    $heat_api_options = merge($common_tcp_options, {
+      'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
+    })
   } else {
-    $heat_api_options = {}
+    $heat_api_options = $common_tcp_options
   }
 
   cloud::loadbalancer::binding { 'heat_api_cluster':
     ip                => $heat_api,
     port              => $ks_heat_public_port,
-    bind_options      => $heat_api_bind_options,
     options           => $heat_api_options,
+    bind_options      => $heat_api_bind_options,
     firewall_settings => $firewall_settings,
   }
 
   if 'ssl' in $heat_cfn_bind_options {
-    $heat_cfn_options = {
-    'reqadd'  => 'X-Forwarded-Proto:\ https if { ssl_fc }' }
+    $heat_cfn_options = merge($common_tcp_options, {
+      'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
+    })
   } else {
-    $heat_cfn_options = { }
+    $heat_cfn_options = $common_tcp_options
   }
 
   cloud::loadbalancer::binding { 'heat_cfn_api_cluster':
@@ -912,10 +923,11 @@ class cloud::loadbalancer(
   }
 
   if 'ssl' in $heat_cloudwatch_bind_options {
-    $heat_cloudwatch_options = {
-    'reqadd'  => 'X-Forwarded-Proto:\ https if { ssl_fc }' }
+    $heat_cloudwatch_options = merge($common_tcp_options, {
+      'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
+    })
   } else {
-    $heat_cloudwatch_options = { }
+    $heat_cloudwatch_options = $common_tcp_options
   }
 
   cloud::loadbalancer::binding { 'heat_cloudwatch_api_cluster':
@@ -1001,8 +1013,8 @@ class cloud::loadbalancer(
       'mode'           => 'tcp',
       'balance'        => 'roundrobin',
       'option'         => ['tcpka', 'tcplog', 'httpchk'], #httpchk mandatory expect 200 on port 9000
-      'timeout client' => $galera_timeout,
-      'timeout server' => $galera_timeout,
+      'timeout client' => '90m',
+      'timeout server' => '90m',
     },
     bind_options => $galera_bind_options,
   }
@@ -1024,8 +1036,8 @@ class cloud::loadbalancer(
         'mode'           => 'tcp',
         'balance'        => 'roundrobin',
         'option'         => ['tcpka', 'tcplog', 'httpchk'], #httpchk mandatory expect 200 on port 9000
-        'timeout client' => $galera_timeout,
-        'timeout server' => $galera_timeout,
+        'timeout client' => '90m',
+        'timeout server' => '90m',
       },
       bind_options => $galera_bind_options,
     }
