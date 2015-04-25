@@ -421,7 +421,7 @@ class cloud::database::sql::mysql (
       }
     } # Debian
     default: {
-      err "${::osfamily} not supported yet"
+      fail("${::osfamily} not supported yet")
     }
   }
 
