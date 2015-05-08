@@ -46,8 +46,6 @@ class cloud::telemetry::collector(
   class { 'ceilometer::db':
     database_connection => $db_conn,
     sync_db             => true,
-    # FIXME: not contained in catalog error, probably use Mongodb_conn_validator['mongodb'] directly here
-#    require             => Mongodb_conn_validator['mongodb'],
   }
   class { 'ceilometer::collector': }
 
