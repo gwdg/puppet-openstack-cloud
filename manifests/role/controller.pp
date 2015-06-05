@@ -8,29 +8,37 @@ class cloud::role::controller inherits ::cloud::role::base {
     Nfs::Client::Mount <<| nfstag == 'images' |>> {
       ensure  => 'mounted',
       options => '_netdev,vers=3',
+      owner   => 'glance',
+      group   => 'glance',
       require => Package['glance-api'],
-    } ->
-
-    file { '/var/lib/glance/images':
-      owner     => 'glance', 
-      group     => 'glance', 
-      recurse   => true,
-      notify    => Service['glance-api'],
     } 
+
+#    ->
+
+#    file { '/var/lib/glance/images':
+#      owner     => 'glance', 
+#      group     => 'glance', 
+#      recurse   => true,
+#      notify    => Service['glance-api'],
+#    } 
 
     # Mount nfs storage for glance image-cache
     Nfs::Client::Mount <<| nfstag == 'image-cache' |>> {
         ensure  => 'mounted',
         options => '_netdev,vers=3',
+        owner   => 'glance',
+        group   => 'glance',
         require => Package['glance-api'],
-    } ->
+    } 
 
-    file { '/var/lib/glance/image-cache':
-      owner     => 'glance',
-      group     => 'glance',
-      recurse   => true,
-      notify    => Service['glance-api'],
-    }
+#    ->
+
+#    file { '/var/lib/glance/image-cache':
+#      owner     => 'glance',
+#      group     => 'glance',
+#      recurse   => true,
+#      notify    => Service['glance-api'],
+#    }
 
     class { '::cloud': }                                ->
 
