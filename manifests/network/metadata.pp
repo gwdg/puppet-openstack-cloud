@@ -15,8 +15,7 @@
 #
 # == Class: cloud::network::metadata
 #
-# Network Metadata node (need to be run once)
-# Could be managed by spof_node manifest
+# Network Metadata node
 #
 # === Parameters:
 #
@@ -77,23 +76,15 @@ class cloud::network::metadata(
   include 'cloud::network::vswitch'
 
   class { 'neutron::agents::metadata':
-    enabled          => $enabled,
-    shared_secret    => $neutron_metadata_proxy_shared_secret,
-    debug            => $debug,
-    metadata_ip      => $nova_metadata_server,
-    auth_url         => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0",
-    auth_password    => $ks_neutron_password,
-    auth_region      => $auth_region,
-    metadata_workers => $::processorcount,
-
-    # New stuff
-    metadata_protocol   => $ks_nova_internal_proto
+    enabled           => $enabled,
+    shared_secret     => $neutron_metadata_proxy_shared_secret,
+    debug             => $debug,
+    metadata_ip       => $nova_metadata_server,
+    auth_url          => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0",
+    auth_password     => $ks_neutron_password,
+    auth_region       => $auth_region,
+    metadata_workers  => $::processorcount,
+    metadata_protocol => $ks_nova_internal_proto,
   }
-
-# This is already handled by neutron::agents::metadata
-#
-#  neutron_metadata_agent_config {
-#    'DEFAULT/nova_metadata_protocol': value => $ks_nova_internal_proto;
-#  }
 
 }
