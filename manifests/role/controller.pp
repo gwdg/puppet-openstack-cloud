@@ -50,7 +50,9 @@ class cloud::role::controller inherits ::cloud::role::base {
     class { '::cloud::identity': }                      ->
     class { '::cloud::image::registry': }               ->
     class { '::cloud::image::api': }                    ->
+
     class { '::cloud::volume': }                        ->
+    class { '::cloud::volume::scheduler': }             ->
     class { '::cloud::volume::api': }                   ->
 
     class { '::cloud::compute::conductor': }            ->
