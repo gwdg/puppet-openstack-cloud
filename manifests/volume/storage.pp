@@ -91,6 +91,9 @@ class cloud::volume::storage(
 
   include 'cinder::volume'
 
+  # Needed as dep. of cinder::type
+  include 'cinder::client'
+
   if $cinder_backends {
 
     if has_key($cinder_backends, 'rbd') {
