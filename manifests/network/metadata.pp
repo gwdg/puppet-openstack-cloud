@@ -84,11 +84,16 @@ class cloud::network::metadata(
     auth_url         => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0",
     auth_password    => $ks_neutron_password,
     auth_region      => $auth_region,
-    metadata_workers => $::processorcount
+    metadata_workers => $::processorcount,
+
+    # New stuff
+    metadata_protocol   => $ks_nova_internal_proto
   }
 
-  neutron_metadata_agent_config {
-    'DEFAULT/nova_metadata_protocol': value => $ks_nova_internal_proto;
-  }
+# This is already handled by neutron::agents::metadata
+#
+#  neutron_metadata_agent_config {
+#    'DEFAULT/nova_metadata_protocol': value => $ks_nova_internal_proto;
+#  }
 
 }
