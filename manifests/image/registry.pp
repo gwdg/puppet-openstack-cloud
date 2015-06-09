@@ -98,6 +98,8 @@ class cloud::image::registry(
   $firewall_settings                 = {},
 ) {
 
+  include 'mysql::client'
+
   # Disable twice logging if syslog is enabled
   if $use_syslog {
     $log_dir           = false
@@ -148,7 +150,7 @@ class cloud::image::registry(
     user    => 'glance',
     path    => '/usr/bin',
     unless  => "/usr/bin/mysql glance -h ${glance_db_host} -u ${encoded_glance_user} -p${encoded_glance_password} -e \"show tables\" | /bin/grep Tables",
-    require => Package['glance-registry']
+    require => [Package['mysql_client'], Package['glance-registry']]
   }
 
   if $::cloud::manage_firewall {

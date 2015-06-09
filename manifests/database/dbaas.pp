@@ -70,6 +70,8 @@ class cloud::database::dbaas(
   $encoded_user     = uriescape($trove_db_user)
   $encoded_password = uriescape($trove_db_password)
 
+  include 'mysql::client'
+
   class { 'trove':
     database_connection          => "mysql://${encoded_user}:${encoded_password}@${trove_db_host}/trove?charset=utf8",
     database_idle_timeout        => $trove_db_idle_timeout,
@@ -86,7 +88,8 @@ class cloud::database::dbaas(
     command => 'trove-manage db_sync',
     user    => 'trove',
     path    => '/usr/bin',
-    unless  => "/usr/bin/mysql trove -h ${trove_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql trove -h ${trove_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+    require => [Package['mysql_client'], Package['trove-common']]
   }
 
 }

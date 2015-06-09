@@ -529,6 +529,8 @@ class cloud::identity (
   $encoded_user     = uriescape($keystone_db_user)
   $encoded_password = uriescape($keystone_db_password)
 
+  include 'mysql::client'
+
   if $use_syslog {
     $log_dir  = false
     $log_file = false
@@ -819,7 +821,8 @@ class cloud::identity (
     command => 'keystone-manage db_sync',
     path    => '/usr/bin',
     user    => 'keystone',
-    unless  => "/usr/bin/mysql keystone -h ${keystone_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql keystone -h ${keystone_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+    require => Package['mysql_client']
   }
 
   if $::cloud::manage_firewall {

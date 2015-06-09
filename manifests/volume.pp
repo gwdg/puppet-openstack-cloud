@@ -99,6 +99,7 @@ class cloud::volume(
   $encoded_user = uriescape($cinder_db_user)
   $encoded_password = uriescape($cinder_db_password)
 
+  include 'mysql::client'
 
   class { 'cinder':
     database_connection       => "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}/cinder?charset=utf8",
@@ -132,7 +133,8 @@ class cloud::volume(
     command => 'cinder-manage db sync',
     path    => '/usr/bin',
     user    => 'cinder',
-    unless  => "/usr/bin/mysql cinder -h ${cinder_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql cinder -h ${cinder_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+    require => [Package['mysql_client'], Package['cinder-common']]
   }
 
 }

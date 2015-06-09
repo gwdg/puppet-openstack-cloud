@@ -122,6 +122,8 @@ class cloud::orchestration(
   $os_endpoint_type           = 'publicURL'
 ) {
 
+  include 'mysql::client'
+
   # Disable twice logging if syslog is enabled
   if $use_syslog {
     $log_dir = false
@@ -168,7 +170,8 @@ class cloud::orchestration(
     command => 'heat-manage --config-file /etc/heat/heat.conf db_sync',
     path    => '/usr/bin',
     user    => 'heat',
-    unless  => "/usr/bin/mysql heat -h ${heat_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables"
+    unless  => "/usr/bin/mysql heat -h ${heat_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
+    require => [Package['mysql_client'], Package['heat-common']]
   }
 
   heat_config {

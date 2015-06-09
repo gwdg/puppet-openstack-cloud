@@ -197,6 +197,7 @@ class cloud::network::controller(
 ) {
 
   include 'cloud::network'
+  include 'mysql::client'
 
   $encoded_user = uriescape($neutron_db_user)
   $encoded_password = uriescape($neutron_db_password)
@@ -290,7 +291,7 @@ class cloud::network::controller(
     path    => '/usr/bin',
     user    => 'neutron',
     unless  => "/usr/bin/mysql neutron -h ${neutron_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
-    require => 'Neutron_config[DEFAULT/service_plugins]',
+    require => ['Neutron_config[DEFAULT/service_plugins]', Package['mysql_client'], Package['cinder-common']],
     notify  => Service['neutron-server']
   }
 
