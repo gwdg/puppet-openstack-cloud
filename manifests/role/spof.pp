@@ -3,7 +3,8 @@ class cloud::role::spof inherits ::cloud::role::base {
     class { '::cloud': }                                ->
 
     # mariadb client is needed for heat db syncs
-    package {'mariadb-client-core-10.0': }              ->
+#    package {'mariadb-client-core-10.0': }              ->
+
     class { '::cloud::orchestration::engine': }         ->
 
     class { '::cloud::telemetry::centralagent': }       ->

@@ -43,7 +43,7 @@ class cloud::role::controller inherits ::cloud::role::base {
     class { '::cloud': }                                ->
 
     # mariadb client is needed for cinder / keystone db syncs
-    package {'mariadb-client-core-10.0': }              ->
+#    package {'mariadb-client-core-10.0': }              ->
 
     class { '::cloud::database::nosql::memcached': }    ->
     class { '::cloud::messaging': }                     ->

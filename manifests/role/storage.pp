@@ -20,7 +20,7 @@ class cloud::role::storage inherits ::cloud::role::base {
     class { '::cloud': }                                ->
 
     # mariadb client is needed for cinder db sync
-    package {'mariadb-client-core-10.0': }              ->
+#    package {'mariadb-client-core-10.0': }              ->
 
     class { '::cloud::volume::storage': }               ->
 
