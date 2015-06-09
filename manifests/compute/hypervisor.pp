@@ -170,13 +170,16 @@ class cloud::compute::hypervisor(
       # We mount the NFS share in filesystem_store_datadir to fake the
       # backend.
       if $nfs_device {
-        file { $filesystem_store_datadir:
-          ensure => 'directory',
-          owner  => 'nova',
-          group  => 'nova',
-          mode   => '0755'
-        }
+
+#        file { $filesystem_store_datadir:
+#          ensure => 'directory',
+#          owner  => 'nova',
+#          group  => 'nova',
+#          mode   => '0755'
+#        }
+
         nova_config { 'DEFAULT/instances_path': value => $filesystem_store_datadir; }
+
 #        $nfs_mount = {
 #          "${filesystem_store_datadir}" => {
 #            'ensure'  => 'mounted',
@@ -269,6 +272,7 @@ Host *
     vncproxy_port                 => $novnc_port,
     virtio_nic                    => false,
     neutron_enabled               => true,
+
     # FIXME: set default_availability_zone here
     default_availability_zone     => $::cloud::compute::availability_zone,
   }
