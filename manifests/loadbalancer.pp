@@ -692,7 +692,6 @@ class cloud::loadbalancer(
     notify_master => $::cloud::params::start_haproxy_service,
   }
 
-
   # If using an internal VIP, allow to use a dedicated interface for VRRP traffic.
   # First we check if internal binding is enabled
   if $keepalived_internal_ipvs {
@@ -793,26 +792,26 @@ class cloud::loadbalancer(
     firewall_settings => $firewall_settings,
   }
 
-  cloud::loadbalancer::binding { 'sensu_dashboard':
-    ip                => $sensu_dashboard,
-    port              => $sensu_dashboard_port,
-    bind_options      => $sensu_dashboard_bind_options,
-    firewall_settings => $firewall_settings,
-    options           => {
-      'balance' => 'source',
-    },
-  }
+#  cloud::loadbalancer::binding { 'sensu_dashboard':
+#    ip                => $sensu_dashboard,
+#    port              => $sensu_dashboard_port,
+#    bind_options      => $sensu_dashboard_bind_options,
+#    firewall_settings => $firewall_settings,
+#    options           => {
+#      'balance' => 'source',
+#    },
+#  }
 
-  cloud::loadbalancer::binding { 'sensu_api':
-    ip                => $sensu_api,
-    port              => $sensu_api_port,
-    bind_options      => $sensu_api_bind_options,
-    firewall_settings => $firewall_settings,
-    options           => {
-      'balance' => 'source',
-      'rspadd'  => ['Access-Control-Allow-Origin:\ *', 'Access-Control-Allow-Headers:\ origin,\ x-requested-with,\ content-type', 'Access-Control-Allow-Methods:\ PUT,\ GET,\ POST,\ DELETE,\ OPTIONS'],
-    },
-  }
+#  cloud::loadbalancer::binding { 'sensu_api':
+#    ip                => $sensu_api,
+#    port              => $sensu_api_port,
+#    bind_options      => $sensu_api_bind_options,
+#    firewall_settings => $firewall_settings,
+#    options           => {
+#      'balance' => 'source',
+#      'rspadd'  => ['Access-Control-Allow-Origin:\ *', 'Access-Control-Allow-Headers:\ origin,\ x-requested-with,\ content-type', 'Access-Control-Allow-Methods:\ PUT,\ GET,\ POST,\ DELETE,\ OPTIONS'],
+#    },
+#  }
 
   cloud::loadbalancer::binding { 'spice_cluster':
     ip                => $spice,
@@ -861,13 +860,13 @@ class cloud::loadbalancer(
     firewall_settings => $firewall_settings,
   }
 
-  cloud::loadbalancer::binding { 'trove_api_cluster':
-    ip                => $trove_api,
-    port              => $ks_trove_public_port,
-    options           => $common_tcp_options,
-    bind_options      => $trove_bind_options,
-    firewall_settings => $firewall_settings,
-  }
+#  cloud::loadbalancer::binding { 'trove_api_cluster':
+#    ip                => $trove_api,
+#    port              => $ks_trove_public_port,
+#    options           => $common_tcp_options,
+#    bind_options      => $trove_bind_options,
+#    firewall_settings => $firewall_settings,
+#  }
 
   cloud::loadbalancer::binding { 'glance_api_cluster':
     ip                => $glance_api,
@@ -994,32 +993,32 @@ class cloud::loadbalancer(
     firewall_settings => $firewall_settings,
   }
 
-  cloud::loadbalancer::binding { 'elasticsearch':
-    ip                => $elasticsearch,
-    port              => $elasticsearch_port,
-    bind_options      => $elasticsearch_bind_options,
-    firewall_settings => $firewall_settings,
-  }
+#  cloud::loadbalancer::binding { 'elasticsearch':
+#    ip                => $elasticsearch,
+#    port              => $elasticsearch_port,
+#    bind_options      => $elasticsearch_bind_options,
+#    firewall_settings => $firewall_settings,
+#  }
 
-  cloud::loadbalancer::binding { 'kibana':
-    ip                => $kibana,
-    port              => $kibana_port,
-    bind_options      => $kibana_bind_options,
-    firewall_settings => $firewall_settings,
-  }
+#  cloud::loadbalancer::binding { 'kibana':
+#    ip                => $kibana,
+#    port              => $kibana_port,
+#    bind_options      => $kibana_bind_options,
+#    firewall_settings => $firewall_settings,
+#  }
 
-  cloud::loadbalancer::binding { 'redis_cluster':
-    ip                => $redis,
-    port              => $redis_port,
-    options           => {
-      'mode'      => 'tcp',
-      'balance'   => 'first',
-      'option'    => ['tcp-check',],
-      'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
-    },
-    bind_options      => $redis_bind_options,
-    firewall_settings => $firewall_settings,
-  }
+#  cloud::loadbalancer::binding { 'redis_cluster':
+#    ip                => $redis,
+#    port              => $redis_port,
+#    options           => {
+#      'mode'      => 'tcp',
+#      'balance'   => 'first',
+#      'option'    => ['tcp-check',],
+#      'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
+#    },
+#    bind_options      => $redis_bind_options,
+#    firewall_settings => $firewall_settings,
+#  }
 
   if (member(any2array($keepalived_public_ipvs), $galera_ip)) {
     warning('Exposing Galera cluster to public network is a security issue.')
