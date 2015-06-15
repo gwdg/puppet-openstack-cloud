@@ -848,7 +848,7 @@ class cloud::loadbalancer(
   }
 
   cloud::loadbalancer::binding { 'rabbitmq_management_cluster':
-    ip                => $rabbitmq,
+    ip                => $::cloud::loadbalancer::vip_internal_ip,
     port              => $rabbitmq_management_port,
     options           => {
       'mode'            => 'tcp',
