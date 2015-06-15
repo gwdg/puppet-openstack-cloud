@@ -10,7 +10,8 @@ class cloud::role::compute inherits ::cloud::role::base {
         options     => '_netdev,vers=3',
         owner       => 'nova',
         group       => 'nova',
-        require     => Package['nova-common'],
+        require     => User['nova'],
+#        require     => Package['nova-common'],
     } 
 
 #    ->
@@ -22,7 +23,7 @@ class cloud::role::compute inherits ::cloud::role::base {
 #      notify    => Service['nova-compute'],
 #    }
 
-    # Use fixe uids / gids for nova user
+    # Use fixed uids / gids for nova user
     User['nova'] -> Package['nova-common']
 
     class { '::cloud': }                                ->
