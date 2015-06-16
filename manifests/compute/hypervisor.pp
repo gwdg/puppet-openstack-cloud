@@ -23,7 +23,7 @@
 #   (optional) The IP address of the server running the console proxy client
 #   Defaults to '127.0.0.1'
 #
-# [*libvirt_virt_type*]
+# [*libvirt_type*]
 #   (optional) Libvirt domain type. Options are: kvm, lxc, qemu, uml, xen
 #   Replaces libvirt_type
 #   Defaults to 'kvm'
@@ -129,7 +129,7 @@
 #
 class cloud::compute::hypervisor(
   $server_proxyclient_address = '127.0.0.1',
-  $libvirt_virt_type          = 'kvm',
+  $libvirt_type               = 'kvm',
   $ks_nova_public_proto       = 'http',
   $ks_nova_public_host        = '127.0.0.1',
   $nova_ssh_private_key       = undef,
@@ -160,8 +160,8 @@ class cloud::compute::hypervisor(
   include 'cloud::network'
   include 'cloud::network::vswitch'
 
-  if $libvirt_virt_type == 'kvm' and ! $::vtx {
-    fail('libvirt_virt_type is set to KVM and VTX seems to be disabled on this node.')
+  if $libvirt_type == 'kvm' and ! $::vtx {
+    fail('libvirt_type is set to KVM and VTX seems to be disabled on this node.')
   }
 
   if $nfs_enabled {
@@ -170,26 +170,23 @@ class cloud::compute::hypervisor(
       # We mount the NFS share in filesystem_store_datadir to fake the
       # backend.
       if $nfs_device {
-
-#        file { $filesystem_store_datadir:
-#          ensure => 'directory',
-#          owner  => 'nova',
-#          group  => 'nova',
-#          mode   => '0755'
-#        }
-
+        file { $filesystem_store_datadir:
+          ensure => 'directory',
+          owner  => 'nova',
+          group  => 'nova',
+          mode   => '0755'
+        }
         nova_config { 'DEFAULT/instances_path': value => $filesystem_store_datadir; }
-
-#        $nfs_mount = {
-#          "${filesystem_store_datadir}" => {
-#            'ensure'  => 'mounted',
-#            'fstype'  => 'nfs',
-#            'device'  => $nfs_device,
-#            'options' => $nfs_options
-#          }
-#        }
-#        ensure_resource('class', 'nfs', {})
-#        create_resources('types::mount', $nfs_mount, {require => File[$filesystem_store_datadir]})
+        $nfs_mount = {
+          "${filesystem_store_datadir}" => {
+            'ensure'  => 'mounted',
+            'fstype'  => 'nfs',
+            'device'  => $nfs_device,
+            'options' => $nfs_options
+          }
+        }
+        ensure_resource('class', 'nfs', {})
+        create_resources('types::mount', $nfs_mount, {require => File[$filesystem_store_datadir]})
 
         # Not using /var/lib/nova/instances may cause side effects.
         if $filesystem_store_datadir != '/var/lib/nova/instances' {
@@ -272,8 +269,6 @@ Host *
     vncproxy_port                 => $novnc_port,
     virtio_nic                    => false,
     neutron_enabled               => true,
-
-    # FIXME: set default_availability_zone here
     default_availability_zone     => $::cloud::compute::availability_zone,
   }
 
@@ -388,7 +383,7 @@ Host *
   }
 
   class { 'nova::compute::libvirt':
-    libvirt_virt_type       => $libvirt_virt_type,
+    libvirt_type             => $libvirt_type,
     # Needed to support migration but we still use Spice:
     vncserver_listen         => '0.0.0.0',
     migration_support        => true,

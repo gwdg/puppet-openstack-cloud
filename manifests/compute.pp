@@ -124,10 +124,7 @@ class cloud::compute(
   $neutron_password         = 'neutronpassword',
   $neutron_region_name      = 'RegionOne',
   $memcache_servers         = ['127.0.0.1:11211'],
-
-# Move to cloud::compute::hypervisor
-#  $availability_zone        = 'RegionOne',
-
+  $availability_zone        = 'RegionOne',
   $cinder_endpoint_type     = 'publicURL'
 ) {
 
@@ -176,7 +173,7 @@ class cloud::compute(
     log_dir            => $log_dir,
     log_facility       => $log_facility,
     use_syslog         => $use_syslog,
-#    nova_shell         => '/bin/bash',
+    nova_shell         => '/bin/bash',
   }
 
   class { 'nova::network::neutron':
@@ -188,13 +185,9 @@ class cloud::compute(
 
   nova_config {
     'DEFAULT/resume_guests_state_on_host_boot': value => true;
-
-#   Already set through nova::compute 
-#    'DEFAULT/default_availability_zone':        value => $availability_zone;
-
     'DEFAULT/servicegroup_driver':              value => 'mc';
     'DEFAULT/glance_num_retries':               value => '10';
-    'cinder/catalog_info':              value => "volume:cinder:${cinder_endpoint_type}";
+    'DEFAULT/cinder_catalog_info':              value => "volume:cinder:${cinder_endpoint_type}";
   }
 
 }
