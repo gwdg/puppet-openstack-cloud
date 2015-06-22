@@ -914,9 +914,12 @@ class cloud::loadbalancer(
   }
 
   if 'ssl' in $heat_api_bind_options {
-    $heat_api_options = merge($common_tcp_options, {
+    $heat_api_options = {
       'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-    })
+      'balance'        => 'source',
+      'timeout server' => $api_timeout,
+      'timeout client' => $api_timeout,
+    }
   } else {
     $heat_api_options = $common_tcp_options
   }
@@ -930,9 +933,12 @@ class cloud::loadbalancer(
   }
 
   if 'ssl' in $heat_cfn_bind_options {
-    $heat_cfn_options = merge($common_tcp_options, {
+    $heat_cfn_options = {
       'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-    })
+      'balance'        => 'source',
+      'timeout server' => $api_timeout,
+      'timeout client' => $api_timeout,
+    }
   } else {
     $heat_cfn_options = $common_tcp_options
   }
@@ -946,9 +952,12 @@ class cloud::loadbalancer(
   }
 
   if 'ssl' in $heat_cloudwatch_bind_options {
-    $heat_cloudwatch_options = merge($common_tcp_options, {
+    $heat_cloudwatch_options = {
       'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-    })
+      'balance'        => 'source',
+      'timeout server' => $api_timeout,
+      'timeout client' => $api_timeout,
+    }
   } else {
     $heat_cloudwatch_options = $common_tcp_options
   }
