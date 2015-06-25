@@ -78,6 +78,9 @@ class cloud::volume::storage(
   $ks_keystone_internal_proto              = 'http',
   $ks_keystone_internal_port               = '5000',
   $ks_keystone_internal_host               = '127.0.0.1',
+  $ks_glance_internal_proto                = 'http',
+  $ks_glance_api_internal_port             = '9292',
+  $ks_glance_internal_host                 = '127.0.0.1',
   $ks_cinder_password                      = 'secrete',
   $cinder_rbd_pool                         = 'volumes',
   $cinder_rbd_user                         = 'cinder',
@@ -167,4 +170,8 @@ class cloud::volume::storage(
     }
   }
 
+  cinder_config {
+    'DEFAULT/glance_api_servers': value => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}";
+    'DEFAULT/glance_host': value => "${ks_glance_internal_host}";
+  }
 }
