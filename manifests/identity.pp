@@ -660,9 +660,10 @@ class cloud::identity (
 
     # Install ssh key for access from secondary keystone nodes
     ssh_authorized_key { 'keystone@controller':
-      user  => 'keystone',
-      type  => 'ssh-rsa',
-      key   => file('ssh/id_rsa.pub'),
+      user      => 'keystone',
+      type      => 'ssh-rsa',
+      key       => file('ssh/id_rsa.pub'),
+      require   => User['keystone'],
     }
 
     # Restrict keystone account to just scp
