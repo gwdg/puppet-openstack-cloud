@@ -658,14 +658,11 @@ class cloud::identity (
   # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)  
   if $::hostname == $keystone_master_name {
 
-    sshkeys::create_ssh_key { 'keystone':
-      ssh_keytype   => 'rsa',
-      require       => Package['keystone']
-    }
-
-    sshkeys::set_authorized_key { 'keystone':
-      local_user  => 'keystone',
-      remote_user => "keystone@${keystone_master_name}.${::domain}",
+    # Install ssh key for access from secondary keystone nodes
+    ssh_authorized_key { 'keystone@controller':
+      user  => 'keystone',
+      type  => 'ssh-rsa',
+      key   => file('ssh/id_rsa.pub'),
     }
 
     # Restrict keystone account to just scp
@@ -691,10 +688,14 @@ class cloud::identity (
       require => Package['keystone'],
     }
 
-    sshkeys::set_private_key { 'keystone':
-      local_user    => 'keystone',
-      remote_user   => "keystone@${keystone_master_name}.${::domain}",
-      require       => File['/var/lib/keystone/.ssh'],
+    # Deploy private ssh key
+    file { '/var/lib/keystone/.ssh/id_rsa':
+      ensure  => present,
+      mode    => '0600',
+      owner   => 'keystone',
+      group   => 'keystone',
+      content => file('ssh/id_rsa'),
+      require => File['/var/lib/keystone/.ssh'],
     }
 
     # Copy files
@@ -702,7 +703,7 @@ class cloud::identity (
       command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
       creates   => '/etc/keystone/ssl/synced_from_master',
       user      => 'keystone',
-      require   => Sshkeys::Set_private_key['keystone'],
+      require   => File['/var/lib/keystone/.ssh/id_rsa'],
       notify    => Service['keystone']
     }
   }
