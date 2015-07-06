@@ -662,7 +662,7 @@ class cloud::identity (
     ssh_authorized_key { 'keystone@controller':
       user      => 'keystone',
       type      => 'ssh-rsa',
-      key       => file('ssh/id_rsa.pub'),
+      key       => template('cloud/ssh/id_rsa.pub'),
       require   => User['keystone'],
     }
 
@@ -695,7 +695,7 @@ class cloud::identity (
       mode    => '0600',
       owner   => 'keystone',
       group   => 'keystone',
-      content => file('ssh/id_rsa'),
+      content => template('cloud/ssh/id_rsa'),
       require => File['/var/lib/keystone/.ssh'],
     }
 
