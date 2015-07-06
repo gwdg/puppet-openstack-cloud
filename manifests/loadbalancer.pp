@@ -547,6 +547,7 @@ class cloud::loadbalancer(
   $novnc                            = true,
   $elasticsearch                    = true,
   $kibana                           = true,
+  logstash_syslog                   = true,
   $sensu_dashboard                  = true,
   $sensu_api                        = true,
   $redis                            = true,
@@ -586,6 +587,7 @@ class cloud::loadbalancer(
   $galera_bind_options              = [],
   $elasticsearch_bind_options       = [],
   $kibana_bind_options              = [],
+  $logstash_syslog_bind_options     = [],
   $sensu_dashboard_bind_options     = [],
   $sensu_api_bind_options           = [],
   $redis_bind_options               = [],
@@ -612,6 +614,7 @@ class cloud::loadbalancer(
   $novnc_port                       = 6080,
   $elasticsearch_port               = 9200,
   $kibana_port                      = 8300,
+  $logstash_syslog_port             = 514,
   $sensu_dashboard_port             = 3000,
   $sensu_api_port                   = 4568,
   $redis_port                       = 6379,
@@ -1028,12 +1031,26 @@ class cloud::loadbalancer(
 #    firewall_settings => $firewall_settings,
 #  }
 
-#  cloud::loadbalancer::binding { 'kibana':
-#    ip                => $kibana,
-#    port              => $kibana_port,
-#    bind_options      => $kibana_bind_options,
-#    firewall_settings => $firewall_settings,
-#  }
+   $kibana_options = {
+      'cookie'  => 'JSESSIONID prefix indirect nocache',
+      'balance' => 'source'
+    }
+
+  cloud::loadbalancer::binding { 'kibana':
+    ip                => $kibana,
+    port              => $kibana_port,
+    options           => $kibana_options,
+    bind_options      => $kibana_bind_options,
+    firewall_settings => $firewall_settings,
+  }
+
+  cloud::loadbalancer::binding { 'logstash_syslog':
+    ip                => $logstash_syslog,
+    port              => $logstash_syslog_port,
+    options           => $common_tcp_options,
+    bind_options      => $logstash_syslog_bind_options,
+    firewall_settings => $firewall_settings,
+  }
 
 #  cloud::loadbalancer::binding { 'redis_cluster':
 #    ip                => $redis,
