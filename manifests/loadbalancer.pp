@@ -547,7 +547,7 @@ class cloud::loadbalancer(
   $novnc                            = true,
   $elasticsearch                    = true,
   $kibana                           = true,
-  logstash_syslog                   = true,
+  $logstash_syslog                  = true,
   $sensu_dashboard                  = true,
   $sensu_api                        = true,
   $redis                            = true,
