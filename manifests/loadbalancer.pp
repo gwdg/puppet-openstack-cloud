@@ -701,6 +701,18 @@ class cloud::loadbalancer(
   # If using an internal VIP, allow to use a dedicated interface for VRRP traffic.
   # First we check if internal binding is enabled
   if $keepalived_internal_ipvs {
+
+    # If vagrant environment setup appropriate routing on lbs for external access via keepalived notification scripts
+    $notify = undef    
+    if !cloud::production {
+        $notify = '/etc/keepalived/keepalived_setup_routing.sh'
+        
+        file { $notify:
+          source    => '/vagrant/scripts/files/keepalived_setup_routing.sh',
+          before    => Keepalived::Instance[$keepalived_internal_id],
+        }
+    }
+
     # Then we validate this is not the same as public binding
     if !empty(difference(any2array($keepalived_internal_ipvs), any2array($keepalived_public_ipvs))) {
       if ! $keepalived_vrrp_interface {
@@ -718,6 +730,7 @@ class cloud::loadbalancer(
         auth_type     => $keepalived_auth_type,
         auth_pass     => $keepalived_auth_pass,
         notify_master => $::cloud::params::start_haproxy_service,
+        notify        => $notify,
       }
     }
   }
