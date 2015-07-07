@@ -662,7 +662,8 @@ class cloud::identity (
     ssh_authorized_key { 'keystone@controller':
       user      => 'keystone',
       type      => 'ssh-rsa',
-      key       => template('cloud/ssh/id_rsa.pub'),
+#      key       => template('cloud/ssh/id_rsa.pub'),
+      key       => 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC9JY0WdPrv9pF7mVZZ7mHPN9HnG+Cm/og0TcddFe1uV6/5wRsUPPb6fYpKNX4+sAuhGJ/hg70X08nLWbdlv6WKyYWQoIwOgP1K4VxFUOuu1aJsyL0iRcPXGaO/xXPcXLcqmhI5ORHPlohJAAp5veM3UsJbeBf14rFYXCATH9YGAhjTr1oP5GkPaeB7cEhjQKGyoGS7lorpbNjdmZ17vZX6Geklm0BtqZQgOvQquvS4L10B90PyhXzCVx/wvzd7PtWj7HTd1s5zF5+vzt1fhbOX5fIwCp2TtSeJ0Ht/gzLx+ninQxxPjVWnFhiZEfi7h7jdisQto5Mt8wxXmwY4Ie3r',
       require   => User['keystone'],
     }
 
