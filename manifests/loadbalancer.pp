@@ -706,14 +706,15 @@ class cloud::loadbalancer(
   if $keepalived_internal_ipvs {
 
     # If vagrant environment setup appropriate routing on lbs for external access via keepalived notification scripts
-    $notify = undef    
-    if !cloud::production {
-        $notify = '/etc/keepalived/keepalived_setup_routing.sh'
+    if ! $::cloud::production {
+        $keepalived_notify = '/etc/keepalived/keepalived_setup_routing.sh'
         
-        file { $notify:
+        file { $keepalived_notify:
           source    => '/vagrant/scripts/files/keepalived_setup_routing.sh',
           before    => Keepalived::Instance[$keepalived_internal_id],
         }
+    } else {
+        $keepalived_notify = undef
     }
 
     # Then we validate this is not the same as public binding
@@ -733,7 +734,7 @@ class cloud::loadbalancer(
         auth_type     => $keepalived_auth_type,
         auth_pass     => $keepalived_auth_pass,
         notify_master => $::cloud::params::start_haproxy_service,
-        notify        => $notify,
+        notify_plain  => $keepalived_notify,
       }
     }
   }
