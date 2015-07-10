@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -523,7 +522,7 @@ class cloud::database::sql::mysql (
   }
 
   # The puppet-xinetd module do not correctly reload
-  # the configuration on “notify”
+  # the configuration
   # TODO(Goneri): remove this once https://github.com/puppetlabs/puppetlabs-xinetd/pull/9
   # get merged
   exec{ 'reload_xinetd':
