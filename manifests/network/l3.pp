@@ -81,9 +81,12 @@ class cloud::network::l3(
   }
 
   if ! $ext_provider_net {
-    vs_bridge{'br-ex':
-      external_ids => 'bridge-id=br-ex',
-    } ->
+
+
+#    vs_bridge{'br-ex':
+#      external_ids => 'bridge-id=br-ex',
+#    } ->
+
     vs_port{$external_int:
       ensure => present,
       bridge => 'br-ex'
