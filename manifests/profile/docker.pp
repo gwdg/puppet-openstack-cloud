@@ -1,0 +1,4 @@
+class cloud::profile::docker {
+
+  
+}
