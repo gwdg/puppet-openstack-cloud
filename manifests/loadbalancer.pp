@@ -241,8 +241,12 @@
 #  (optional) The HTTP sytle basic credentials (using login:password form)
 #  Defaults to 'admin:changeme'
 #
-# [*haproxy_options*]
+# [*haproxy_global_options*]
 #  (optional) The haproxy global options
+#  Defaults to {}
+#
+# [*haproxy_defaults__options*]
+#  (optional) The haproxy defaults options
 #  Defaults to {}
 #
 # [*keepalived_state*]
@@ -552,7 +556,6 @@ class cloud::loadbalancer(
   $sensu_api                        = true,
   $redis                            = true,
   $haproxy_auth                     = 'admin:changeme',
-  $haproxy_options                  = {},
   $keepalived_state                 = 'BACKUP',
   $keepalived_priority              = '50',
   $keepalived_vrrp_interface        = false,
@@ -630,6 +633,9 @@ class cloud::loadbalancer(
 
   # New settings
   $haproxy_ensure                   = 'present',
+  $haproxy_global_options           = {},
+  $haproxy_defaults_options         = {},
+
   $keepalived_preempt_delay         = undef,
   $rabbitmq_management_port         = 15672,
 
@@ -664,24 +670,22 @@ class cloud::loadbalancer(
   }
 
   # TODO : Use global_options in puppetlabs-haproxy as merge in params.pp
-  $haproxy_default_options = {
+  $haproxy_global_default_options = {
     'log'     => "${::ipaddress} local0",
-    'chroot'  => '/var/lib/haproxy',
-    'pidfile' => '/var/run/haproxy.pid',
-    'maxconn' => '4000',
-    'user'    => 'haproxy',
-    'group'   => 'haproxy',
-    'daemon'  => '',
-    'stats'   => 'socket /var/lib/haproxy/stats',
+    'maxconn' => '4096',
     'nbproc'  => $::processorcount
   }
-  $haproxy_global_options = merge($haproxy_default_options,$haproxy_options)
+  $haproxy_global_options = merge($haproxy_global_default_options, $haproxy_options)
+
+
+
   # Ensure Keepalived is started before HAproxy to avoid binding errors.
   class { 'keepalived': } ->
   class { 'haproxy':
-    service_manage  => true,
-    package_ensure  => $haproxy_ensure,
-    global_options  => $haproxy_global_options
+    service_manage      => true,
+    package_ensure      => $haproxy_ensure,
+    global_options      => $haproxy_global_options,
+    defaults_options    => $haproxy_defaults_options,
   }
 
   keepalived::vrrp_script { 'haproxy':
