@@ -642,6 +642,7 @@ class cloud::loadbalancer(
 ){
 
   include cloud::params
+  include haproxy::params
   include cloud::network::contrail::haproxy
 
   $common_tcp_options = {
@@ -669,23 +670,17 @@ class cloud::loadbalancer(
     fail('galera_ip should be part of keepalived_public_ipvs or keepalived_internal_ipvs.')
   }
 
-  # TODO : Use global_options in puppetlabs-haproxy as merge in params.pp
-  $haproxy_global_default_options = {
-    'log'     => "${::ipaddress} local0",
-    'maxconn' => '4096',
-    'nbproc'  => $::processorcount
-  }
-  $haproxy_global_options = merge($haproxy_global_default_options, $haproxy_options)
-
-
+  # Merge haproxy global / defaults options with param defaults from haproxy class, so that distro specific stuff is correctly taken into account
+  $haproxy_global_options_real      = merge($::haproxy::params::global_options,   $haproxy_global_options)
+  $haproxy_defaults_options_real    = merge($::haproxy::params::defaults_options, $haproxy_defaults_options)
 
   # Ensure Keepalived is started before HAproxy to avoid binding errors.
   class { 'keepalived': } ->
   class { 'haproxy':
     service_manage      => true,
     package_ensure      => $haproxy_ensure,
-    global_options      => $haproxy_global_options,
-    defaults_options    => $haproxy_defaults_options,
+    global_options      => $haproxy_global_options_real,
+    defaults_options    => $haproxy_defaults_options_real,
   }
 
   keepalived::vrrp_script { 'haproxy':
