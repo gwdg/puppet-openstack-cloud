@@ -168,6 +168,7 @@ class cloud::image::api(
   $nfs_options                       = 'defaults',
   $pipeline                          = 'keystone',
   $firewall_settings                 = {},
+  $container_formats                 = 'ami,ari,aki,bare,ovf,ova',
 ) {
 
   # Disable twice logging if syslog is enabled
@@ -227,6 +228,7 @@ class cloud::image::api(
 
   glance_api_config {
     'DEFAULT/notifier_driver':          value => 'noop';
+    'DEFAULT/container_formats':        value => $container_formats;
     # TODO(EmilienM) Drop this line when https://review.openstack.org/#/c/133521/ has been merged.
     # FIXME (Piotr): Puppet complains about redeclaration, so drop the line
 #    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
