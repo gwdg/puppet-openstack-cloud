@@ -676,7 +676,7 @@ class cloud::loadbalancer(
     owner       => 'haproxy',
     group       => 'haproxy',
     mode        => '600',
-    source      => "puppet:///modules/cloud/ssl/api.dev.cloud.gwdg.de_20150716_all.pem"
+    source      => "puppet:///modules/cloud/secrets/api.dev.cloud.gwdg.de_20150716_all.pem"
   }
 
   # Make sure it is deployed before the rest runs
