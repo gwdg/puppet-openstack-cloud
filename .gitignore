@@ -7,3 +7,4 @@ doc/
 .yardoc
 .librarian/
 .tmp/
+files/secrets
