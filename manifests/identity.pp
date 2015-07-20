@@ -532,8 +532,8 @@ class cloud::identity (
   include 'mysql::client'
 
   if $use_syslog {
-    $log_dir  = false
-    $log_file = false
+    $log_dir  = '/var/log/keystone'
+    $log_file = 'keystone.log'
     keystone_config {
       'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
       'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
