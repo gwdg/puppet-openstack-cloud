@@ -126,7 +126,7 @@ class cloud::orchestration(
 
   # Disable twice logging if syslog is enabled
   if $use_syslog {
-    $log_dir = false
+    $log_dir = '/var/log/heat'
     heat_config {
       'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
       'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
