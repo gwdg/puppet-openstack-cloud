@@ -796,28 +796,6 @@ class cloud::loadbalancer(
 
   # Instanciate HAproxy binding
 
-#  cloud::loadbalancer::binding { 'keystone_api_cluster':
-#    ip                => $keystone_api,
-#    port              => $ks_keystone_public_port,
-#    options           => $common_tcp_options,
-#    bind_options      => $keystone_bind_options,
-#    firewall_settings => $firewall_settings,
-#  }
-
-#  haproxy::listen { 'keystone_api_cluster':
-#
-#    bind                => {
-#      # Internal via http
-#      "${::cloud::loadbalancer::vip_internal_ip}:${ks_keystone_public_port}"    => [],
-#
-#      # External via https
-#      "${::cloud::loadbalancer::vip_public_ip}:${ks_keystone_public_port}"      => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
-#    },
-#
-#    mode                => 'http',
-#    options             => $common_http_options,
-#  }
-
   cloud::loadbalancer::bind_api { 'keystone_api_cluster':
     port                => $ks_keystone_public_port,
     options             => merge($common_http_options, $keystone_bind_options),
@@ -943,72 +921,20 @@ class cloud::loadbalancer(
     options             => merge($common_http_options, $ceilometer_bind_options),
   }
 
-#  if 'ssl' in $heat_api_bind_options {
-#    $heat_api_options = {
-#      'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-#      'balance'        => 'source',
-#      'timeout server' => $api_timeout,
-#      'timeout client' => $api_timeout,
-#    }
-#  } else {
-#    $heat_api_options = $common_tcp_options
-#  }
-
   cloud::loadbalancer::bind_api { 'heat_api_cluster':
     port                => $ks_heat_public_port,
     options             => merge($common_http_options, $heat_api_bind_options),
   }
-
-#  if 'ssl' in $heat_cfn_bind_options {
-#    $heat_cfn_options = {
-#      'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-#      'balance'        => 'source',
-#      'timeout server' => $api_timeout,
-#      'timeout client' => $api_timeout,
-#    }
-#  } else {
-#    $heat_cfn_options = $common_tcp_options
-#  }
 
   cloud::loadbalancer::bind_api { 'heat_cfn_api_cluster':
     port                => $ks_heat_cfn_public_port,
     options             => merge($common_http_options, $heat_cfn_options),
   }
 
-#  if 'ssl' in $heat_cloudwatch_bind_options {
-#    $heat_cloudwatch_options = {
-#      'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-#      'balance'        => 'source',
-#      'timeout server' => $api_timeout,
-#      'timeout client' => $api_timeout,
-#    }
-#  } else {
-#    $heat_cloudwatch_options = $common_tcp_options
-#  }
-
   cloud::loadbalancer::bind_api { 'heat_cloudwatch_api_cluster':
     port                => $ks_heat_cloudwatch_public_port,
     options             => merge($common_http_options, $heat_cloudwatch_options),
   }
-
-#  $horizon_ssl_options = {
-#    'mode'    => 'tcp',
-#    'cookie'  => 'sessionid prefix',
-#    'balance' => 'leastconn'
-#  }
-
-#  if 'ssl' in $horizon_bind_options {
-#    $horizon_options = {
-#      'cookie'  => 'sessionid prefix',
-#      'reqadd'  => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-#      'balance' => 'leastconn'
-#    }
-#  } else {
-#    $horizon_options = {
-#      'cookie'  => 'sessionid prefix',
-#      'balance' => 'leastconn'
-#    }
-#  }
 
   cloud::loadbalancer::bind_api { 'horizon_cluster':
     port                => $horizon_port,
@@ -1024,15 +950,6 @@ class cloud::loadbalancer(
 
 #    httpchk           => "httpchk GET  /${::cloud::params::horizon_auth_url}  \"HTTP/1.0\\r\\nUser-Agent: HAproxy-${::hostname}\"",
   }
-
-#  cloud::loadbalancer::binding { 'horizon_ssl_cluster':
-#    ip                => $horizon_ssl,
-#    port              => $horizon_ssl_port,
-#    httpchk           => 'ssl-hello-chk',
-#    options           => $horizon_ssl_options,
-#    bind_options      => $horizon_ssl_bind_options,
-#    firewall_settings => $firewall_settings,
-#  }
 
 #  cloud::loadbalancer::binding { 'elasticsearch':
 #    ip                => $elasticsearch,
