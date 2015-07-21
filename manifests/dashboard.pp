@@ -134,11 +134,12 @@ class cloud::dashboard(
   $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}/v2.0"
 
   # Apache2 specific configuration
-  if $ssl_forward {
-    $setenvif = ['X-Forwarded-Proto https HTTPS=1']
-  } else {
+  # FIXME(piotr): we add the headers for ssl termination via haproxy, so don't do it here
+#  if $ssl_forward {
+#    $setenvif = ['X-Forwarded-Proto https HTTPS=1']
+#  } else {
     $setenvif = []
-  }
+#  }
   $extra_params = {
     'add_listen' => true,
     'setenvif'   => $setenvif
@@ -165,6 +166,7 @@ class cloud::dashboard(
     vhost_extra_params      => $vhost_extra_params_real,
     openstack_endpoint_type => $os_endpoint_type,
     allowed_hosts           => $allowed_hosts,
+    ssl_forward             => $ssl_forward,
   }
 
   if ($::osfamily == 'Debian') {
