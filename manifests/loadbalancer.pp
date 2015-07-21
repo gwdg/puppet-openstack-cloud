@@ -1015,7 +1015,7 @@ class cloud::loadbalancer(
     options             => merge($common_http_options,
                                 {
                                     'cookie'        => 'sessionid prefix',
-                                    'option'        => ['http-server-close', 'httplog', 'forwardfor', "httpchk GET  /${::cloud::params::horizon_auth_url}  \"HTTP/1.0\\r\\nUser-Agent: HAproxy-${::hostname}\""],
+                                    'option'        => ['http-server-close', 'httplog', 'forwardfor', "httpchk GET  /${::cloud::params::horizon_auth_url}  HTTP/1.0\\r\\nUser-Agent:\ HAproxy-${::hostname}"],
                                     'http-check'    => 'expect ! rstatus ^5',
                                     # Needs to match with SECURE_PROXY_SSL_HEADER in /etc/openstack-dashboard/local_settings.py
                                     'reqadd'        => 'X-Forwarded-Protocol:\ https if { ssl_fc }',
