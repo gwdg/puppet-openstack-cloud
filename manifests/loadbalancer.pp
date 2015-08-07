@@ -739,6 +739,7 @@ class cloud::loadbalancer(
         
         file { $keepalived_notify:
           source    => '/vagrant/files/keepalived_setup_routing.sh',
+          require   => Package['keepalived'],
           before    => Keepalived::Instance[$keepalived_internal_id],
         }
     } else {
