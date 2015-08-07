@@ -13,6 +13,8 @@ class cloud::profile::nfs_server (
     ensure  => 'mounted',
     server  => $server,
     clients => $clients,
+#    owner   => 'nova',
+#    group   => 'nova',
     mount   => '/var/lib/nova/instances',
   }
 
