@@ -82,18 +82,6 @@
 #   (optional) Public Hostname or IP to connect to Keystone API
 #   Defaults to '127.0.0.1'
 #
-# [*ks_cinder_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Cinder API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_cinder_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Cinder API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_cinder_public_host*]
-#   (optional) Public Hostname or IP to connect to Cinder API
-#   Defaults to '127.0.0.1'
-#
 # [*ks_trove_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Trove API
 #   Defaults to '127.0.0.1'
@@ -170,7 +158,7 @@
 #   (optional) Password used by Glance to connect to Keystone API
 #   Defaults to 'glancepassword'
 #
-# [*ks_cinder_password*]
+# [*cinder_password*]
 #   (optional) Password used by Cinder to connect to Keystone API
 #   Defaults to 'cinderpassword'
 #
@@ -246,18 +234,6 @@
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
-# [*ks_cinder_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_cinder_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_cinder_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
 # [*ks_keystone_internal_port*]
 #   (optional) TCP port to connect to Keystone API from internal network
 #   Defaults to '5000'
@@ -286,10 +262,6 @@
 #   (optional) Password of the dispersion tenant, used for swift-dispersion-report
 #   and swift-dispersion-populate tools.
 #   Defaults to 'dispersion'
-#
-# [*ks_cinder_public_port*]
-#   (optional) TCP port to connect to Cinder API from public network
-#   Defaults to '8776'
 #
 # [*ks_neutron_public_port*]
 #   (optional) TCP port to connect to Neutron API from public network
@@ -385,14 +357,15 @@ class cloud::identity (
   $ceilometer_admin_url         = undef,
   $ceilometer_password          = 'ceilometerpassword',
 
-  $ks_cinder_admin_host         = '127.0.0.1',
-  $ks_cinder_internal_host      = '127.0.0.1',
-  $ks_cinder_password           = 'cinderpassword',
-  $ks_cinder_public_host        = '127.0.0.1',
-  $ks_cinder_public_proto       = 'http',
-  $ks_cinder_admin_proto        = 'http',
-  $ks_cinder_internal_proto     = 'http',
-  $ks_cinder_public_port        = 8776,
+  $cinder_v1_public_url        = undef,
+  $cinder_v1_internal_url      = undef,
+  $cinder_v1_admin_url         = undef,
+
+  $cinder_v2_public_url        = undef,
+  $cinder_v2_internal_url      = undef,
+  $cinder_v2_admin_url         = undef,
+
+  $cinder_password              = 'cinderpassword',
 
   $ks_glance_admin_host         = '127.0.0.1',
   $ks_glance_internal_host      = '127.0.0.1',
@@ -708,15 +681,17 @@ class cloud::identity (
 
   if $cinder_enabled {
     class { 'cinder::keystone::auth':
-      admin_address     => $ks_cinder_admin_host,
-      internal_address  => $ks_cinder_internal_host,
-      public_address    => $ks_cinder_public_host,
-      port              => $ks_cinder_public_port,
-      public_protocol   => $ks_cinder_public_proto,
-      admin_protocol    => $ks_cinder_admin_proto,
-      internal_protocol => $ks_cinder_internal_proto,
+
+      public_url        => $cinder_v1_public_url,
+      internal_url      => $cinder_v1_internal_url,
+      admin_url         => $cinder_v1_admin_url,
+
+      public_url_v2     => $cinder_v2_public_url,
+      internal_url_v2   => $cinder_v2_internal_url,
+      admin_url_v2      => $cinder_v2_admin_url,
+
       region            => $region,
-      password          => $ks_cinder_password
+      password          => $cinder_password
     }
   }
 
