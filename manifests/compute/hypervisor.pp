@@ -28,14 +28,6 @@
 #   Replaces libvirt_type
 #   Defaults to 'kvm'
 #
-# [*ks_nova_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_nova_public_host*]
-#   (optional) Public Hostname or IP to connect to Nova API
-#   Defaults to '127.0.0.1'
-#
 # [*nova_ssh_public_key*]
 #   (optional) Install public key in .ssh/authorized_keys for the 'nova' user.
 #   Note: this parameter use the 'content' provider of Puppet, in consequence
@@ -114,14 +106,6 @@
 #   Need to be a valid shell path.
 #   Defaults to false
 #
-# [*ks_console_public_proto*]
-#   (optional) Protocol used to connect to console service.
-#   Defaults to false (use nova_public_proto)
-#
-# [*ks_console_public_host*]
-#   (optional) Hostname or IP used to connect to console service.
-#   Defaults to false (use nova_public_host)
-#
 # [*include_vswitch*]
 #   (optional) Should the class cloud::network::vswitch should be included.
 #   Defaults to true
@@ -134,15 +118,11 @@
 class cloud::compute::hypervisor(
   $server_proxyclient_address = '127.0.0.1',
   $libvirt_virt_type          = 'kvm',
-  $ks_nova_public_proto       = 'http',
-  $ks_nova_public_host        = '127.0.0.1',
   $nova_ssh_private_key       = undef,
   $nova_ssh_public_key        = undef,
   $console                    = 'novnc',
   $novnc_port                 = '6080',
   $spice_port                 = '6082',
-  $ks_console_public_proto    = 'http',
-  $ks_console_public_host     = '127.0.0.1',
   $cinder_rbd_user            = 'cinder',
   $nova_rbd_pool              = 'vms',
   $nova_rbd_secret_uuid       = undef,
@@ -275,9 +255,12 @@ Host *
     enabled                       => true,
     vnc_enabled                   => $vnc_enabled,
     vncserver_proxyclient_address => $server_proxyclient_address,
-    vncproxy_host                 => $ks_console_public_host,
-    vncproxy_protocol             => $ks_console_public_proto,
-    vncproxy_port                 => $novnc_port,
+
+    # Set directly in nova modul through hiera (nova::vncproxy::common::vncproxy_base_url)
+#    vncproxy_host                 => $ks_console_public_host,
+#    vncproxy_protocol             => $ks_console_public_proto,
+#    vncproxy_port                 => $novnc_port,
+
     virtio_nic                    => false,
     neutron_enabled               => true,
     default_availability_zone     => $::cloud::compute::availability_zone,
