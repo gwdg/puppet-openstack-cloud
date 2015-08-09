@@ -70,18 +70,6 @@
 #   (optional) Public Hostname or IP to connect to Glance API
 #   Defaults to '127.0.0.1'
 #
-# [*ks_ceilometer_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Ceilometer API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_ceilometer_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Ceilometer API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_ceilometer_public_host*]
-#   (optional) Public Hostname or IP to connect to Ceilometer API
-#   Defaults to '127.0.0.1'
-#
 # [*ks_keystone_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Keystone API
 #   Defaults to '127.0.0.1'
@@ -92,18 +80,6 @@
 #
 # [*ks_keystone_public_host*]
 #   (optional) Public Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_nova_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Nova API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_nova_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Nova API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_nova_public_host*]
-#   (optional) Public Hostname or IP to connect to Nova API
 #   Defaults to '127.0.0.1'
 #
 # [*ks_cinder_internal_host*]
@@ -170,7 +146,7 @@
 #   (optional) Password used by Trove to connect to Keystone API
 #   Defaults to 'trovepassword'
 #
-# [*ks_ceilometer_password*]
+# [*ceilometer_password*]
 #   (optional) Password used by Ceilometer to connect to Keystone API
 #   Defaults to 'ceilometerpassword'
 #
@@ -178,7 +154,7 @@
 #   (optional) Password used by Swift to connect to Keystone API
 #   Defaults to 'swiftpassword'
 #
-# [*ks_nova_password*]
+# [*nova_password*]
 #   (optional) Password used by Nova to connect to Keystone API
 #   Defaults to 'novapassword'
 #
@@ -210,18 +186,6 @@
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
-# [*ks_ceilometer_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_ceilometer_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_ceilometer_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
 # [*ks_heat_public_proto*]
 #   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
 #   Defaults to 'http'
@@ -243,18 +207,6 @@
 #   Defaults to 'http'
 #
 # [*ks_keystone_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_nova_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_nova_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_nova_internal_proto*]
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
@@ -306,10 +258,6 @@
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
-# [*ks_ceilometer_public_port*]
-#   (optional) TCP port to connect to Ceilometer API from public network
-#   Defaults to '8777'
-#
 # [*ks_keystone_internal_port*]
 #   (optional) TCP port to connect to Keystone API from internal network
 #   Defaults to '5000'
@@ -329,10 +277,6 @@
 # [*ks_trove_public_port*]
 #   (optional) TCP port to connect to Trove API from public network
 #   Defaults to '8779'
-#
-# [*ks_nova_public_port*]
-#   (optional) TCP port to connect to Nova API from public network
-#   Defaults to '8774'
 #
 # [*ks_ec2_public_port*]
 #   (optional) TCP port to connect to EC2 API from public network
@@ -435,14 +379,12 @@ class cloud::identity (
   $ks_admin_password            = 'adminpassword',
   $ks_admin_tenant              = 'admin',
   $ks_admin_token               = undef,
-  $ks_ceilometer_admin_host     = '127.0.0.1',
-  $ks_ceilometer_internal_host  = '127.0.0.1',
-  $ks_ceilometer_password       = 'ceilometerpassword',
-  $ks_ceilometer_public_host    = '127.0.0.1',
-  $ks_ceilometer_public_port    = 8777,
-  $ks_ceilometer_public_proto   = 'http',
-  $ks_ceilometer_admin_proto    = 'http',
-  $ks_ceilometer_internal_proto = 'http',
+
+  $ceilometer_public_url        = undef,
+  $ceilometer_internal_url      = undef,
+  $ceilometer_admin_url         = undef,
+  $ceilometer_password          = 'ceilometerpassword',
+
   $ks_cinder_admin_host         = '127.0.0.1',
   $ks_cinder_internal_host      = '127.0.0.1',
   $ks_cinder_password           = 'cinderpassword',
@@ -451,6 +393,7 @@ class cloud::identity (
   $ks_cinder_admin_proto        = 'http',
   $ks_cinder_internal_proto     = 'http',
   $ks_cinder_public_port        = 8776,
+
   $ks_glance_admin_host         = '127.0.0.1',
   $ks_glance_internal_host      = '127.0.0.1',
   $ks_glance_password           = 'glancepassword',
@@ -459,6 +402,7 @@ class cloud::identity (
   $ks_glance_internal_proto     = 'http',
   $ks_glance_admin_proto        = 'http',
   $ks_glance_api_public_port    = 9292,
+
   $ks_heat_admin_host           = '127.0.0.1',
   $ks_heat_internal_host        = '127.0.0.1',
   $ks_heat_password             = 'heatpassword',
@@ -468,6 +412,7 @@ class cloud::identity (
   $ks_heat_internal_proto       = 'http',
   $ks_heat_public_port          = 8004,
   $ks_heat_cfn_public_port      = 8000,
+
   $ks_keystone_admin_host       = '127.0.0.1',
   $ks_keystone_admin_port       = 35357,
   $ks_keystone_internal_host    = '127.0.0.1',
@@ -475,9 +420,10 @@ class cloud::identity (
   $ks_keystone_public_host      = '127.0.0.1',
   $ks_keystone_public_port      = 5000,
   $ks_keystone_public_proto     = 'http',
-  $ks_neutron_admin_host        = '127.0.0.1',
   $ks_keystone_admin_proto      = 'http',
   $ks_keystone_internal_proto   = 'http',
+
+  $ks_neutron_admin_host        = '127.0.0.1',
   $ks_neutron_internal_host     = '127.0.0.1',
   $ks_neutron_password          = 'neutronpassword',
   $ks_neutron_public_host       = '127.0.0.1',
@@ -485,15 +431,23 @@ class cloud::identity (
   $ks_neutron_admin_proto       = 'http',
   $ks_neutron_internal_proto    = 'http',
   $ks_neutron_public_port       = 9696,
-  $ks_nova_admin_host           = '127.0.0.1',
-  $ks_nova_internal_host        = '127.0.0.1',
-  $ks_nova_password             = 'novapassword',
-  $ks_nova_public_host          = '127.0.0.1',
-  $ks_nova_public_proto         = 'http',
-  $ks_nova_internal_proto       = 'http',
-  $ks_nova_admin_proto          = 'http',
-  $ks_nova_public_port          = 8774,
+
+  $nova_password             = 'novapassword',
+
+  $nova_v2_public_url           = undef,
+  $nova_v2_internal_url         = undef,
+  $nova_v2_admin_url            = undef,
+
+  $nova_v3_public_url           = undef,
+  $nova_v3_internal_url         = undef,
+  $nova_v3_admin_url            = undef,
+
+  $nova_ec2_public_url          = undef,
+  $nova_ec2_internal_url        = undef,
+  $nova_ec2_admin_url           = undef,
+
   $ks_ec2_public_port           = 8773,
+
   $ks_swift_dispersion_password = 'dispersion',
   $ks_swift_internal_host       = '127.0.0.1',
   $ks_swift_admin_host          = '127.0.0.1',
@@ -503,6 +457,7 @@ class cloud::identity (
   $ks_swift_public_proto        = 'http',
   $ks_swift_admin_proto         = 'http',
   $ks_swift_internal_proto      = 'http',
+
   $ks_trove_admin_host          = '127.0.0.1',
   $ks_trove_internal_host       = '127.0.0.1',
   $ks_trove_password            = 'trovepassword',
@@ -511,6 +466,7 @@ class cloud::identity (
   $ks_trove_public_proto        = 'http',
   $ks_trove_admin_proto         = 'http',
   $ks_trove_internal_proto      = 'http',
+
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
   $verbose                      = true,
@@ -549,7 +505,7 @@ class cloud::identity (
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
-    compute_port          => $ks_nova_public_port,
+    compute_port          => $cloud::global::api::ports::nova,
     debug                 => $debug,
     database_idle_timeout => $keystone_db_idle_timeout,
     log_facility          => $log_facility,
@@ -711,29 +667,32 @@ class cloud::identity (
   }
 
   class {'ceilometer::keystone::auth':
-    admin_address     => $ks_ceilometer_admin_host,
-    internal_address  => $ks_ceilometer_internal_host,
-    public_address    => $ks_ceilometer_public_host,
-    public_protocol   => $ks_ceilometer_public_proto,
-    admin_protocol    => $ks_ceilometer_admin_proto,
-    internal_protocol => $ks_ceilometer_internal_proto,
-    port              => $ks_ceilometer_public_port,
-    region            => $region,
-    password          => $ks_ceilometer_password
+
+    public_url          => $ceilometer_public_url,
+    internal_url        => $ceilometer_internal_url,
+    admin_url           => $ceilometer_admin_url,
+
+    region              => $region,
+    password            => $ceilometer_password
   }
 
   class { 'nova::keystone::auth':
-    admin_address     => $ks_nova_admin_host,
-    internal_address  => $ks_nova_internal_host,
-    public_address    => $ks_nova_public_host,
-    compute_port      => $ks_nova_public_port,
-    public_protocol   => $ks_nova_public_proto,
-    admin_protocol    => $ks_nova_admin_proto,
-    internal_protocol => $ks_nova_internal_proto,
-    ec2_port          => $ks_ec2_public_port,
-    region            => $region,
-    password          => $ks_nova_password
-  }
+
+    public_url          => $nova_v2_public_url,
+    internal_url        => $nova_v2_internal_url,
+    admin_url           => $nova_v2_admin_url,
+
+    public_url_v3       => $nova_v3_public_url,
+    internal_url_v3     => $nova_v3_internal_url,
+    admin_url_v3        => $nova_v3_admin_url,
+
+    ec2_public_url      => $nova_ec2_public_url,
+    ec2_internal_url    => $nova_ec2_internal_url, 
+    ec2_admin_url       => $nova_ec2_admin_url,
+
+    region              => $region,
+    password            => $nova_password
+  }                                                                                                                                                                                                         
 
   class { 'neutron::keystone::auth':
     admin_address     => $ks_neutron_admin_host,
