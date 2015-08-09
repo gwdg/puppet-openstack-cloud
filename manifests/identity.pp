@@ -58,18 +58,6 @@
 # [*ks_admin_token*]
 #   (required) Admin token used by Keystone.
 #
-# [*ks_glance_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Glance API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_glance_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Glance API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_glance_public_host*]
-#   (optional) Public Hostname or IP to connect to Glance API
-#   Defaults to '127.0.0.1'
-#
 # [*ks_keystone_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Keystone API
 #   Defaults to '127.0.0.1'
@@ -154,7 +142,7 @@
 #   (optional) Password used by Heat to connect to Keystone API
 #   Defaults to 'heatpassword'
 #
-# [*ks_glance_password*]
+# [*glance_password*]
 #   (optional) Password used by Glance to connect to Keystone API
 #   Defaults to 'glancepassword'
 #
@@ -222,18 +210,6 @@
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
-# [*ks_glance_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_glance_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_glance_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
 # [*ks_keystone_internal_port*]
 #   (optional) TCP port to connect to Keystone API from internal network
 #   Defaults to '5000'
@@ -274,10 +250,6 @@
 # [*ks_heat_cfn_public_port*]
 #   (optional) TCP port to connect to Heat API from public network
 #   Defaults to '8000'
-#
-# [*ks_glance_api_public_port*]
-#   (optional) TCP port to connect to Glance API from public network
-#   Defaults to '9292'
 #
 # [*api_eth*]
 #   (optional) Which interface we bind the Keystone server.
@@ -355,26 +327,25 @@ class cloud::identity (
   $ceilometer_public_url        = undef,
   $ceilometer_internal_url      = undef,
   $ceilometer_admin_url         = undef,
+
   $ceilometer_password          = 'ceilometerpassword',
 
-  $cinder_v1_public_url        = undef,
-  $cinder_v1_internal_url      = undef,
-  $cinder_v1_admin_url         = undef,
+  $cinder_v1_public_url         = undef,
+  $cinder_v1_internal_url       = undef,
+  $cinder_v1_admin_url          = undef,
 
-  $cinder_v2_public_url        = undef,
-  $cinder_v2_internal_url      = undef,
-  $cinder_v2_admin_url         = undef,
+  $cinder_v2_public_url         = undef,
+  $cinder_v2_internal_url       = undef,
+  $cinder_v2_admin_url          = undef,
 
   $cinder_password              = 'cinderpassword',
 
-  $ks_glance_admin_host         = '127.0.0.1',
-  $ks_glance_internal_host      = '127.0.0.1',
-  $ks_glance_password           = 'glancepassword',
-  $ks_glance_public_host        = '127.0.0.1',
-  $ks_glance_public_proto       = 'http',
-  $ks_glance_internal_proto     = 'http',
-  $ks_glance_admin_proto        = 'http',
-  $ks_glance_api_public_port    = 9292,
+  $glance_public_url            = undef,
+  $glance_internal_url          = undef,
+  $glance_admin_url             = undef,
+
+  $glance_password              = 'glancepassword',
+
 
   $ks_heat_admin_host           = '127.0.0.1',
   $ks_heat_internal_host        = '127.0.0.1',
@@ -696,15 +667,13 @@ class cloud::identity (
   }
 
   class { 'glance::keystone::auth':
-    admin_address     => $ks_glance_admin_host,
-    internal_address  => $ks_glance_internal_host,
-    public_address    => $ks_glance_public_host,
-    port              => $ks_glance_api_public_port,
-    public_protocol   => $ks_glance_public_proto,
-    internal_protocol => $ks_glance_internal_proto,
-    admin_protocol    => $ks_glance_admin_proto,
+
+    public_url        => $glance_public_url,
+    internal_url      => $glance_internal_url,
+    admin_url         => $glance_admin_url,
+
     region            => $region,
-    password          => $ks_glance_password
+    password          => $glance_password
   }
 
   class { 'heat::keystone::auth':
