@@ -478,7 +478,7 @@ class cloud::identity (
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
-    compute_port          => $cloud::global::api::ports::nova,
+#    compute_port          => $::cloud::global::api::ports::nova,
     debug                 => $debug,
     database_idle_timeout => $keystone_db_idle_timeout,
     log_facility          => $log_facility,
