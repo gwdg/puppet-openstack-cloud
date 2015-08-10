@@ -70,19 +70,7 @@
 #   (optional) Public Hostname or IP to connect to Keystone API
 #   Defaults to '127.0.0.1'
 #
-# [*ks_trove_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Trove API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_trove_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Trove API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_trove_public_host*]
-#   (optional) Public Hostname or IP to connect to Trove API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_trove_password*]
+# [*trove_password*]
 #   (optional) Password used by Trove to connect to Keystone API
 #   Defaults to 'trovepassword'
 #
@@ -126,18 +114,6 @@
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
-# [*ks_trove_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_trove_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_trove_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
 # [*ks_keystone_internal_port*]
 #   (optional) TCP port to connect to Keystone API from internal network
 #   Defaults to '5000'
@@ -149,10 +125,6 @@
 # [*ks_keystone_admin_port*]
 #   (optional) TCP port to connect to Keystone API from admin network
 #   Defaults to '35357'
-#
-# [*ks_trove_public_port*]
-#   (optional) TCP port to connect to Trove API from public network
-#   Defaults to '8779'
 #
 # [*ks_ec2_public_port*]
 #   (optional) TCP port to connect to EC2 API from public network
@@ -305,15 +277,11 @@ class cloud::identity (
   $ks_swift_dispersion_password = 'dispersion',
   $swift_password               = 'swiftpassword',
 
+  $trove_public_url             = undef,
+  $trove_internal_url           = undef,
+  $trove_admin_url              = undef,
 
-  $ks_trove_admin_host          = '127.0.0.1',
-  $ks_trove_internal_host       = '127.0.0.1',
-  $ks_trove_password            = 'trovepassword',
-  $ks_trove_public_host         = '127.0.0.1',
-  $ks_trove_public_port         = 8779,
-  $ks_trove_public_proto        = 'http',
-  $ks_trove_admin_proto         = 'http',
-  $ks_trove_internal_proto      = 'http',
+  $trove_password               = 'trovepassword',
 
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
@@ -598,15 +566,13 @@ class cloud::identity (
 
   if $trove_enabled {
     class {'trove::keystone::auth':
-      admin_address     => $ks_trove_admin_host,
-      internal_address  => $ks_trove_internal_host,
-      public_address    => $ks_trove_public_host,
-      public_protocol   => $ks_trove_public_proto,
-      admin_protocol    => $ks_trove_admin_proto,
-      internal_protocol => $ks_trove_internal_proto,
-      port              => $ks_trove_public_port,
+
+      public_url        => $trove_public_url,
+      internal_url      => $trove_internal_url,
+      admin_url         => $trove_admin_url,
+
       region            => $region,
-      password          => $ks_trove_password
+      password          => $trove_password
     }
   }
 
