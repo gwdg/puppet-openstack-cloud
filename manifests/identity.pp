@@ -82,18 +82,6 @@
 #   (optional) Public Hostname or IP to connect to Trove API
 #   Defaults to '127.0.0.1'
 #
-# [*ks_swift_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Swift API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_swift_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Swift API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_swift_public_host*]
-#   (optional) Public Hostname or IP to connect to Swift API
-#   Defaults to '127.0.0.1'
-#
 # [*ks_trove_password*]
 #   (optional) Password used by Trove to connect to Keystone API
 #   Defaults to 'trovepassword'
@@ -102,7 +90,7 @@
 #   (optional) Password used by Ceilometer to connect to Keystone API
 #   Defaults to 'ceilometerpassword'
 #
-# [*ks_swift_password*]
+# [*swift_password*]
 #   (optional) Password used by Swift to connect to Keystone API
 #   Defaults to 'swiftpassword'
 #
@@ -125,18 +113,6 @@
 # [*cinder_password*]
 #   (optional) Password used by Cinder to connect to Keystone API
 #   Defaults to 'cinderpassword'
-#
-# [*ks_swift_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_swift_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_swift_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
 #
 # [*ks_keystone_public_proto*]
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
@@ -173,10 +149,6 @@
 # [*ks_keystone_admin_port*]
 #   (optional) TCP port to connect to Keystone API from admin network
 #   Defaults to '35357'
-#
-# [*ks_swift_public_port*]
-#   (optional) TCP port to connect to Swift API from public network
-#   Defaults to '8080'
 #
 # [*ks_trove_public_port*]
 #   (optional) TCP port to connect to Trove API from public network
@@ -324,17 +296,15 @@ class cloud::identity (
   $nova_ec2_internal_url        = undef,
   $nova_ec2_admin_url           = undef,
 
-  $nova_password             = 'novapassword',
+  $nova_password                = 'novapassword',
+
+  $swift_public_url             = undef,
+  $swift_internal_url           = undef,
+  $swift_admin_url              = undef,
 
   $ks_swift_dispersion_password = 'dispersion',
-  $ks_swift_internal_host       = '127.0.0.1',
-  $ks_swift_admin_host          = '127.0.0.1',
-  $ks_swift_password            = 'swiftpassword',
-  $ks_swift_public_host         = '127.0.0.1',
-  $ks_swift_public_port         = 8080,
-  $ks_swift_public_proto        = 'http',
-  $ks_swift_admin_proto         = 'http',
-  $ks_swift_internal_proto      = 'http',
+  $swift_password               = 'swiftpassword',
+
 
   $ks_trove_admin_host          = '127.0.0.1',
   $ks_trove_internal_host       = '127.0.0.1',
@@ -473,19 +443,17 @@ class cloud::identity (
 
   if $swift_enabled {
     class {'swift::keystone::auth':
-      password          => $ks_swift_password,
-      public_address    => $ks_swift_public_host,
-      public_port       => $ks_swift_public_port,
-      public_protocol   => $ks_swift_public_proto,
-      admin_protocol    => $ks_swift_admin_proto,
-      internal_protocol => $ks_swift_internal_proto,
-      admin_address     => $ks_swift_admin_host,
-      internal_address  => $ks_swift_internal_host,
+
+      public_url        => $swift_public_url,
+      internal_url      => $swift_internal_url,
+      admin_url         => $swift_admin_url,
+
+      password          => $swift_password,
       region            => $region
     }
 
     class {'swift::keystone::dispersion':
-      auth_pass => $ks_swift_dispersion_password
+      auth_pass         => $ks_swift_dispersion_password
     }
   }
 
