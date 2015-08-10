@@ -94,18 +94,6 @@
 #   (optional) Public Hostname or IP to connect to Neutron API
 #   Defaults to '127.0.0.1'
 #
-# [*ks_heat_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Heat API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_heat_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Heat API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_heat_public_host*]
-#   (optional) Public Hostname or IP to connect to Heat API
-#   Defaults to '127.0.0.1'
-#
 # [*ks_swift_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Swift API
 #   Defaults to '127.0.0.1'
@@ -138,7 +126,7 @@
 #   (optional) Password used by Neutron to connect to Keystone API
 #   Defaults to 'neutronpassword'
 #
-# [*ks_heat_password*]
+# [*heat_password*]
 #   (optional) Password used by Heat to connect to Keystone API
 #   Defaults to 'heatpassword'
 #
@@ -159,18 +147,6 @@
 #   Defaults to 'http'
 #
 # [*ks_swift_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_heat_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_heat_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_heat_internal_proto*]
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
@@ -242,14 +218,6 @@
 # [*ks_neutron_public_port*]
 #   (optional) TCP port to connect to Neutron API from public network
 #   Defaults to '9696'
-#
-# [*ks_heat_public_port*]
-#   (optional) TCP port to connect to Heat API from public network
-#   Defaults to '8004'
-#
-# [*ks_heat_cfn_public_port*]
-#   (optional) TCP port to connect to Heat API from public network
-#   Defaults to '8000'
 #
 # [*api_eth*]
 #   (optional) Which interface we bind the Keystone server.
@@ -346,16 +314,15 @@ class cloud::identity (
 
   $glance_password              = 'glancepassword',
 
+  $heat_public_url              = undef,
+  $heat_internal_url            = undef,
+  $heat_admin_url               = undef,
 
-  $ks_heat_admin_host           = '127.0.0.1',
-  $ks_heat_internal_host        = '127.0.0.1',
-  $ks_heat_password             = 'heatpassword',
-  $ks_heat_public_host          = '127.0.0.1',
-  $ks_heat_public_proto         = 'http',
-  $ks_heat_admin_proto          = 'http',
-  $ks_heat_internal_proto       = 'http',
-  $ks_heat_public_port          = 8004,
-  $ks_heat_cfn_public_port      = 8000,
+  $heat_cfn_public_url          = undef,
+  $heat_cfn_internal_url        = undef,
+  $heat_cfn_admin_url           = undef,
+
+  $heat_password                = 'heatpassword',
 
   $ks_keystone_admin_host       = '127.0.0.1',
   $ks_keystone_admin_port       = 35357,
@@ -668,36 +635,32 @@ class cloud::identity (
 
   class { 'glance::keystone::auth':
 
-    public_url        => $glance_public_url,
-    internal_url      => $glance_internal_url,
-    admin_url         => $glance_admin_url,
+    public_url          => $glance_public_url,
+    internal_url        => $glance_internal_url,
+    admin_url           => $glance_admin_url,
 
-    region            => $region,
-    password          => $glance_password
+    region              => $region,
+    password            => $glance_password
   }
 
   class { 'heat::keystone::auth':
-    admin_address     => $ks_heat_admin_host,
-    internal_address  => $ks_heat_internal_host,
-    public_address    => $ks_heat_public_host,
-    port              => $ks_heat_public_port,
-    public_protocol   => $ks_heat_public_proto,
-    internal_protocol => $ks_heat_internal_proto,
-    admin_protocol    => $ks_heat_admin_proto,
-    region            => $region,
-    password          => $ks_heat_password
+
+    public_url          => $heat_public_url,                                                                                                                                                                
+    internal_url        => $heat_internal_url,
+    admin_url           => $heat_admin_url,                                                                                                                                                                 
+
+    region              => $region,
+    password            => $heat_password
   }
 
   class { 'heat::keystone::auth_cfn':
-    admin_address     => $ks_heat_admin_host,
-    internal_address  => $ks_heat_internal_host,
-    public_address    => $ks_heat_public_host,
-    port              => $ks_heat_cfn_public_port,
-    public_protocol   => $ks_heat_public_proto,
-    internal_protocol => $ks_heat_internal_proto,
-    admin_protocol    => $ks_heat_admin_proto,
-    region            => $region,
-    password          => $ks_heat_password
+
+    public_url          => $heat_cfn_public_url,
+    internal_url        => $heat_cfn_internal_url,
+    admin_url           => $heat_cfn_admin_url,
+
+    region              => $region,
+    password            => $heat_password
   }
 
   if $trove_enabled {
