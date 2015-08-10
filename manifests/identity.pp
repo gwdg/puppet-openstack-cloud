@@ -82,18 +82,6 @@
 #   (optional) Public Hostname or IP to connect to Trove API
 #   Defaults to '127.0.0.1'
 #
-# [*ks_neutron_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Neutron API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_neutron_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Neutron API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_neutron_public_host*]
-#   (optional) Public Hostname or IP to connect to Neutron API
-#   Defaults to '127.0.0.1'
-#
 # [*ks_swift_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Swift API
 #   Defaults to '127.0.0.1'
@@ -122,7 +110,7 @@
 #   (optional) Password used by Nova to connect to Keystone API
 #   Defaults to 'novapassword'
 #
-# [*ks_neutron_password*]
+# [*neutron_password*]
 #   (optional) Password used by Neutron to connect to Keystone API
 #   Defaults to 'neutronpassword'
 #
@@ -159,18 +147,6 @@
 #   Defaults to 'http'
 #
 # [*ks_keystone_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_neutron_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_neutron_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_neutron_internal_proto*]
 #   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
@@ -214,10 +190,6 @@
 #   (optional) Password of the dispersion tenant, used for swift-dispersion-report
 #   and swift-dispersion-populate tools.
 #   Defaults to 'dispersion'
-#
-# [*ks_neutron_public_port*]
-#   (optional) TCP port to connect to Neutron API from public network
-#   Defaults to '9696'
 #
 # [*api_eth*]
 #   (optional) Which interface we bind the Keystone server.
@@ -334,16 +306,11 @@ class cloud::identity (
   $ks_keystone_admin_proto      = 'http',
   $ks_keystone_internal_proto   = 'http',
 
-  $ks_neutron_admin_host        = '127.0.0.1',
-  $ks_neutron_internal_host     = '127.0.0.1',
-  $ks_neutron_password          = 'neutronpassword',
-  $ks_neutron_public_host       = '127.0.0.1',
-  $ks_neutron_public_proto      = 'http',
-  $ks_neutron_admin_proto       = 'http',
-  $ks_neutron_internal_proto    = 'http',
-  $ks_neutron_public_port       = 9696,
+  $neutron_public_url           = undef,
+  $neutron_internal_url         = undef,
+  $neutron_admin_url            = undef,
 
-  $nova_password             = 'novapassword',
+  $neutron_password             = 'neutronpassword',
 
   $nova_v2_public_url           = undef,
   $nova_v2_internal_url         = undef,
@@ -357,7 +324,7 @@ class cloud::identity (
   $nova_ec2_internal_url        = undef,
   $nova_ec2_admin_url           = undef,
 
-  $ks_ec2_public_port           = 8773,
+  $nova_password             = 'novapassword',
 
   $ks_swift_dispersion_password = 'dispersion',
   $ks_swift_internal_host       = '127.0.0.1',
@@ -606,15 +573,13 @@ class cloud::identity (
   }                                                                                                                                                                                                         
 
   class { 'neutron::keystone::auth':
-    admin_address     => $ks_neutron_admin_host,
-    internal_address  => $ks_neutron_internal_host,
-    public_address    => $ks_neutron_public_host,
-    public_protocol   => $ks_neutron_public_proto,
-    internal_protocol => $ks_neutron_internal_proto,
-    admin_protocol    => $ks_neutron_admin_proto,
-    port              => $ks_neutron_public_port,
-    region            => $region,
-    password          => $ks_neutron_password
+
+    public_url          => $neutron_public_url,
+    internal_url        => $neutron_internal_url,
+    admin_url           => $neutron_admin_url,
+
+    region              => $region,
+    password            => $neutron_password
   }
 
   if $cinder_enabled {
