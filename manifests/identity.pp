@@ -58,18 +58,6 @@
 # [*ks_admin_token*]
 #   (required) Admin token used by Keystone.
 #
-# [*ks_keystone_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_keystone_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_keystone_public_host*]
-#   (optional) Public Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
 # [*trove_password*]
 #   (optional) Password used by Trove to connect to Keystone API
 #   Defaults to 'trovepassword'
@@ -101,34 +89,6 @@
 # [*cinder_password*]
 #   (optional) Password used by Cinder to connect to Keystone API
 #   Defaults to 'cinderpassword'
-#
-# [*ks_keystone_public_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_keystone_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_keystone_internal_proto*]
-#   (optional) Protocol for public endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_keystone_internal_port*]
-#   (optional) TCP port to connect to Keystone API from internal network
-#   Defaults to '5000'
-#
-# [*ks_keystone_public_port*]
-#   (optional) TCP port to connect to Keystone API from public network
-#   Defaults to '5000'
-#
-# [*ks_keystone_admin_port*]
-#   (optional) TCP port to connect to Keystone API from admin network
-#   Defaults to '35357'
-#
-# [*ks_ec2_public_port*]
-#   (optional) TCP port to connect to EC2 API from public network
-#   Defaults to '8773'
 #
 # [*ks_swift_dispersion_password*]
 #   (optional) Password of the dispersion tenant, used for swift-dispersion-report
@@ -240,15 +200,12 @@ class cloud::identity (
 
   $heat_password                = 'heatpassword',
 
-  $ks_keystone_admin_host       = '127.0.0.1',
-  $ks_keystone_admin_port       = 35357,
-  $ks_keystone_internal_host    = '127.0.0.1',
-  $ks_keystone_internal_port    = 5000,
-  $ks_keystone_public_host      = '127.0.0.1',
-  $ks_keystone_public_port      = 5000,
-  $ks_keystone_public_proto     = 'http',
-  $ks_keystone_admin_proto      = 'http',
-  $ks_keystone_internal_proto   = 'http',
+  $keystone_public_url          = undef,
+  $keystone_internal_url        = undef,
+  $keystone_admin_url           = undef,
+
+  $ks_keystone_public_port      = undef,
+  $ks_keystone_admin_port       = undef,
 
   $neutron_public_url           = undef,
   $neutron_internal_url         = undef,
@@ -317,7 +274,11 @@ class cloud::identity (
     $log_file = 'keystone.log'
   }
 
-# Configure Keystone
+#
+# Configure Keystone:
+#
+# Commented out vars are set directly from hiera
+#
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
@@ -333,12 +294,12 @@ class cloud::identity (
     admin_bind_host       => $api_eth,
     log_dir               => $log_dir,
     log_file              => $log_file,
-    public_port           => $ks_keystone_public_port,
-    admin_port            => $ks_keystone_admin_port,
+#    public_port           => $ks_keystone_public_port,
+#    admin_port            => $ks_keystone_admin_port,
     token_driver          => $token_driver,
     token_expiration      => $ks_token_expiration,
-    admin_endpoint        => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/",
-    public_endpoint       => "${ks_keystone_public_proto}://${ks_keystone_public_host}:${ks_keystone_public_port}/",
+    admin_endpoint        => $keystone_admin_url,
+    public_endpoint       => $keystone_public_url,
   }
 
   keystone_config {
@@ -383,7 +344,9 @@ class cloud::identity (
   }
 
 # Keystone Endpoints + Users
+
   class { 'keystone::roles::admin':
+
     email        => $ks_admin_email,
     password     => $ks_admin_password,
     admin_tenant => $ks_admin_tenant,
@@ -392,9 +355,11 @@ class cloud::identity (
   keystone_role { $identity_roles_addons: ensure => present }
 
   class {'keystone::endpoint':
-    public_url   => "${ks_keystone_public_proto}://${ks_keystone_public_host}:${ks_keystone_public_port}",
-    internal_url => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
-    admin_url    => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
+
+    public_url   => $keystone_public_url,
+    internal_url => $keystone_internal_url,
+    admin_url    => $keystone_admin_url,
+
     region       => $region,
   }
 
