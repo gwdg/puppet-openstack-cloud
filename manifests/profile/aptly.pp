@@ -1,4 +1,6 @@
-class cloud::profile::aptly {
+class cloud::profile::aptly(
+  $vhost = undef,
+) {
 
   # ----- Setup apache for serving apt repos managed by aptly
 
@@ -8,7 +10,7 @@ class cloud::profile::aptly {
     purge_configs   => true,
   }
 
-  apache::vhost { 'puppetmaster.dev.cloud.gwg.de':
+  apache::vhost { "$vhost":
     port          => '80',
     docroot       => '/var/lib/aptly/public',
   }
