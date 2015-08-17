@@ -118,7 +118,7 @@
 #   (optional) Full path of data directory to store the images.
 #   Defaults to '/var/lib/glance/images/'
 #
-# [*nfs_device*]
+# [*nfs_server*]
 #   (optionnal) NFS device to mount
 #   Example: 'nfs.example.com:/vol1'
 #   Required when running 'nfs' backend.
@@ -164,7 +164,8 @@ class cloud::image::api(
   $backend                           = 'rbd',
   $known_stores                      = ['rbd', 'http'],
   $filesystem_store_datadir          = '/var/lib/glance/images/',
-  $nfs_device                        = false,
+  $nfs_server                        = false,
+  $nfs_share                         = undef,
   $nfs_options                       = 'defaults',
   $pipeline                          = 'keystone',
   $firewall_settings                 = {},
@@ -235,6 +236,7 @@ class cloud::image::api(
   }
 
   if ($backend == 'rbd') {
+
     class { 'glance::backend::rbd':
       rbd_store_user => $glance_rbd_user,
       rbd_store_pool => $glance_rbd_pool
@@ -249,47 +251,58 @@ class cloud::image::api(
       notify  => Service['glance-api','glance-registry']
     }
     Concat::Fragment <<| title == 'ceph-client-os' |>>
+
   } elsif ($backend == 'file') {
+
     class { 'glance::backend::file':
       filesystem_store_datadir => $filesystem_store_datadir
     }
+
   } elsif ($backend == 'swift') {
+
     class { 'glance::backend::swift':
       swift_store_user                    => 'services:glance',
       swift_store_key                     => $ks_glance_password,
       swift_store_auth_address            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357/v2.0/",
       swift_store_create_container_on_put => true,
     }
+
   } elsif ($backend == 'nfs') {
-    # There is no NFS backend in Glance.
-    # We mount the NFS share in filesystem_store_datadir to fake the
-    # backend.
-    #
-    # FIXME (Piotr): We use the nfs module to mount nfs shares elsewhere, so disable it here
-    #
-#    if $nfs_device {
-#      file { $filesystem_store_datadir:
-#        ensure => 'directory',
-#        owner  => 'glance',
-#        group  => 'glance',
-#        mode   => '0755'
-#      } ->
+
+    # FIXME (Piotr): Use the nfs module to mount the necessary nfs shares
+    include ::nfs::client
+
+    nfs::client::mount { '/var/lib/glance/images':
+
+      mount     => '/var/lib/glance/images',
+
+      server    => $nfs_server,
+      share     => "${nfs_share}/images",
+      options   => $nfs_options,
+
+      owner     => 'glance',
+      group     => 'glance',
+
+      require   => Package['glance-api'],
+    }
+
+    nfs::client::mount { '/var/lib/glance/image-cache':
+      
+      mount     => '/var/lib/glance/image-cache',
+
+      server    => $nfs_server,
+      share     => "${nfs_share}/image-cache",
+      options   => $nfs_options,
+
+      owner     => 'glance',
+      group     => 'glance',
+
+      require   => Package['glance-api'],                                                                                                                                                                   
+    }
+
 #      class { 'glance::backend::file':
 #        filesystem_store_datadir => $filesystem_store_datadir
 #      }
-#      $nfs_mount = {
-#        "${filesystem_store_datadir}" => {
-#          'ensure'  => 'mounted',
-#          'fstype'  => 'nfs',
-#          'device'  => $nfs_device,
-#          'options' => $nfs_options
-#        }
-#      }
-#      ensure_resource('class', 'nfs', {})
-#      create_resources('types::mount', $nfs_mount, {require => File[$filesystem_store_datadir]})
-#    } else {
-#      fail('When running NFS backend, you need to provide nfs_device parameter.')
-#    }
 
   } else {
     fail("${backend} is not a Glance supported backend.")
