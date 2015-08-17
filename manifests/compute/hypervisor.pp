@@ -82,7 +82,7 @@
 #   (optional) Store (or not) instances on a NFS share.
 #   Defaults to false
 #
-# [*nfs_device*]
+# [*nfs_server*]
 #   (optional) NFS device to mount
 #   Example: 'nfs.example.com:/vol1'
 #   Required when nfs_enabled is at true.
@@ -134,7 +134,8 @@ class cloud::compute::hypervisor(
   $include_vswitch            = true,
   # when using NFS storage backend
   $nfs_enabled                = false,
-  $nfs_device                 = false,
+  $nfs_server                 = false,
+  $nfs_share                  = undef,
   $nfs_options                = 'defaults',
   $filesystem_store_datadir   = '/var/lib/nova/instances',
 ) inherits cloud::params {
@@ -158,33 +159,33 @@ class cloud::compute::hypervisor(
       # We mount the NFS share in filesystem_store_datadir to fake the
       # backend.
 
-      if $nfs_device {
-#        file { $filesystem_store_datadir:
-#          ensure => 'directory',
-#          owner  => 'nova',
-#          group  => 'nova',
-#          mode   => '0755'
-#        }
+      if $nfs_server {
+
+        # FIXME (Piotr): Use the nfs module to mount the necessary nfs shares
+        include ::nfs::client
+
+        nfs::client::mount { '/var/lib/nova/instances':
+
+          mount     => '/var/lib/nova/instances',
+
+          server    => $nfs_server,
+          share     => "${nfs_share}/instances",
+          options   => $nfs_options,
+
+          owner     => 'nova',
+          group     => 'nova',
+
+          require   => User['nova'],
+        }
 
         nova_config { 'DEFAULT/instances_path': value => $filesystem_store_datadir; }
-
-#        $nfs_mount = {
-#          "${filesystem_store_datadir}" => {
-#            'ensure'  => 'mounted',
-#            'fstype'  => 'nfs',
-#            'device'  => $nfs_device,
-#            'options' => $nfs_options
-#          }
-#        }
-#        ensure_resource('class', 'nfs', {})
-#        create_resources('types::mount', $nfs_mount, {require => File[$filesystem_store_datadir]})
 
         # Not using /var/lib/nova/instances may cause side effects.
         if $filesystem_store_datadir != '/var/lib/nova/instances' {
           warning('filesystem_store_datadir is not /var/lib/nova/instances so you may have side effects (SElinux, etc)')
         }
       } else {
-        fail('When running NFS backend, you need to provide nfs_device parameter.')
+        fail('When running NFS backend, you need to provide nfs_server parameter.')
       }
     } else {
       fail('When running NFS backend, vm_rbd parameter cannot be set to true.')
