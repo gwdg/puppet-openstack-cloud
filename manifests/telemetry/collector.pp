@@ -43,9 +43,9 @@ class cloud::telemetry::collector(
     $db_conn = "mongodb://${s_mongo_nodes}/ceilometer"
   }
 
-  mongodb_conn_validator { $mongo_nodes:
-    before => Class['ceilometer::db']
-  }
+#  mongodb_conn_validator { $mongo_nodes:
+#    before => Class['ceilometer::db']
+#  }
 
   class { 'ceilometer::db':
     database_connection => $db_conn,
