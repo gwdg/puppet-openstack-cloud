@@ -1,6 +1,5 @@
 class cloud::role::mongodb inherits ::cloud::role::base {
 
-    class { '::cloud': }                                    ->
     class { '::mongodb::globals':
 #        manage_package_repo => true,
     }                                                       ->
