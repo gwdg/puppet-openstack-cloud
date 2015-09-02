@@ -624,8 +624,15 @@ class cloud::loadbalancer(
   $galera_timeout                   = '90m',
   $galera_connections               = '4096',
   $api_timeout                      = '90m',
-  $vip_public_ip                    = ['127.0.0.1'],
+
+  $vip_public_ip                    = false,
+  $vip_public_network               = false,
+  $vip_public_gateway               = false,
+
   $vip_internal_ip                  = false,
+  $vip_internal_network             = false,
+  $vip_internal_gateway             = false,
+
   $vip_monitor_ip                   = false,
   $galera_ip                        = ['127.0.0.1'],
   $galera_slave                     = false,
@@ -734,16 +741,25 @@ class cloud::loadbalancer(
   if $keepalived_internal_ipvs {
 
     # If vagrant environment setup appropriate routing on lbs for external access via keepalived notification scripts
+    $keepalived_notify = '/etc/keepalived/keepalived_setup_routing.sh'
+
     if ! $::cloud::production {
-        $keepalived_notify = '/etc/keepalived/keepalived_setup_routing.sh'
-        
-        file { $keepalived_notify:
-          source    => '/vagrant/files/keepalived_setup_routing.sh',
-          require   => Package['keepalived'],
-          before    => Keepalived::Instance[$keepalived_internal_id],
-        }
+
+        # Vagrant setup
+        $routing_internal   = true
+        $routing_public     = true
+
     } else {
-        $keepalived_notify = undef
+
+        # Production setup
+        $routing_internal   = false
+        $routing_public     = true
+    }
+
+    file { $keepalived_notify:                                                                                                                                                                          
+      content   => template('cloud/loadbalancer/keepalived_setup_routing.sh'),
+      require   => Package['keepalived'],                                                                                                                                                               
+      before    => Keepalived::Instance[$keepalived_internal_id],
     }
 
     # Then we validate this is not the same as public binding

@@ -200,11 +200,13 @@ class cloud(
 #  include ::sudo
 #  include ::sudo::configs
 
-  # NTP
-  class { '::ntp':
-    servers     => $ntp_servers,
-    restrict    => ['127.0.0.1'],
-#    interfaces  => ['127.0.0.1', ip_for_network(hiera('openstack::network::management'))],
+  # NTP (do not install for containers)
+  if ! ($::virtual == 'lxc')  {
+    class { '::ntp':
+      servers     => $ntp_servers,
+      restrict    => ['127.0.0.1'],
+#     interfaces  => ['127.0.0.1', ip_for_network(hiera('openstack::network::management'))],
+    }
   }
 
   # Security Limits
