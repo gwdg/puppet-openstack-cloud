@@ -7,7 +7,7 @@ python /tmp/get-pip.py
 
 ## Install nova-docker
 
-git clone https://github.com/stackforge/nova-docker /tmp/nova-docker
+git clone https://github.com/gwdg/nova-docker /tmp/nova-docker
 cd /tmp/nova-docker
 git checkout stable/kilo
 
