@@ -758,7 +758,8 @@ class cloud::loadbalancer(
 
     file { $keepalived_notify:                                                                                                                                                                          
       content   => template('cloud/loadbalancer/keepalived_setup_routing.sh'),
-      require   => Package['keepalived'],                                                                                                                                                               
+      require   => Package['keepalived'],
+      mode      => '0775',
       before    => Keepalived::Instance[$keepalived_internal_id],
     }
 
