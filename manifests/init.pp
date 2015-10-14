@@ -164,9 +164,12 @@ class cloud(
 #   proxy_port => '3142',
 
     # Purge all repos not managed by puppet
-    purge_sources_list    => true,
-    purge_sources_list_d  => true,
-    fancy_progress        => true,
+    purge => { 'sources.list' => true , 'sources.list.d' => true },
+  }
+
+  apt::conf { 'progressbar':
+    priority => 99,
+    content  => 'Dpkg::Progress-Fancy "1";',
   }
 
   # Create users / groups whose uids / gids need to be in sync on different systems
