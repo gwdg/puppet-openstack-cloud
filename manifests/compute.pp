@@ -100,10 +100,6 @@
 #   (optional) Name of the default Nova availability zone.
 #   Defaults to 'RegionOne'
 #
-# [*cinder_endpoint_type*]
-#   (optional) Cinder endpoint type to use.
-#   Defaults to 'publicURL'
-#
 class cloud::compute(
   $nova_db_host             = '127.0.0.1',
   $nova_db_use_slave        = false,
@@ -125,7 +121,6 @@ class cloud::compute(
   $neutron_region_name      = 'RegionOne',
   $memcache_servers         = ['127.0.0.1:11211'],
   $availability_zone        = 'RegionOne',
-  $cinder_endpoint_type     = 'publicURL'
 ) {
 
   if !defined(Resource['nova_config']) {
@@ -187,7 +182,6 @@ class cloud::compute(
     'DEFAULT/resume_guests_state_on_host_boot': value => true;
     'DEFAULT/servicegroup_driver':              value => 'mc';
     'DEFAULT/glance_num_retries':               value => '10';
-    'cinder/catalog_info':              value => "volume:cinder:${cinder_endpoint_type}";
   }
 
 }

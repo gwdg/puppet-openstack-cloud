@@ -64,10 +64,6 @@
 #   (optional) The storage availability zone
 #   Defaults to 'nova'
 #
-# [*nova_endpoint_type*]
-#   (optional) The type of the OpenStack endpoint (public/internal/admin) URL
-#   Defaults to 'publicURL'
-#
 class cloud::volume(
   $cinder_db_host             = '127.0.0.1',
   $cinder_db_user             = 'cinder',
@@ -80,7 +76,6 @@ class cloud::volume(
   $log_facility               = 'LOG_LOCAL0',
   $storage_availability_zone  = 'nova',
   $use_syslog                 = true,
-  $nova_endpoint_type         = 'publicURL'
 ) {
 
   # Disable twice logging if syslog is enabled
@@ -115,10 +110,6 @@ class cloud::volume(
     log_facility              => $log_facility,
     use_syslog                => $use_syslog,
     storage_availability_zone => $storage_availability_zone
-  }
-
-  cinder_config {
-    'DEFAULT/nova_catalog_info': value => "compute:nova:${nova_endpoint_type}";
   }
 
   class { 'cinder::ceilometer': }
