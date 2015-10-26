@@ -59,14 +59,14 @@ class cloud::storage::rbd::pools(
   $setup_pools          = false,
 
   $glance_key           = undef,
-  $glance_rbd_user      = 'glance',
-  $glance_rbd_pool      = 'images',
+  $glance_user          = 'glance',
+  $glance_pool          = 'images',
 
   $cinder_key           = undef,
-  $cinder_rbd_user      = 'cinder',
-  $cinder_rbd_pool      = 'volumes',
+  $cinder_user          = 'cinder',
+  $cinder_pool          = 'volumes',
 
-  $nova_rbd_pool        = 'vms',
+  $nova_pool            = 'vms',
 
   $cinder_backup_key    = undef,
   $cinder_backup_user   = 'cinder',
@@ -78,54 +78,54 @@ class cloud::storage::rbd::pools(
   if $setup_pools {
 #    if !empty($::ceph_admin_key) {
 
-#      exec { "create_${glance_rbd_pool}_pool":
-#        command => "rados mkpool ${glance_rbd_pool}",
-#        unless  => "rados lspools | grep -sq ${glance_rbd_pool}",
+#      exec { "create_${glance_pool}_pool":
+#        command => "rados mkpool ${glance_pool}",
+#        unless  => "rados lspools | grep -sq ${glance_pool}",
 #      }
 
-#      exec { "create_${glance_rbd_pool}_user_and_key":
-#        command => "ceph auth get-or-create client.${glance_rbd_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=${glance_rbd_pool}'",
-#        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${glance_rbd_user}$'",
-#        require => Exec["create_${glance_rbd_pool}_pool"];
+#      exec { "create_${glance_pool}_user_and_key":
+#        command => "ceph auth get-or-create client.${glance_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=${glance_pool}'",
+#        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${glance_user}$'",
+#        require => Exec["create_${glance_pool}_pool"];
 #      }
 
-#      exec { "create_${cinder_rbd_pool}_pool":
-#        command => "rados mkpool ${cinder_rbd_pool}",
-#        unless  => "/usr/bin/rados lspools | grep -sq ${cinder_rbd_pool}",
+#      exec { "create_${cinder_pool}_pool":
+#        command => "rados mkpool ${cinder_pool}",
+#        unless  => "/usr/bin/rados lspools | grep -sq ${cinder_pool}",
 #      }
 
-#      exec { "create_${cinder_rbd_pool}_user_and_key":
+#      exec { "create_${cinder_pool}_user_and_key":
         # TODO: point PG num with a cluster variable
-#        command => "ceph auth get-or-create client.${cinder_rbd_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rx pool=${glance_rbd_pool}, allow rwx pool=${cinder_rbd_pool}, allow rwx pool=${nova_rbd_pool}'",
-#        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${cinder_rbd_user}$'",
-#        require => Exec["create_${cinder_rbd_pool}_pool"];
+#        command => "ceph auth get-or-create client.${cinder_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rx pool=${glance_pool}, allow rwx pool=${cinder_pool}, allow rwx pool=${nova_pool}'",
+#        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${cinder_user}$'",
+#        require => Exec["create_${cinder_pool}_pool"];
 #      }
 
       # Note(EmilienM): We use the same keyring for Nova and Cinder.
-#      exec { "create_${nova_rbd_pool}_pool":
-#        command => "rados mkpool ${nova_rbd_pool}",
-#        unless  => "/usr/bin/rados lspools | grep -sq ${nova_rbd_pool}",
+#      exec { "create_${nova_pool}_pool":
+#        command => "rados mkpool ${nova_pool}",
+#        unless  => "/usr/bin/rados lspools | grep -sq ${nova_pool}",
 #      }
 
       if $glance_key {
         # NOTE(fc): Puppet needs to run a second time to enter this
-        @@ceph::key { $glance_rbd_user:
+        @@ceph::key { $glance_user:
           secret       => $glance_key,
-          keyring_path => "/etc/ceph/ceph.client.${glance_rbd_user}.keyring"
+          keyring_path => "/etc/ceph/ceph.client.${glance_user}.keyring"
         }
-        Ceph::Key <<| title == $glance_rbd_user |>>
+        Ceph::Key <<| title == $glance_user |>>
       }
 
       if $cinder_key {
         # NOTE(fc): Puppet needs to run a second time to enter this
-        @@ceph::key { $cinder_rbd_user:
+        @@ceph::key { $cinder_user:
           secret       => $cinder_key,
-          keyring_path => "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring"
+          keyring_path => "/etc/ceph/ceph.client.${cinder_user}.keyring"
         }
-        Ceph::Key <<| title == $cinder_rbd_user |>>
+        Ceph::Key <<| title == $cinder_user |>>
       }
 
-      $clients = [$glance_rbd_user, $cinder_rbd_user]
+      $clients = [$glance_user, $cinder_user]
       @@concat::fragment { 'ceph-clients-os':
         target  => '/etc/ceph/ceph.conf',
         order   => '95',
