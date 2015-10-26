@@ -67,7 +67,7 @@ class cloud::storage::rbd::pools(
 ) {
 
   if $setup_pools {
-    if !empty($::ceph_admin_key) {
+#    if !empty($::ceph_admin_key) {
 
 #      exec { "create_${glance_rbd_pool}_pool":
 #        command => "rados mkpool ${glance_rbd_pool}",
@@ -148,6 +148,6 @@ class cloud::storage::rbd::pools(
         refreshonly =>  true,
       }
 
-    } # !empty($::ceph_admin_key)
+#    } # !empty($::ceph_admin_key)
   } # if setup pools
 } # class
