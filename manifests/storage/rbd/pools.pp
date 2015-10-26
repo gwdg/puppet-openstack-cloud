@@ -69,34 +69,34 @@ class cloud::storage::rbd::pools(
   if $setup_pools {
     if !empty($::ceph_admin_key) {
 
-      exec { "create_${glance_rbd_pool}_pool":
-        command => "rados mkpool ${glance_rbd_pool}",
-        unless  => "rados lspools | grep -sq ${glance_rbd_pool}",
-      }
+#      exec { "create_${glance_rbd_pool}_pool":
+#        command => "rados mkpool ${glance_rbd_pool}",
+#        unless  => "rados lspools | grep -sq ${glance_rbd_pool}",
+#      }
 
-      exec { "create_${glance_rbd_pool}_user_and_key":
-        command => "ceph auth get-or-create client.${glance_rbd_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=${glance_rbd_pool}'",
-        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${glance_rbd_user}$'",
-        require => Exec["create_${glance_rbd_pool}_pool"];
-      }
+#      exec { "create_${glance_rbd_pool}_user_and_key":
+#        command => "ceph auth get-or-create client.${glance_rbd_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=${glance_rbd_pool}'",
+#        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${glance_rbd_user}$'",
+#        require => Exec["create_${glance_rbd_pool}_pool"];
+#      }
 
-      exec { "create_${cinder_rbd_pool}_pool":
-        command => "rados mkpool ${cinder_rbd_pool}",
-        unless  => "/usr/bin/rados lspools | grep -sq ${cinder_rbd_pool}",
-      }
+#      exec { "create_${cinder_rbd_pool}_pool":
+#        command => "rados mkpool ${cinder_rbd_pool}",
+#        unless  => "/usr/bin/rados lspools | grep -sq ${cinder_rbd_pool}",
+#      }
 
-      exec { "create_${cinder_rbd_pool}_user_and_key":
+#      exec { "create_${cinder_rbd_pool}_user_and_key":
         # TODO: point PG num with a cluster variable
-        command => "ceph auth get-or-create client.${cinder_rbd_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rx pool=${glance_rbd_pool}, allow rwx pool=${cinder_rbd_pool}, allow rwx pool=${nova_rbd_pool}'",
-        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${cinder_rbd_user}$'",
-        require => Exec["create_${cinder_rbd_pool}_pool"];
-      }
+#        command => "ceph auth get-or-create client.${cinder_rbd_user} mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rx pool=${glance_rbd_pool}, allow rwx pool=${cinder_rbd_pool}, allow rwx pool=${nova_rbd_pool}'",
+#        unless  => "ceph auth list 2> /dev/null | egrep -sq '^client.${cinder_rbd_user}$'",
+#        require => Exec["create_${cinder_rbd_pool}_pool"];
+#      }
 
       # Note(EmilienM): We use the same keyring for Nova and Cinder.
-      exec { "create_${nova_rbd_pool}_pool":
-        command => "rados mkpool ${nova_rbd_pool}",
-        unless  => "/usr/bin/rados lspools | grep -sq ${nova_rbd_pool}",
-      }
+#      exec { "create_${nova_rbd_pool}_pool":
+#        command => "rados mkpool ${nova_rbd_pool}",
+#        unless  => "/usr/bin/rados lspools | grep -sq ${nova_rbd_pool}",
+#      }
 
       if $::ceph_keyring_glance {
         # NOTE(fc): Puppet needs to run a second time to enter this
