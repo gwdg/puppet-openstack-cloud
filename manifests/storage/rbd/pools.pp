@@ -55,14 +55,23 @@
 #   Defaults to 'vms'
 #
 class cloud::storage::rbd::pools(
+
   $setup_pools          = false,
+
+  $glance_key           = undef,
   $glance_rbd_user      = 'glance',
   $glance_rbd_pool      = 'images',
+
+  $cinder_key           = undef,
   $cinder_rbd_user      = 'cinder',
   $cinder_rbd_pool      = 'volumes',
+
   $nova_rbd_pool        = 'vms',
+
+  $cinder_backup_key    = undef,
   $cinder_backup_user   = 'cinder',
   $cinder_backup_pool   = 'cinder_backup',
+
   $ceph_fsid            = undef
 ) {
 
@@ -98,19 +107,19 @@ class cloud::storage::rbd::pools(
 #        unless  => "/usr/bin/rados lspools | grep -sq ${nova_rbd_pool}",
 #      }
 
-      if $::ceph_keyring_glance {
+      if $glance_key {
         # NOTE(fc): Puppet needs to run a second time to enter this
         @@ceph::key { $glance_rbd_user:
-          secret       => $::ceph_keyring_glance,
+          secret       => $glance_key,
           keyring_path => "/etc/ceph/ceph.client.${glance_rbd_user}.keyring"
         }
         Ceph::Key <<| title == $glance_rbd_user |>>
       }
 
-      if $::ceph_keyring_cinder {
+      if $cinder_key {
         # NOTE(fc): Puppet needs to run a second time to enter this
         @@ceph::key { $cinder_rbd_user:
-          secret       => $::ceph_keyring_cinder,
+          secret       => $cinder_key,
           keyring_path => "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring"
         }
         Ceph::Key <<| title == $cinder_rbd_user |>>
@@ -143,7 +152,7 @@ class cloud::storage::rbd::pools(
       }
 
       @@exec { 'set_secret_value_virsh':
-        command     => "virsh secret-set-value --secret ${ceph_fsid} --base64 ${::ceph_keyring_cinder}",
+        command     => "virsh secret-set-value --secret ${ceph_fsid} --base64 ${cinder_key}",
         tag         => 'ceph_compute_set_secret',
         refreshonly =>  true,
       }
