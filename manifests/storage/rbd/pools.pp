@@ -56,23 +56,28 @@
 #
 class cloud::storage::rbd::pools(
 
-  $setup_pools          = false,
+  $setup_pools              = false,
 
-  $glance_key           = undef,
-  $glance_user          = 'glance',
-  $glance_pool          = 'images',
+  $glance_key               = undef,
+  $glance_user              = 'glance',
+  $glance_pool              = 'images',
 
-  $cinder_key           = undef,
-  $cinder_user          = 'cinder',
-  $cinder_pool          = 'volumes',
+  $cinder_key               = undef,
+  $cinder_user              = 'cinder',
+  $cinder_pool              = 'volumes',
 
-  $nova_pool            = 'vms',
+  $nova_pool                = 'vms',
 
-  $cinder_backup_key    = undef,
-  $cinder_backup_user   = 'cinder',
-  $cinder_backup_pool   = 'cinder_backup',
+  $cinder_backup_key        = undef,
+  $cinder_backup_user       = 'cinder',
+  $cinder_backup_pool       = 'cinder_backup',
 
-  $ceph_fsid            = undef
+  $ceph_fsid                = undef,
+  $ceph_mon_initial_members = undef,
+  $ceph_mon_host            = undef,
+  $ceph_public_network      = undef,
+  $ceph_cluster_network     = undef,
+
 ) {
 
   if $setup_pools {
