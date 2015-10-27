@@ -73,11 +73,6 @@ class cloud::storage::rbd::pools(
   $cinder_backup_pool       = 'cinder_backup',
 
   $ceph_fsid                = undef,
-  $ceph_mon_initial_members = undef,
-  $ceph_mon_host            = undef,
-  $ceph_public_network      = undef,
-  $ceph_cluster_network     = undef,
-
 ) {
 
   if $setup_pools {

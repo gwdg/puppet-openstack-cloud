@@ -29,18 +29,28 @@
 #   Defaults to '127.0.0.1/24'
 #
 class cloud::storage::rbd (
-  $fsid            = undef,
-  $cluster_network = '127.0.0.1/24',
-  $public_network  = '127.0.0.1/24'
+
+  $fsid                 = undef,
+
+  $mon_initial_members  = undef,
+  $mon_host             = undef,
+
+  $cluster_network      = '127.0.0.1/24',
+  $public_network       = '127.0.0.1/24'
+
 ) {
 
-  class { 'ceph::conf':
-    fsid            => $fsid,
-    auth_type       => 'cephx',
-    cluster_network => $cluster_network,
-    public_network  => $public_network,
-    enable_service  => true
+  file { '/etc/ceph/ceph.conf':
+    content => template('cloud/storage/ceph/ceph-conf.erb'),
   }
+
+#  class { 'ceph::conf':
+#    fsid            => $fsid,
+#    auth_type       => 'cephx',
+#    cluster_network => $cluster_network,
+#    public_network  => $public_network,
+#    enable_service  => true
+#  }
 
   Exec {
     path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin'
