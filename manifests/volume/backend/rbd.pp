@@ -60,6 +60,9 @@ define cloud::volume::backend::rbd (
   $rbd_max_clone_depth              = '5',
 ) {
 
+  # Create ceph.conf
+  include cloud::storage::rbd
+
   cinder::backend::rbd { $volume_backend_name:
     rbd_pool                         => $rbd_pool,
     rbd_user                         => $rbd_user,
