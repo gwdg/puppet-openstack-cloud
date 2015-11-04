@@ -32,8 +32,8 @@ class cloud::storage::rbd (
 
   $fsid                 = undef,
 
-  $mon_initial_members  = undef,
-  $mon_host             = undef,
+  $mon_initial_members  = [],
+  $mon_host             = [],
 
   $cluster_network      = '127.0.0.1/24',
   $public_network       = '127.0.0.1/24'
@@ -41,7 +41,7 @@ class cloud::storage::rbd (
 ) {
 
   file { '/etc/ceph/ceph.conf':
-    content => template('cloud/storage/ceph/ceph-conf.erb'),
+    content => template('cloud/storage/ceph/ceph.conf.erb'),
   }
 
 #  class { 'ceph::conf':
