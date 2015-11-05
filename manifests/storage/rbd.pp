@@ -30,18 +30,36 @@
 #
 class cloud::storage::rbd (
 
+  $enable               = false,
+
   $fsid                 = undef,
 
   $mon_initial_members  = [],
   $mon_host             = [],
 
   $cluster_network      = '127.0.0.1/24',
-  $public_network       = '127.0.0.1/24'
+  $public_network       = '127.0.0.1/24',
+
+  $package_ensure       = 'latest',
 
 ) {
 
+  # Install ceph client packages
+  $packages = ['python-rbd', 'ceph-common']
+
+  package { 'ceph':
+    ensure  => $package_ensure,
+    name    => 'ceph-common',
+  } 
+
+  package { 'python-rbd':
+    ensure  => $package_ensure,
+  }
+
+  # Setup ceph.conf
   file { '/etc/ceph/ceph.conf':
     content => template('cloud/storage/ceph/ceph.conf.erb'),
+    require => Package['ceph']
   }
 
 #  class { 'ceph::conf':
