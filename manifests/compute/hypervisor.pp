@@ -349,15 +349,17 @@ Host *
 
     # If Cinder & Nova reside on the same node, we need a group
     # where nova & cinder users have read permissions.
-    ensure_resource('group', 'cephkeyring', {
-      ensure => 'present'
-    })
+    #
+    # pete: not relevant for our deplyoment
+#    ensure_resource('group', 'cephkeyring', {
+#      ensure => 'present'
+#    })
 
-    ensure_resource ('exec','add-nova-to-group', {
-      'command' => 'usermod -a -G cephkeyring nova',
-      'path'    => ['/usr/sbin', '/usr/bin', '/bin', '/sbin'],
-      'unless'  => 'groups nova | grep cephkeyring'
-    })
+#    ensure_resource ('exec','add-nova-to-group', {
+#      'command' => 'usermod -a -G cephkeyring nova',
+#      'path'    => ['/usr/sbin', '/usr/bin', '/bin', '/sbin'],
+#      'unless'  => 'groups nova | grep cephkeyring'
+#    })
 
     # Configure Ceph keyring
     Ceph::Key <<| title == $cinder_rbd_user |>>
