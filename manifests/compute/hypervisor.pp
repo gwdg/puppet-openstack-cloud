@@ -377,7 +377,7 @@ Host *
     }
 
     exec { 'set_secret_value_virsh':
-      command     => "virsh secret-set-value --secret ${ceph_fsid} --base64 ${cinder_key}",
+      command     => "virsh secret-set-value --secret ${ceph_fsid} --base64 ${cinder_rbd_key}",
       tag         => 'ceph_compute_set_secret',
       refreshonly =>  true,
     } ~> Service['nova-compute']
