@@ -123,16 +123,21 @@ class cloud::compute::hypervisor(
   $console                    = 'novnc',
   $novnc_port                 = '6080',
   $spice_port                 = '6082',
-  $cinder_rbd_user            = 'cinder',
-  $nova_rbd_pool              = 'vms',
-  $nova_rbd_secret_uuid       = undef,
-  $vm_rbd                     = false,
-  $volume_rbd                 = false,
   $manage_tso                 = true,
   $nova_shell                 = false,
   $firewall_settings          = {},
   $include_vswitch            = true,
-  # when using NFS storage backend
+
+  # Ceph storage backend
+  $ceph_fsid                  = undef,
+  $cinder_rbd_user            = 'cinder',
+  $cinder_rbd_key             = undef,
+  $nova_rbd_pool              = 'vms',
+  $nova_rbd_secret_uuid       = undef,
+  $vm_rbd                     = false,
+  $volume_rbd                 = false,
+
+  # NFS storage backend
   $nfs_enabled                = false,
   $nfs_server                 = false,
   $nfs_share                  = undef,
@@ -340,12 +345,49 @@ Host *
       'libvirt/rbd_secret_uuid': value => $nova_rbd_secret_uuid;
     }
 
-    File <<| tag == 'ceph_compute_secret_file' |>>
-    Exec <<| tag == 'get_or_set_virsh_secret' |>>
+    # Create key for rbd user
+    ceph::key { "client.${cinder_rbd_user}":
+      secret          => $cinder_rbd_key,
+      user            => 'nova',
+      group           => 'nova',
+      keyring_path    => "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring"
+    }
+
+    file { '/etc/ceph/secret.xml':
+      content => template('cloud/storage/ceph/secret-compute.xml.erb'),
+      tag     => 'ceph_compute_secret_file',
+    }
+
+    if $::osfamily == 'RedHat' {
+      $libvirt_package_name = 'libvirt'
+    } else {
+      $libvirt_package_name = 'libvirt-bin'
+    }
+
+    Exec {
+      path => '/bin:/sbin:/usr/bin:/usr/sbin'
+    }
+
+    exec { 'get_or_set_virsh_secret':
+      command => 'virsh secret-define --file /etc/ceph/secret.xml',
+      unless  => "virsh secret-list | tail -n +3 | cut -f1 -d' ' | grep -sq ${ceph_fsid}",
+      tag     => 'ceph_compute_get_secret',
+      require => [Package[$libvirt_package_name], File['/etc/ceph/secret.xml']],
+      notify  => Exec['set_secret_value_virsh'],
+    }
+
+    exec { 'set_secret_value_virsh':
+      command     => "virsh secret-set-value --secret ${ceph_fsid} --base64 ${cinder_key}",
+      tag         => 'ceph_compute_set_secret',
+      refreshonly =>  true,
+    } ~> Service['nova-compute']
+
+#    File <<| tag == 'ceph_compute_secret_file' |>>
+#    Exec <<| tag == 'get_or_set_virsh_secret' |>>
 
     # After setting virsh key, we need to restart nova-compute
     # otherwise nova will fail to connect to RADOS.
-    Exec <<| tag == 'set_secret_value_virsh' |>> ~> Service['nova-compute']
+#    Exec <<| tag == 'set_secret_value_virsh' |>> ~> Service['nova-compute']
 
     # If Cinder & Nova reside on the same node, we need a group
     # where nova & cinder users have read permissions.
@@ -362,19 +404,19 @@ Host *
 #    })
 
     # Configure Ceph keyring
-    Ceph::Key <<| title == $cinder_rbd_user |>>
-    ensure_resource(
-      'file',
-      "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring", {
-        owner   => 'root',
-        group   => 'cephkeyring',
-        mode    => '0440',
-        require => Ceph::Key[$cinder_rbd_user],
-        notify  => Service['nova-compute'],
-      }
-    )
+#    Ceph::Key <<| title == $cinder_rbd_user |>>
+#    ensure_resource(
+#      'file',
+#      "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring", {
+#        owner   => 'root',
+#        group   => 'cephkeyring',
+#        mode    => '0440',
+#        require => Ceph::Key[$cinder_rbd_user],
+#        notify  => Service['nova-compute'],
+#      }
+#    )
 
-    Concat::Fragment <<| title == 'ceph-client-os' |>>
+#    Concat::Fragment <<| title == 'ceph-client-os' |>>
   } else {
     $libvirt_disk_cachemodes_real = []
   }
