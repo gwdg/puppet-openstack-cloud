@@ -301,4 +301,22 @@ class cloud(
     })
   }
 
+  exec { 'restart_rsyslogd':
+    command     => 'service rsyslog restart',
+    path        => [ '/usr/sbin', '/sbin', '/usr/bin/', '/bin', ],
+    refreshonly => true,
+  } 
+
+  $logstash_syslog_bind_ip = hiera('cloud::logging::server::logstash_syslog_bind_ip') 
+  $logstash_syslog_port = hiera('cloud::logging::server::logstash_syslog_port') 
+
+  #*.* @@$IP_PREFIX.1.3:514 > /etc/rsyslog.d/10-logstash.conf
+  file { '/etc/rsyslog.d/10-logstash.conf':
+    ensure => file,
+    content => "*.* @@${logstash_syslog_bind_ip}:${logstash_syslog_port}",
+    owner => root,
+    group => root,
+    mode => '0644',
+    notify => Exec['restart_rsyslogd']
+  }
 }
