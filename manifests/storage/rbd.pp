@@ -43,24 +43,24 @@ class cloud::storage::rbd (
   $package_ensure       = 'latest',
 
 ) {
+  if $enable {
+    # Install ceph client packages
+    $packages = ['python-rbd', 'ceph-common']
 
-  # Install ceph client packages
-  $packages = ['python-rbd', 'ceph-common']
+    package { 'ceph':
+      ensure  => $package_ensure,
+      name    => 'ceph-common',
+    } 
 
-  package { 'ceph':
-    ensure  => $package_ensure,
-    name    => 'ceph-common',
-  } 
+    package { 'python-rbd':
+      ensure  => $package_ensure,
+    }
 
-  package { 'python-rbd':
-    ensure  => $package_ensure,
-  }
-
-  # Setup ceph.conf
-  file { '/etc/ceph/ceph.conf':
-    content => template('cloud/storage/ceph/ceph.conf.erb'),
-    require => Package['ceph']
-  }
+    # Setup ceph.conf
+    file { '/etc/ceph/ceph.conf':
+      content => template('cloud/storage/ceph/ceph.conf.erb'),
+      require => Package['ceph']
+    }
 
 #  class { 'ceph::conf':
 #    fsid            => $fsid,
@@ -70,8 +70,9 @@ class cloud::storage::rbd (
 #    enable_service  => true
 #  }
 
-  Exec {
-    path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin'
+    Exec {
+      path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin'
+    }
   }
 
 }
