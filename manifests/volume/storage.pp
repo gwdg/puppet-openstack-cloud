@@ -168,6 +168,22 @@ class cloud::volume::storage(
       os_password    => $ks_cinder_password,
       os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0"
     }
+    
+    # Cloud::Volume::Qos::Create requires keystone credentials
+    Cloud::Volume::Qos::Create <| |> {
+      os_tenant_name => 'services',
+      os_username    => 'cinder',
+      os_password    => $ks_cinder_password,
+      os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0"
+    }
+    
+    # Cloud::Volume::Qos::Associate requires keystone credentials
+    Cloud::Volume::Qos::Associate <| |> {
+      os_tenant_name => 'services',
+      os_username    => 'cinder',
+      os_password    => $ks_cinder_password,
+      os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0"
+    }
   }
 
   cinder_config {
