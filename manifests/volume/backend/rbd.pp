@@ -59,6 +59,7 @@ define cloud::volume::backend::rbd (
   $rbd_flatten_volume_from_snapshot = false,
   $rbd_secret_uuid                  = false,
   $rbd_max_clone_depth              = '5',
+  $qos = undef,
 ) {
 
   # Create ceph.conf on node
@@ -123,5 +124,19 @@ define cloud::volume::backend::rbd (
     set_key   => 'volume_backend_name',
     set_value => $volume_backend_name,
     notify    => Service['cinder-volume']
+  }
+
+  if $qos and has_key($qos, 'frontend') {
+    Cinder::Type[$volume_backend_name] ->
+    cloud::volume::qos::create { "qos_${volume_backend_name}":
+      properties => $qos['frontend'],
+      consumer => 'front-end',
+    }->
+
+    #associate with volume type
+    cloud::volume::qos::associate { "association_qos_${volume_backend_name}": 
+      qos_name => "qos_${volume_backend_name}",
+      volume_type => $volume_backend_name
+    }
   }
 }
