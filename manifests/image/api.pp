@@ -172,21 +172,17 @@ class cloud::image::api(
   $container_formats                 = 'ami,ari,aki,bare,ovf,ova',
 ) {
 
-  # Disable twice logging if syslog is enabled
-  if $use_syslog {
-    $log_dir           = '/var/log/glance'
-    $log_file_api      = '/var/log/glance/api.log'
-    $log_file_registry = '/var/log/glance/registry.log'
-    glance_api_config {
-      'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
-      'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
-      'DEFAULT/logging_debug_format_suffix': value => '%(funcName)s %(pathname)s:%(lineno)d';
-      'DEFAULT/logging_exception_prefix': value => '%(process)d: TRACE %(name)s %(instance)s';
-    }
-  } else {
-    $log_dir           = '/var/log/glance'
-    $log_file_api      = '/var/log/glance/api.log'
-    $log_file_registry = '/var/log/glance/registry.log'
+  # Configure logging for cinder
+  class { '::glance::api::logging':
+    use_syslog                      => $use_syslog,
+    log_facility                    => $log_facility,
+    verbose                         => $verbose,
+    debug                           => $debug,
+
+    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
+    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
+    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
+    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
   }
 
   $encoded_glance_user     = uriescape($glance_db_user)
@@ -197,8 +193,6 @@ class cloud::image::api(
     database_idle_timeout    => $glance_db_idle_timeout,
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
-    verbose                  => $verbose,
-    debug                    => $debug,
     auth_host                => $ks_keystone_internal_host,
     auth_protocol            => $ks_keystone_internal_proto,
     registry_client_protocol => $ks_glance_registry_internal_proto,
@@ -206,12 +200,8 @@ class cloud::image::api(
     keystone_tenant          => 'services',
     keystone_user            => 'glance',
     show_image_direct_url    => true,
-    log_dir                  => $log_dir,
-    log_file                 => $log_file_api,
-    log_facility             => $log_facility,
     bind_host                => $api_eth,
     bind_port                => $ks_glance_api_internal_port,
-    use_syslog               => $use_syslog,
     pipeline                 => 'keystone',
     known_stores             => $known_stores,
   }
