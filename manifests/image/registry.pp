@@ -100,21 +100,17 @@ class cloud::image::registry(
 
   include 'mysql::client'
 
-  # Disable twice logging if syslog is enabled
-  if $use_syslog {
-    $log_dir           = '/var/log/glance'
-    $log_file_api      = '/var/log/glance/api.log'
-    $log_file_registry = '/var/log/glance/registry.log'
-    glance_registry_config {
-      'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
-      'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
-      'DEFAULT/logging_debug_format_suffix': value => '%(funcName)s %(pathname)s:%(lineno)d';
-      'DEFAULT/logging_exception_prefix': value => '%(process)d: TRACE %(name)s %(instance)s';
-    }
-  } else {
-    $log_dir           = '/var/log/glance'
-    $log_file_api      = '/var/log/glance/api.log'
-    $log_file_registry = '/var/log/glance/registry.log'
+  # Configure logging for cinder
+  class { '::glance::registry::logging':
+    use_syslog                      => $use_syslog,
+    log_facility                    => $log_facility,
+    verbose                         => $verbose,
+    debug                           => $debug,
+
+    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
+    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
+    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
+    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
   }
 
   $encoded_glance_user     = uriescape($glance_db_user)
@@ -123,19 +119,13 @@ class cloud::image::registry(
   class { 'glance::registry':
     database_connection   => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}/glance?charset=utf8",
     database_idle_timeout => $glance_db_idle_timeout,
-    verbose               => $verbose,
-    debug                 => $debug,
     auth_host             => $ks_keystone_internal_host,
     auth_protocol         => $ks_keystone_internal_proto,
     keystone_password     => $ks_glance_password,
     keystone_tenant       => 'services',
     keystone_user         => 'glance',
     bind_host             => $api_eth,
-    log_dir               => $log_dir,
-    log_file              => $log_file_registry,
     bind_port             => $ks_glance_registry_internal_port,
-    use_syslog            => $use_syslog,
-    log_facility          => $log_facility,
   }
 
   # FIXME (Piotr): Puppet complains about redeclaration, so drop the line
