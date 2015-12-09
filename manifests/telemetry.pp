@@ -96,17 +96,17 @@ class cloud::telemetry(
   $os_endpoint_type           = 'publicURL'
 ){
 
-  # Disable twice logging if syslog is enabled
-  if $use_syslog {
-    $log_dir = '/var/log/ceilometer'
-    ceilometer_config {
-      'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
-      'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
-      'DEFAULT/logging_debug_format_suffix': value => '%(funcName)s %(pathname)s:%(lineno)d';
-      'DEFAULT/logging_exception_prefix': value => '%(process)d: TRACE %(name)s %(instance)s';
-    }
-  } else {
-    $log_dir = '/var/log/ceilometer'
+  # Configure logging for ceilometer
+  class { '::ceilometer::logging':
+    use_syslog                      => $use_syslog,
+    log_facility                    => $log_facility,
+    verbose                         => $verbose,
+    debug                           => $debug,
+
+    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
+    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
+    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
+    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
   }
 
   class { 'ceilometer':
@@ -114,11 +114,6 @@ class cloud::telemetry(
     rabbit_hosts    => $rabbit_hosts,
     rabbit_password => $rabbit_password,
     rabbit_userid   => 'ceilometer',
-    verbose         => $verbose,
-    debug           => $debug,
-    log_dir         => $log_dir,
-    use_syslog      => $use_syslog,
-    log_facility    => $log_facility
   }
 
   ceilometer_config {
