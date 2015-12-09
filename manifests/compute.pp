@@ -129,17 +129,17 @@ class cloud::compute(
     }
   }
 
-  # Disable twice logging if syslog is enabled
-  if $use_syslog {
-    $log_dir = '/var/log/nova'
-    nova_config {
-      'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user)s] %(instance)s%(message)s';
-      'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
-      'DEFAULT/logging_debug_format_suffix': value => '%(funcName)s %(pathname)s:%(lineno)d';
-      'DEFAULT/logging_exception_prefix': value => '%(process)d: TRACE %(name)s %(instance)s';
-    }
-  } else {
-    $log_dir = '/var/log/nova'
+  # Configure logging for nova
+  class { '::nova::logging':
+    use_syslog                      => $use_syslog,
+    log_facility                    => $log_facility,
+    verbose                         => $verbose,
+    debug                           => $debug,
+
+    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
+    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
+    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
+    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
   }
 
   $encoded_user     = uriescape($nova_db_user)
@@ -163,11 +163,6 @@ class cloud::compute(
     rabbit_password    => $rabbit_password,
     glance_api_servers => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
     memcached_servers  => $memcache_servers,
-    verbose            => $verbose,
-    debug              => $debug,
-    log_dir            => $log_dir,
-    log_facility       => $log_facility,
-    use_syslog         => $use_syslog,
 #    nova_shell         => '/bin/bash',
   }
 
