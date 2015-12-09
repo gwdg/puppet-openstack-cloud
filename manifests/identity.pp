@@ -261,18 +261,17 @@ class cloud::identity (
 
   include 'mysql::client'
 
-  if $use_syslog {
-    $log_dir  = '/var/log/keystone'
-    $log_file = 'keystone.log'
-    keystone_config {
-      'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
-      'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
-      'DEFAULT/logging_debug_format_suffix': value => '%(funcName)s %(pathname)s:%(lineno)d';
-      'DEFAULT/logging_exception_prefix': value => '%(process)d: TRACE %(name)s %(instance)s';
-    }
-  } else {
-    $log_dir  = '/var/log/keystone'
-    $log_file = 'keystone.log'
+  # Configure logging for cinder
+  class { '::keystone::logging':
+    use_syslog                      => $use_syslog,
+    log_facility                    => $log_facility,
+    verbose                         => $verbose,
+    debug                           => $debug,
+
+    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
+    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
+    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
+    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
   }
 
 #
@@ -284,17 +283,11 @@ class cloud::identity (
     enabled               => true,
     admin_token           => $ks_admin_token,
 #    compute_port          => $::cloud::global::api::ports::nova,
-    debug                 => $debug,
     database_idle_timeout => $keystone_db_idle_timeout,
-    log_facility          => $log_facility,
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}/keystone?charset=utf8",
     token_provider        => 'keystone.token.providers.uuid.Provider',
-    use_syslog            => $use_syslog,
-    verbose               => $verbose,
     public_bind_host      => $api_eth,
     admin_bind_host       => $api_eth,
-    log_dir               => $log_dir,
-    log_file              => $log_file,
 #    public_port           => $ks_keystone_public_port,
 #    admin_port            => $ks_keystone_admin_port,
     token_driver          => $token_driver,
