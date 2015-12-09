@@ -206,6 +206,7 @@ class cloud::identity (
 
   $ks_keystone_public_port      = undef,
   $ks_keystone_admin_port       = undef,
+  $ssh_port                     = hiera('cloud::global::ssh_port'),
 
   $neutron_public_url           = undef,
   $neutron_internal_url         = undef,
@@ -437,7 +438,7 @@ class cloud::identity (
 
     # Copy files
     exec { 'keystone-copy-ssl-certs':
-      command   => "/usr/bin/scp -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
+      command   => "/usr/bin/scp -P $ssh_port -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
       creates   => '/etc/keystone/ssl/synced_from_master',
       user      => 'keystone',
       require   => File['/var/lib/keystone/.ssh/id_rsa'],
