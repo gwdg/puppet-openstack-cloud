@@ -148,7 +148,7 @@ class cloud::compute(
   if $nova_db_use_slave {
     $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:3307/nova?charset=utf8"
   } else {
-    $slave_connection_url = false
+    $slave_connection_url = undef
   }
 
   class { 'nova::db':
