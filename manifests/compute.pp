@@ -158,11 +158,12 @@ class cloud::compute(
   }
 
   class { 'nova':
-    rabbit_userid      => 'nova',
-    rabbit_hosts       => $rabbit_hosts,
-    rabbit_password    => $rabbit_password,
-    glance_api_servers => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
-    memcached_servers  => $memcache_servers,
+    rabbit_userid       => 'nova',
+    rabbit_hosts        => $rabbit_hosts,
+    rabbit_password     => $rabbit_password,
+    glance_api_servers  => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
+    memcached_servers   => $memcache_servers,
+    cinder_catalog_info => 'volumev2:cinderv2:internalURL',
 #    nova_shell         => '/bin/bash',
   }
 
