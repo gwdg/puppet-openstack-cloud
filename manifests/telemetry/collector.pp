@@ -38,9 +38,11 @@ class cloud::telemetry::collector(
   $s_mongo_nodes = join($mongo_nodes, ',')
 
   if $replicaset_enabled {
-    $db_conn = "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=ceilometer"
+    $replicat_set   = 'ceilometer'
+    $db_conn        = "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replicat_set}"
   } else {
     $db_conn = "mongodb://${s_mongo_nodes}/ceilometer"
+    $replicat_set   = undef
   }
 
 #  mongodb_conn_validator { $mongo_nodes:
@@ -50,7 +52,9 @@ class cloud::telemetry::collector(
   class { 'ceilometer::db':
     database_connection => $db_conn,
     sync_db             => true,
+    mongodb_replica_set => $replicat_set,
   }
+
   class { 'ceilometer::collector': }
 
 }
