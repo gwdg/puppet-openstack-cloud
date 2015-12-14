@@ -49,6 +49,7 @@ define cloud::volume::qos::create (
     "OS_USERNAME=${os_username}",
     "OS_PASSWORD=${os_password}",
     "OS_AUTH_URL=${os_auth_url}",
+    "OS_VOLUME_API_VERSION=1",
   ]
 
   if $os_region_name {
