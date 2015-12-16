@@ -289,9 +289,9 @@ class cloud::image::api(
       require   => Package['glance-api'],                                                                                                                                                                   
     }
 
-#      class { 'glance::backend::file':
-#        filesystem_store_datadir => $filesystem_store_datadir
-#      }
+    class { 'glance::backend::file':
+      filesystem_store_datadir => $filesystem_store_datadir
+    }
 
   } else {
     fail("${backend} is not a Glance supported backend.")
