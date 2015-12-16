@@ -51,9 +51,26 @@ class cloud::telemetry::api(
   $ks_ceilometer_password         = 'ceilometerpassword',
   $api_eth                        = '127.0.0.1',
   $firewall_settings              = {},
+  $mongo_nodes                    = ['127.0.0.1:27017'],
+  $replicaset_enabled             = true,
 ){
 
   include 'cloud::telemetry'
+
+  unless defined(Class['ceilometer::db']) {
+    $s_mongo_nodes = join($mongo_nodes, ',')
+
+    if $replicaset_enabled {
+      $db_conn = "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=ceilometer"
+    } else {
+      $db_conn = "mongodb://${s_mongo_nodes}/ceilometer"
+    }
+
+    class { 'ceilometer::db':
+      database_connection => $db_conn,
+      sync_db             => true,
+    }
+  }
 
   class { 'ceilometer::api':
     keystone_password => $ks_ceilometer_password,
