@@ -45,8 +45,12 @@
 #   Default to {}
 #
 class cloud::telemetry::api(
+
   $ks_keystone_internal_host      = '127.0.0.1',
   $ks_keystone_internal_proto     = 'http',
+  $ks_keystone_internal_port      = 5000,
+
+
   $ks_ceilometer_internal_port    = '8777',
   $ks_ceilometer_password         = 'ceilometerpassword',
   $api_eth                        = '127.0.0.1',
@@ -73,10 +77,9 @@ class cloud::telemetry::api(
   }
 
   class { 'ceilometer::api':
-    keystone_password => $ks_ceilometer_password,
-    keystone_host     => $ks_keystone_internal_host,
-    keystone_protocol => $ks_keystone_internal_proto,
-    host              => $api_eth
+    keystone_auth_uri   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    keystone_password   => $ks_ceilometer_password,
+    host                => $api_eth
   }
 
 # Configure TTL for samples
