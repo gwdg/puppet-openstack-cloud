@@ -252,9 +252,7 @@ class cloud::network::controller(
 
   class { 'neutron::server':
     auth_password         => $ks_neutron_password,
-    auth_host             => $ks_keystone_admin_host,
-    auth_protocol         => $ks_keystone_admin_proto,
-    auth_port             => $ks_keystone_public_port,
+    auth_uri              => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_public_port}",
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}/neutron?charset=utf8",
     database_idle_timeout => $neutron_db_idle_timeout,
     api_workers           => $::neutron::server::api_workers,
