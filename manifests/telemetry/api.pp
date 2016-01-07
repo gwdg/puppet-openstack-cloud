@@ -50,13 +50,15 @@ class cloud::telemetry::api(
   $ks_keystone_internal_proto     = 'http',
   $ks_keystone_internal_port      = 5000,
 
-
   $ks_ceilometer_internal_port    = '8777',
   $ks_ceilometer_password         = 'ceilometerpassword',
+
   $api_eth                        = '127.0.0.1',
   $firewall_settings              = {},
+
   $mongo_nodes                    = ['127.0.0.1:27017'],
-  $replicaset_enabled             = true,
+  $replica_set_enabled            = true,
+  $replica_set_name               = 'ceilometer',
 ){
 
   include 'cloud::telemetry'
@@ -64,15 +66,18 @@ class cloud::telemetry::api(
   unless defined(Class['ceilometer::db']) {
     $s_mongo_nodes = join($mongo_nodes, ',')
 
-    if $replicaset_enabled {
-      $db_conn = "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=ceilometer"
+    if $replica_set_enabled {
+      $replicat_set_name_real   = $replica_set_name
+      $db_conn                  = "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}"
     } else {
-      $db_conn = "mongodb://${s_mongo_nodes}/ceilometer"
+      $replicat_set_name_real   = undef
+      $db_conn                  = "mongodb://${s_mongo_nodes}/ceilometer"
     }
 
     class { 'ceilometer::db':
       database_connection => $db_conn,
       sync_db             => true,
+      mongodb_replica_set => $replicat_set_name_real,
     }
   }
 
