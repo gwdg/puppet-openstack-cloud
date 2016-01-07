@@ -87,7 +87,6 @@ class cloud::telemetry::api(
 # Run the script once a day but with a random time to avoid
 # issues with MongoDB access
   class { 'ceilometer::expirer':
-    time_to_live => '2592000',
     minute       => '0',
     hour         => '0',
   }

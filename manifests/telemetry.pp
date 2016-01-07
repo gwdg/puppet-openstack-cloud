@@ -82,18 +82,27 @@
 #
 class cloud::telemetry(
   $ceilometer_secret          = 'ceilometersecret',
+
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword' ,
+
   $ks_keystone_internal_host  = '127.0.0.1',
   $ks_keystone_internal_port  = '5000',
   $ks_keystone_internal_proto = 'http',
+
   $ks_ceilometer_password     = 'ceilometerpassword',
+
   $region                     = 'RegionOne',
+
   $verbose                    = true,
   $debug                      = true,
+
   $log_facility               = 'LOG_LOCAL0',
   $use_syslog                 = true,
-  $os_endpoint_type           = 'publicURL'
+
+  $os_endpoint_type           = 'publicURL',
+
+  $metering_time_to_live      = 2592000,
 ){
 
   # Configure logging for ceilometer
@@ -110,10 +119,13 @@ class cloud::telemetry(
   }
 
   class { 'ceilometer':
-    metering_secret => $ceilometer_secret,
-    rabbit_hosts    => $rabbit_hosts,
-    rabbit_password => $rabbit_password,
-    rabbit_userid   => 'ceilometer',
+    metering_secret         => $ceilometer_secret,
+
+    rabbit_hosts            => $rabbit_hosts,
+    rabbit_password         => $rabbit_password,
+    rabbit_userid           => 'ceilometer',
+
+    metering_time_to_live   => $metering_time_to_live,
   }
 
   ceilometer_config {
