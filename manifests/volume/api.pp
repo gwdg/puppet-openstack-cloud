@@ -72,6 +72,7 @@ class cloud::volume::api(
   $ks_keystone_internal_host   = '127.0.0.1',
   $ks_keystone_internal_proto  = 'http',
   $ks_keystone_internal_port   = 5000,
+  $ks_keystone_admin_port      = 35357,
 
   $ks_glance_internal_host     = '127.0.0.1',
   $ks_glance_internal_proto    = 'http',
@@ -91,6 +92,7 @@ class cloud::volume::api(
   class { 'cinder::api':
     keystone_password      => $ks_cinder_password,
     auth_uri               => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    identity_uri           => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     bind_host              => $api_eth,
     default_volume_type    => $default_volume_type
   }
