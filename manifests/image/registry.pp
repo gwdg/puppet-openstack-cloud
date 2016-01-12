@@ -81,15 +81,21 @@
 #   Default to {}
 #
 class cloud::image::registry(
+
   $glance_db_host                   = '127.0.0.1',
   $glance_db_user                   = 'glance',
   $glance_db_password               = 'glancepassword',
   $glance_db_idle_timeout           = 5000,
+
   $ks_keystone_internal_host        = '127.0.0.1',
   $ks_keystone_internal_proto       = 'http',
+  $ks_keystone_internal_port         = 5000,
+  $ks_keystone_admin_port            = 35357,
+
   $ks_glance_internal_host          = '127.0.0.1',
   $ks_glance_registry_internal_port = '9191',
   $ks_glance_password               = 'glancepassword',
+
   $api_eth                          = '127.0.0.1',
   $verbose                          = true,
   $debug                            = true,
@@ -117,22 +123,20 @@ class cloud::image::registry(
   $encoded_glance_password = uriescape($glance_db_password)
 
   class { 'glance::registry':
+
     database_connection   => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}/glance?charset=utf8",
     database_idle_timeout => $glance_db_idle_timeout,
-    auth_host             => $ks_keystone_internal_host,
-    auth_protocol         => $ks_keystone_internal_proto,
+
+    auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+
     keystone_password     => $ks_glance_password,
     keystone_tenant       => 'services',
     keystone_user         => 'glance',
+
     bind_host             => $api_eth,
     bind_port             => $ks_glance_registry_internal_port,
   }
-
-  # FIXME (Piotr): Puppet complains about redeclaration, so drop the line
-#  glance_registry_config {
-    # TODO(EmilienM) Drop this line when https://review.openstack.org/#/c/133521/ been merged.
-#    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
-#  }
 
   exec {'glance_db_sync':
     command => 'glance-manage db_sync',
