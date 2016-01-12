@@ -140,19 +140,26 @@
 #   Default to {}
 #
 class cloud::image::api(
+
   $glance_db_host                    = '127.0.0.1',
   $glance_db_user                    = 'glance',
   $glance_db_password                = 'glancepassword',
   $glance_db_idle_timeout            = 5000,
+
   $ks_keystone_internal_host         = '127.0.0.1',
   $ks_keystone_internal_proto        = 'http',
+  $ks_keystone_internal_port         = 5000,
+  $ks_keystone_admin_port            = 35357,
+
   $ks_glance_internal_host           = '127.0.0.1',
   $ks_glance_api_internal_port       = '9292',
   $ks_glance_registry_internal_port  = '9191',
   $ks_glance_registry_internal_proto = 'http',
   $ks_glance_password                = 'glancepassword',
+
   $rabbit_password                   = 'rabbit_password',
   $rabbit_host                       = '127.0.0.1',
+
   $api_eth                           = '127.0.0.1',
   $openstack_vip                     = '127.0.0.1',
   $glance_rbd_pool                   = 'images',
@@ -189,12 +196,16 @@ class cloud::image::api(
   $encoded_glance_password = uriescape($glance_db_password)
 
   class { 'glance::api':
+
     database_connection      => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}/glance?charset=utf8",
     database_idle_timeout    => $glance_db_idle_timeout,
+
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
-    auth_host                => $ks_keystone_internal_host,
-    auth_protocol            => $ks_keystone_internal_proto,
+
+    auth_uri                => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    identity_uri            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+
     registry_client_protocol => $ks_glance_registry_internal_proto,
     keystone_password        => $ks_glance_password,
     keystone_tenant          => 'services',
@@ -219,9 +230,6 @@ class cloud::image::api(
   glance_api_config {
     'DEFAULT/notifier_driver':          value => 'noop';
     'DEFAULT/container_formats':        value => $container_formats;
-    # TODO(EmilienM) Drop this line when https://review.openstack.org/#/c/133521/ has been merged.
-    # FIXME (Piotr): Puppet complains about redeclaration, so drop the line
-#    'keystone_authtoken/identity_uri':  value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357";
   }
 
   if ($backend == 'rbd') {
