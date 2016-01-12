@@ -94,7 +94,12 @@ class cloud::volume::api(
     auth_uri               => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
     identity_uri           => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     bind_host              => $api_eth,
-    default_volume_type    => $default_volume_type
+    default_volume_type    => $default_volume_type,
+
+    # Workaround for Cinder quota bug: https://review.openstack.org/#/c/254700/
+    # (should be fixed in 2015.2.1)
+    keymgr_encryption_auth_url => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3",
+
   }
 
   class { 'cinder::glance':
