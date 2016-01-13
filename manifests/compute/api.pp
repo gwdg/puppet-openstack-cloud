@@ -62,14 +62,20 @@
 #   Default to false
 #
 class cloud::compute::api(
+
   $ks_keystone_internal_host            = '127.0.0.1',
   $ks_keystone_internal_proto           = 'http',
+  $ks_keystone_internal_port            = 5000,
+  $ks_keystone_admin_port               = 35357,
+
   $ks_nova_password                     = 'novapassword',
   $neutron_metadata_proxy_shared_secret = 'metadatapassword',
   $api_eth                              = '127.0.0.1',
+
   $ks_nova_public_port                  = '8774',
   $ks_ec2_public_port                   = '8773',
   $ks_metadata_public_port              = '8775',
+
   $firewall_settings                    = {},
   $pacemaker_enabled                    = false,
 ){
@@ -79,9 +85,12 @@ class cloud::compute::api(
   include nova::params
 
   class { 'nova::api':
+
     enabled                              => true,
-    auth_host                            => $ks_keystone_internal_host,
-    auth_protocol                        => $ks_keystone_internal_proto,
+
+    auth_uri                             => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    identity_uri                         => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+
     admin_password                       => $ks_nova_password,
     api_bind_address                     => $api_eth,
     metadata_listen                      => $api_eth,
