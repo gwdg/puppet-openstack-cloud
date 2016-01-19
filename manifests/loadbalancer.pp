@@ -646,6 +646,7 @@ class cloud::loadbalancer(
   $keepalived_preempt_delay         = undef,
   $rabbitmq_management_port         = 15672,
 
+  $haproxy_certs                    = 'api.dev.cloud.gwdg.de_20150716_all.pem',
 ){
 
   include cloud::params
@@ -683,7 +684,7 @@ class cloud::loadbalancer(
     owner       => 'haproxy',
     group       => 'haproxy',
     mode        => '600',
-    source      => "puppet:///modules/cloud/secrets/api.dev.cloud.gwdg.de_20150716_all.pem"
+    source      => "puppet:///modules/cloud/secrets/${haproxy_certs}"
   }
 
   # Make sure it is deployed before the rest runs
