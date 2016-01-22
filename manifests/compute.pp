@@ -101,26 +101,34 @@
 #   Defaults to 'RegionOne'
 #
 class cloud::compute(
+
   $nova_db_host             = '127.0.0.1',
   $nova_db_use_slave        = false,
   $nova_db_user             = 'nova',
   $nova_db_password         = 'novapassword',
   $nova_db_idle_timeout     = 5000,
+
   $rabbit_hosts             = ['127.0.0.1:5672'],
   $rabbit_password          = 'rabbitpassword',
+
   $ks_glance_internal_host  = '127.0.0.1',
   $ks_glance_internal_proto = 'http',
   $glance_api_port          = 9292,
+
   $verbose                  = true,
   $debug                    = true,
   $use_syslog               = true,
   $log_facility             = 'LOG_LOCAL0',
+
   $neutron_endpoint         = '127.0.0.1',
   $neutron_protocol         = 'http',
   $neutron_password         = 'neutronpassword',
   $neutron_region_name      = 'RegionOne',
+
   $memcache_servers         = ['127.0.0.1:11211'],
   $availability_zone        = 'RegionOne',
+
+  $upgrade_level            = undef,
 ) {
 
   if !defined(Resource['nova_config']) {
@@ -158,13 +166,26 @@ class cloud::compute(
   }
 
   class { 'nova':
-    rabbit_userid       => 'nova',
-    rabbit_hosts        => $rabbit_hosts,
-    rabbit_password     => $rabbit_password,
-    glance_api_servers  => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
-    memcached_servers   => $memcache_servers,
-    cinder_catalog_info => 'volumev2:cinderv2:internalURL',
-#    nova_shell         => '/bin/bash',
+    rabbit_userid               => 'nova',
+    rabbit_hosts                => $rabbit_hosts,
+    rabbit_password             => $rabbit_password,
+
+    glance_api_servers          => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
+    memcached_servers           => $memcache_servers,
+
+    cinder_catalog_info         => 'volumev2:cinderv2:internalURL',
+#    nova_shell                  => '/bin/bash',
+
+    # Set upgrade levels
+    upgrade_level_cells         => $upgrade_level,
+    upgrade_level_cert          => $upgrade_level,
+    upgrade_level_compute       => $upgrade_level,
+    upgrade_level_conductor     => $upgrade_level,
+    upgrade_level_console       => $upgrade_level,
+    upgrade_level_consoleauth   => $upgrade_level,
+    upgrade_level_intercell     => $upgrade_level,
+    upgrade_level_network       => $upgrade_level,
+    upgrade_level_scheduler     => $upgrade_level,
   }
 
   class { 'nova::network::neutron':
@@ -178,6 +199,9 @@ class cloud::compute(
     'DEFAULT/resume_guests_state_on_host_boot': value => true;
     'DEFAULT/servicegroup_driver':              value => 'mc';
     'DEFAULT/glance_num_retries':               value => '10';
+
+    # Currently not set in nova module
+    'upgrade_levels/baseapi':                   value => $upgrade_level;
   }
 
 }
