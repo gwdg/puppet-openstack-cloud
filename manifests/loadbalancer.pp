@@ -957,6 +957,7 @@ class cloud::loadbalancer(
 
   cloud::loadbalancer::bind_api { 'horizon_cluster':
     port                => $horizon_port,
+    lb_https_port       => $horizon_ssl_port,
     options             => merge($common_http_options,
                                 {
                                     'cookie'        => 'sessionid prefix',

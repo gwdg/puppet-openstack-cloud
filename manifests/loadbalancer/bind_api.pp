@@ -18,9 +18,17 @@
 # cloud::loadbalancer::bind_api
 #
 define cloud::loadbalancer::bind_api(
-  $port         = undef,
-  $options      = {}
+  $port             = undef,
+  $lb_https_port    = undef,
+  $options          = {}
 ){
+
+  if $lb_https_port {
+     $lb_https_port_real = $lb_https_port
+  }
+  else {
+     $lb_https_port_real = $port
+  }  
 
   haproxy::listen { $title:
 
@@ -29,7 +37,7 @@ define cloud::loadbalancer::bind_api(
       "${::cloud::loadbalancer::vip_internal_ip}:${port}"   => [],
 
       # External binding via https
-      "${::cloud::loadbalancer::vip_public_ip}:${port}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
+      "${::cloud::loadbalancer::vip_public_ip}:${lb_https_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
     },
 
     mode                => 'http',
