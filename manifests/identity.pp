@@ -301,43 +301,11 @@ class cloud::identity (
   }
 
   # Keystone LDAP
-
   if $use_ldap {
-    class { 'keystone::ldap':
-      url                   => "ldap://ldap.dev.cloud.gwdg.de",
-      user                  => 'cn=admin,dc=computecloud,dc=gwdg,dc=de',
-      password              => 'OLigt,uwhF!',
-      suffix                => 'dc=computecloud,dc=gwdg,dc=de',
-      user_tree_dn          => 'ou=Users,dc=computecloud,dc=gwdg,dc=de', 
-#      tenant_tree_dn       => 'ou=Groups,dc=computecloud,dc=gwdg,dc=de', 
-      project_tree_dn       => 'ou=Groups,dc=computecloud,dc=gwdg,dc=de', 
-      project_objectclass   => 'groupOfNames',
-
-      role_tree_dn          => 'ou=Roles,dc=computecloud,dc=gwdg,dc=de',
-      identity_driver       => 'keystone.identity.backends.ldap.Identity',
-#      assignment_driver    => 'keystone.assignment.backends.ldap.Assignment',
-    
-      use_dumb_member           => true,
-      user_id_attribute         => 'uid',
-      user_name_attribute       => 'cn',
-      user_mail_attribute       => 'mail',
-      user_enabled_attribute    => 'sn',
-#      user_attribute_ignore    => 'tenantId,tenants',
-#      user_enabled_emulation   => false,
-#      tenant_member_attribute  => 'member',
-#      tenant_desc_attribute    => 'o',
-#      tenant_enabled_attribute => 'description',
-#      tenant_enabled_emulation => false,
-      project_member_attribute  => 'member',
-      project_desc_attribute    => 'o',
-      project_enabled_attribute => 'description',
-      project_enabled_emulation => false,
-#      role_name_attribute      => 'cn',
-#      role_id_attribute        => 'cn',
-    }
+    include 'keystone::ldap'
   }
 
-# Keystone Endpoints + Users
+  # Keystone Endpoints + Users
 
   class { 'keystone::roles::admin':
 
