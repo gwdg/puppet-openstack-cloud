@@ -39,10 +39,6 @@
 #   (optional) Timeout before idle SQL connections are reaped.
 #   Defaults to 5000
 #
-# [*memcache_servers*]
-#   (optionnal) Memcached servers used by Keystone. Should be an array.
-#   Defaults to ['127.0.0.1:11211']
-#
 # [*ks_admin_email*]
 #   (optional) Email address of admin user in Keystone
 #   Defaults to 'no-reply@keystone.openstack'
@@ -166,7 +162,7 @@ class cloud::identity (
   $keystone_db_user             = 'keystone',
   $keystone_db_password         = 'keystonepassword',
   $keystone_db_idle_timeout     = 5000,
-  $memcache_servers             = ['127.0.0.1:11211'],
+
   $ks_admin_email               = 'no-reply@keystone.openstack',
   $ks_admin_password            = 'adminpassword',
   $ks_admin_tenant              = 'admin',
