@@ -82,6 +82,10 @@
 #   (optional) Password used by Heat to connect to Keystone API
 #   Defaults to 'heatpassword'
 #
+# [*magnum_password*]
+#   (optional) Password used by Magnum to connect to Keystone API
+#   Defaults to 'magnumpassword'
+#
 # [*glance_password*]
 #   (optional) Password used by Glance to connect to Keystone API
 #   Defaults to 'glancepassword'
@@ -240,6 +244,12 @@ class cloud::identity (
   $trove_admin_url              = undef,
 
   $trove_password               = 'trovepassword',
+
+  $magnum_public_url            = undef,
+  $magnum_internal_url          = undef,
+  $magnum_admin_url             = undef,
+
+  $magnum_password              = 'magnumpassword',
 
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
@@ -501,6 +511,16 @@ class cloud::identity (
       region            => $region,
       password          => $trove_password
     }
+  }
+
+  class { 'magnum::keystone::auth':
+
+    public_url          => $magnum_public_url,
+    internal_url        => $magnum_internal_url,
+    admin_url           => $magnum_admin_url,
+
+    region              => $region,
+    password            => $magnum_password
   }
 
   # Purge expored tokens every days at midnight
