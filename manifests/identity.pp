@@ -291,6 +291,7 @@ class cloud::identity (
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
+    service_name          => 'httpd',
 
     database_idle_timeout => $keystone_db_idle_timeout,
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}/keystone?charset=utf8",
