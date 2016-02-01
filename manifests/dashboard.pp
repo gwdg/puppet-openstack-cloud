@@ -151,6 +151,7 @@ class cloud::dashboard(
   }
   $neutron_options_real = merge ($neutron_options, $neutron_extra_options)
 
+  include ::cloud::util::apache_common
   class { 'horizon':
     secret_key              => $secret_key,
     servername              => $servername,

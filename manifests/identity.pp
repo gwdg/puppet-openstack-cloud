@@ -154,10 +154,13 @@
 #   for HA).
 #
 class cloud::identity (
+
   $swift_enabled                = true,
   $cinder_enabled               = true,
   $trove_enabled                = false,
+
   $identity_roles_addons        = ['SwiftOperator', 'ResellerAdmin'],
+
   $keystone_db_host             = '127.0.0.1',
   $keystone_db_user             = 'keystone',
   $keystone_db_password         = 'keystonepassword',
@@ -331,16 +334,17 @@ class cloud::identity (
     region       => $region,
   }
 
-  # TODO(EmilienM) Disable WSGI - bug #98
-  #include 'apache'
-  # class {'keystone::wsgi::apache':
-  #   servername  => $::fqdn,
-  #   admin_port  => $ks_keystone_admin_port,
-  #   public_port => $ks_keystone_public_port,
-  #   # TODO(EmilienM) not sure workers is useful when using WSGI backend
-  #   workers     => $::processorcount,
-  #   ssl         => false
-  # }
+  # Configure keystone to use apache/wsgi
+  include 'cloud::util::apache_common'
+  class {'keystone::wsgi::apache':
+    servername  => $::fqdn,
+    admin_port  => $ks_keystone_admin_port,
+    public_port => $ks_keystone_public_port,
+
+    # TODO(EmilienM) not sure workers is useful when using WSGI backend
+    workers     => $::processorcount,
+    ssl         => false
+  }
 
   if $swift_enabled {
     class {'swift::keystone::auth':
