@@ -291,18 +291,20 @@ class cloud::identity (
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
-#    compute_port          => $::cloud::global::api::ports::nova,
+
     database_idle_timeout => $keystone_db_idle_timeout,
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}/keystone?charset=utf8",
+
     token_provider        => 'keystone.token.providers.uuid.Provider',
+
     public_bind_host      => $api_eth,
     admin_bind_host       => $api_eth,
-#    public_port           => $ks_keystone_public_port,
-#    admin_port            => $ks_keystone_admin_port,
-    token_driver          => $token_driver,
-    token_expiration      => $ks_token_expiration,
+
     admin_endpoint        => $keystone_admin_url,
     public_endpoint       => $keystone_public_url,
+
+    token_driver          => $token_driver,
+    token_expiration      => $ks_token_expiration,
   }
 
   keystone_config {
