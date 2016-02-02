@@ -49,13 +49,19 @@
 #    Defaults to 'secrete'
 #
 class cloud::orchestration::engine(
+
   $enabled                        = true,
+
   $ks_heat_public_host            = '127.0.0.1',
   $ks_heat_public_proto           = 'http',
   $ks_heat_password               = 'heatpassword',
   $ks_heat_cfn_public_port        = 8000,
   $ks_heat_cloudwatch_public_port = 8003,
-  $auth_encryption_key            = 'secrete'
+
+  $auth_encryption_key            = 'secrete',
+
+  $workers                        = 2,
+
 ) {
 
   include 'cloud::orchestration'
@@ -71,6 +77,11 @@ class cloud::orchestration::engine(
     # strongly encouraged to move to using deferred_auth_method=trusts, which is planned to become the default for Juno.
     # 'trusts' requires Keystone API v3 enabled, otherwise we have to use 'password'.
     deferred_auth_method          => 'password',
+  }
+
+  # Set currently unsupported options in offical puppet module
+  heat_config {
+    'DEFAULT/num_engine_workers':   value => $workers;
   }
 
 }
