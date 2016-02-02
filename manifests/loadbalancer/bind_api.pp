@@ -45,7 +45,6 @@ define cloud::loadbalancer::bind_api(
         "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
       },
 
-      mode                => 'http',
       options             => $options,
     }
   } else {
@@ -58,7 +57,6 @@ define cloud::loadbalancer::bind_api(
         "${::cloud::loadbalancer::vip_internal_ip}:${port}"   => [],
       },
 
-      mode                => 'http',
       options             => $options,
     } 
   }

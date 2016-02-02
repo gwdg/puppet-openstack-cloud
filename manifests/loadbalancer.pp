@@ -662,6 +662,7 @@ class cloud::loadbalancer(
   }
 
   $common_http_options = {
+    'mode'           => 'http',
     'option'         => ['http-server-close', 'httplog', 'forwardfor'],
     'balance'        => 'source',
 
@@ -875,21 +876,18 @@ class cloud::loadbalancer(
     options             => merge($common_http_options, $novnc_bind_options),
   }
 
-  cloud::loadbalancer::binding { 'rabbitmq_cluster':
-    ip                => $rabbitmq,
-    port              => $rabbitmq_port,
-    options           => {
-      'mode'            => 'tcp',
-      'option'          => ['tcpka', 'tcplog', 'forwardfor', 'clitcpka'],
-      # Timeouts must be > /proc/sys/net/ipv4/tcp_keepalive_time (= 2h on Ubuntu 14.04), to allow for client tcp to send keepalives
-      'timeout server'  => '180m',
-      'timeout client'  => '180m',
-      'timeout server'  => $api_timeout,
-      'timeout client'  => $api_timeout,
-      'balance'         => 'roundrobin',
-    },
-    bind_options      => $rabbitmq_bind_options,
-    firewall_settings => $firewall_settings,
+  cloud::loadbalancer::bind_api { 'rabbitmq_cluster':
+    port                => $rabbitmq_port,
+    options             => merge($common_tcp_options, 
+                                {
+                                    'option'          => ['tcpka', 'tcplog', 'forwardfor', 'clitcpka'],
+                                    # Timeouts must be > /proc/sys/net/ipv4/tcp_keepalive_time (= 2h on Ubuntu 14.04), to allow for client tcp to send keepalives
+                                    'timeout server'  => '180m',
+                                    'timeout client'  => '180m',
+                                    'timeout server'  => $api_timeout,
+                                    'timeout client'  => $api_timeout,
+                                    'balance'         => 'roundrobin',
+                                }),
   }
 
   cloud::loadbalancer::binding { 'rabbitmq_management_cluster':
@@ -905,6 +903,8 @@ class cloud::loadbalancer(
     bind_options      => $rabbitmq_bind_options,
     firewall_settings => $firewall_settings,
   }
+
+
 
 #  cloud::loadbalancer::binding { 'trove_api_cluster':
 #    ip                => $trove_api,
@@ -997,6 +997,8 @@ class cloud::loadbalancer(
     bind_options      => $kibana_bind_options,
     firewall_settings => $firewall_settings,
   }
+
+
 
   cloud::loadbalancer::binding { 'logstash_syslog':
     ip                => $logstash_syslog,
