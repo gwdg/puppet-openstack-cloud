@@ -817,6 +817,7 @@ class cloud::loadbalancer(
 
   cloud::loadbalancer::bind_api { 'keystone_api_cluster':
     port                => $ks_keystone_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $keystone_bind_options),
   }
 
@@ -825,13 +826,9 @@ class cloud::loadbalancer(
     options             => merge($common_http_options, $keystone_admin_bind_options),
   }
 
-#  cloud::loadbalancer::bind_api { 'swift_api_cluster':
-#    port                => $ks_swift_public_port,
-#    options             => merge($common_http_options, $swift_bind_options),
-#  }
-
   cloud::loadbalancer::bind_api { 'nova_api_cluster':
     port                => $ks_nova_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $nova_bind_options),
   }
 
@@ -868,11 +865,13 @@ class cloud::loadbalancer(
 
 #  cloud::loadbalancer::bind_api { 'spice_cluster':
 #    port                => $spice_port,
+#     public_access       => true,
 #    options             => merge($common_http_options, $spice_bind_options),
 #  }
 
   cloud::loadbalancer::bind_api { 'novnc_cluster':
     port                => $novnc_port,
+    public_access       => true,
     options             => merge($common_http_options, $novnc_bind_options),
   }
 
@@ -917,47 +916,55 @@ class cloud::loadbalancer(
 
   cloud::loadbalancer::bind_api { 'glance_api_cluster':
     port                => $ks_glance_api_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $glance_api_bind_options),
   }
 
   cloud::loadbalancer::bind_api { 'glance_registry_cluster':
     port                => $ks_glance_registry_internal_port,
+    public_access       => true,
     options             => merge($common_http_options, $glance_registry_bind_options),
   }
 
   cloud::loadbalancer::bind_api { 'neutron_api_cluster':
     port                => $ks_neutron_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $neutron_bind_options),
   }
 
   cloud::loadbalancer::bind_api { 'cinder_api_cluster':
     port                => $ks_cinder_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $cinder_bind_options),
   }
 
   cloud::loadbalancer::bind_api { 'ceilometer_api_cluster':
     port                => $ks_ceilometer_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $ceilometer_bind_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_api_cluster':
     port                => $ks_heat_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $heat_api_bind_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cfn_api_cluster':
     port                => $ks_heat_cfn_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $heat_cfn_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cloudwatch_api_cluster':
     port                => $ks_heat_cloudwatch_public_port,
+    public_access       => true,
     options             => merge($common_http_options, $heat_cloudwatch_options),
   }
 
   cloud::loadbalancer::bind_api { 'horizon_cluster':
     port                => $horizon_port,
-    lb_https_port       => $horizon_ssl_port,
+    public_port         => $horizon_ssl_port,
     options             => merge($common_http_options,
                                 {
                                     'cookie'        => 'sessionid prefix',
