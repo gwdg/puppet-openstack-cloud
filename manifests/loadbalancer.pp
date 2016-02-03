@@ -892,24 +892,14 @@ class cloud::loadbalancer(
                                     'timeout server'  => $api_timeout,
                                     'timeout client'  => $api_timeout,
                                     'balance'         => 'roundrobin',
-                                }),
+                                },
+                                $rabbitmq_options),
   }
 
-  cloud::loadbalancer::binding { 'rabbitmq_management_cluster':
-    ip                => $::cloud::loadbalancer::vip_internal_ip,
-    port              => $rabbitmq_management_port,
-    options           => {
-      'mode'            => 'tcp',
-      'option'          => ['tcpka', 'tcplog', 'forwardfor'],
-      'balance'         => 'roundrobin',
-      'timeout server'  => $api_timeout,
-      'timeout client'  => $api_timeout,
-    },
-    bind_options      => $rabbitmq_bind_options,
-    firewall_settings => $firewall_settings,
+  cloud::loadbalancer::bind_api { 'rabbitmq_management_cluster':
+    port                => $rabbitmq_management_port,
+    options             => merge($common_http_options, $rabbitmq_management_options),
   }
-
-
 
 #  cloud::loadbalancer::binding { 'trove_api_cluster':
 #    ip                => $trove_api,
