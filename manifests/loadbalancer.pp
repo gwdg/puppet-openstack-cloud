@@ -871,11 +871,12 @@ class cloud::loadbalancer(
                                 $sensu_api_options),
   }
 
-#  cloud::loadbalancer::bind_api { 'spice_cluster':
-#    port                => $spice_port,
-#     public_access       => true,
-#    options             => merge($common_http_options, $spice_options),
-#  }
+  cloud::loadbalancer::bind_api { 'spice_cluster':
+    enable              => $enable_spice,
+    public_access       => true,
+    port                => $spice_port,
+    options             => merge($common_http_options, $spice_options),
+  }
 
   cloud::loadbalancer::bind_api { 'novnc_cluster':
     enable              => $enable_novnc,
@@ -987,12 +988,11 @@ class cloud::loadbalancer(
 #    httpchk           => "httpchk GET  /${::cloud::params::horizon_auth_url}  \"HTTP/1.0\\r\\nUser-Agent: HAproxy-${::hostname}\"",
   }
 
-#  cloud::loadbalancer::binding { 'elasticsearch':
-#    ip                => $elasticsearch,
-#    port              => $elasticsearch_port,
-#    bind_options      => $elasticsearch_bind_options,
-#    firewall_settings => $firewall_settings,
-#  }
+  cloud::loadbalancer::bind_api { 'elasticsearch':
+    enable              => $enable_elasticsearch,
+    port                => $elasticsearch_port,
+    options             => merge($common_http_options, $elasticsearch_options),
+  }
 
   cloud::loadbalancer::bind_api { 'kibana':
     enable              => $enable_kibana,
