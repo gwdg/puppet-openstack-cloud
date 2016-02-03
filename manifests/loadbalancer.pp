@@ -529,6 +529,7 @@
 #   Default to {}
 #
 class cloud::loadbalancer(
+
   $swift_api                        = true,
   $ceilometer_api                   = true,
   $cinder_api                       = true,
@@ -555,7 +556,9 @@ class cloud::loadbalancer(
   $sensu_dashboard                  = true,
   $sensu_api                        = true,
   $redis                            = true,
+
   $haproxy_auth                     = 'admin:changeme',
+
   $keepalived_state                 = 'BACKUP',
   $keepalived_priority              = '50',
   $keepalived_vrrp_interface        = false,
@@ -567,33 +570,35 @@ class cloud::loadbalancer(
   $keepalived_internal_id           = '2',
   $keepalived_auth_type             = false,
   $keepalived_auth_pass             = false,
-  $ceilometer_bind_options          = {},
-  $cinder_bind_options              = {},
-  $ec2_bind_options                 = {},
-  $glance_api_bind_options          = {},
-  $glance_registry_bind_options     = {},
-  $heat_cfn_bind_options            = {},
-  $heat_cloudwatch_bind_options     = {},
-  $heat_api_bind_options            = {},
-  $keystone_bind_options            = {},
-  $keystone_admin_bind_options      = {},
-  $metadata_bind_options            = {},
-  $neutron_bind_options             = {},
-  $nova_bind_options                = {},
-  $trove_bind_options               = {},
-  $swift_bind_options               = {},
-  $spice_bind_options               = {},
-  $novnc_bind_options               = {},
-  $horizon_bind_options             = {},
-  $horizon_ssl_bind_options         = {},
-  $rabbitmq_bind_options            = {},
-  $galera_bind_options              = {},
-  $elasticsearch_bind_options       = {},
-  $kibana_bind_options              = {},
-  $logstash_syslog_bind_options     = {},
-  $sensu_dashboard_bind_options     = {},
-  $sensu_api_bind_options           = {},
-  $redis_bind_options               = {},
+
+  $ceilometer_options               = {},
+  $cinder_options                   = {},
+  $ec2_options                      = {},
+  $glance_api_options               = {},
+  $glance_registry_options          = {},
+  $heat_cfn_options                 = {},
+  $heat_cloudwatch_options          = {},
+  $heat_api_options                 = {},
+  $keystone_options                 = {},
+  $keystone_admin_options           = {},
+  $metadata_options                 = {},
+  $neutron_options                  = {},
+  $nova_options                     = {},
+  $trove_options                    = {},
+  $swift_options                    = {},
+  $spice_options                    = {},
+  $novnc_options                    = {},
+  $horizon_options                  = {},
+  $horizon_ssl_options              = {},
+  $rabbitmq_options                 = {},
+  $galera_options                   = {},
+  $elasticsearch_options            = {},
+  $kibana_options                   = {},
+  $logstash_syslog_options          = {},
+  $sensu_dashboard_options          = {},
+  $sensu_api_options                = {},
+  $redis_options                    = {},
+
   $ks_ceilometer_public_port        = 8777,
   $ks_cinder_public_port            = 8776,
   $ks_ec2_public_port               = 8773,
@@ -819,28 +824,28 @@ class cloud::loadbalancer(
   cloud::loadbalancer::bind_api { 'keystone_api_cluster':
     port                => $ks_keystone_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $keystone_bind_options),
+    options             => merge($common_http_options, $keystone_options),
   }
 
   cloud::loadbalancer::bind_api { 'keystone_api_admin_cluster':
     port                => $ks_keystone_admin_port,
-    options             => merge($common_http_options, $keystone_admin_bind_options),
+    options             => merge($common_http_options, $keystone_admin_options),
   }
 
   cloud::loadbalancer::bind_api { 'nova_api_cluster':
     port                => $ks_nova_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $nova_bind_options),
+    options             => merge($common_http_options, $nova_options),
   }
 
   cloud::loadbalancer::bind_api { 'ec2_api_cluster':
     port                => $ks_ec2_public_port,
-    options             => merge($common_http_options, $ec2_bind_options),
+    options             => merge($common_http_options, $ec2_options),
   }
 
   cloud::loadbalancer::bind_api { 'metadata_api_cluster':
     port                => $ks_metadata_public_port,
-    options             => merge($common_http_options, $metadata_bind_options),
+    options             => merge($common_http_options, $metadata_options),
   }
 
 #  cloud::loadbalancer::binding { 'sensu_dashboard':
@@ -867,13 +872,13 @@ class cloud::loadbalancer(
 #  cloud::loadbalancer::bind_api { 'spice_cluster':
 #    port                => $spice_port,
 #     public_access       => true,
-#    options             => merge($common_http_options, $spice_bind_options),
+#    options             => merge($common_http_options, $spice_options),
 #  }
 
   cloud::loadbalancer::bind_api { 'novnc_cluster':
     port                => $novnc_port,
     public_access       => true,
-    options             => merge($common_http_options, $novnc_bind_options),
+    options             => merge($common_http_options, $novnc_options),
   }
 
   cloud::loadbalancer::bind_api { 'rabbitmq_cluster':
@@ -917,37 +922,37 @@ class cloud::loadbalancer(
   cloud::loadbalancer::bind_api { 'glance_api_cluster':
     port                => $ks_glance_api_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $glance_api_bind_options),
+    options             => merge($common_http_options, $glance_api_options),
   }
 
   cloud::loadbalancer::bind_api { 'glance_registry_cluster':
     port                => $ks_glance_registry_internal_port,
     public_access       => true,
-    options             => merge($common_http_options, $glance_registry_bind_options),
+    options             => merge($common_http_options, $glance_registry_options),
   }
 
   cloud::loadbalancer::bind_api { 'neutron_api_cluster':
     port                => $ks_neutron_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $neutron_bind_options),
+    options             => merge($common_http_options, $neutron_options),
   }
 
   cloud::loadbalancer::bind_api { 'cinder_api_cluster':
     port                => $ks_cinder_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $cinder_bind_options),
+    options             => merge($common_http_options, $cinder_options),
   }
 
   cloud::loadbalancer::bind_api { 'ceilometer_api_cluster':
     port                => $ks_ceilometer_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $ceilometer_bind_options),
+    options             => merge($common_http_options, $ceilometer_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_api_cluster':
     port                => $ks_heat_public_port,
     public_access       => true,
-    options             => merge($common_http_options, $heat_api_bind_options),
+    options             => merge($common_http_options, $heat_api_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cfn_api_cluster':
@@ -985,20 +990,20 @@ class cloud::loadbalancer(
 #    firewall_settings => $firewall_settings,
 #  }
 
-   $kibana_options = {
-      'cookie'      => 'JSESSIONID prefix indirect nocache',
-      'http-check'  => 'expect ! rstatus ^5',
-      'balance'     => 'source'
-    }
-
   cloud::loadbalancer::bind_api { 'kibana':
     port                => $kibana_port,
-    options             => merge($common_http_options, $kibana_options),
+    options             => merge($common_http_options, 
+                                {
+                                    'cookie'      => 'JSESSIONID prefix indirect nocache',
+                                    'http-check'  => 'expect ! rstatus ^5',
+                                    'balance'     => 'source',
+                                },
+                                $kibana_options),
   }
 
   cloud::loadbalancer::bind_api { 'logstash_syslog':
     port                => $logstash_syslog_port,
-    options             => merge($common_tcp_options, $logstash_syslog_bind_options),
+    options             => merge($common_tcp_options, $logstash_syslog_options),
   }
 
 #  cloud::loadbalancer::binding { 'redis_cluster':
