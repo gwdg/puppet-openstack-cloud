@@ -986,19 +986,15 @@ class cloud::loadbalancer(
 #  }
 
    $kibana_options = {
-      'cookie'  => 'JSESSIONID prefix indirect nocache',
-      'balance' => 'source'
+      'cookie'      => 'JSESSIONID prefix indirect nocache',
+      'http-check'  => 'expect ! rstatus ^5',
+      'balance'     => 'source'
     }
 
-  cloud::loadbalancer::binding { 'kibana':
-    ip                => $kibana,
-    port              => $kibana_port,
-    options           => $kibana_options,
-    bind_options      => $kibana_bind_options,
-    firewall_settings => $firewall_settings,
+  cloud::loadbalancer::bind_api { 'kibana':
+    port                => $kibana_port,
+    options             => merge($common_http_options, $kibana_options),
   }
-
-
 
   cloud::loadbalancer::binding { 'logstash_syslog':
     ip                => $logstash_syslog,
