@@ -1012,18 +1012,17 @@ class cloud::loadbalancer(
     options             => merge($common_tcp_options, $logstash_syslog_options),
   }
 
-#  cloud::loadbalancer::binding { 'redis_cluster':
-#    ip                => $redis,
-#    port              => $redis_port,
-#    options           => {
-#      'mode'      => 'tcp',
-#      'balance'   => 'first',
-#      'option'    => ['tcp-check',],
-#      'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
-#    },
-#    bind_options      => $redis_bind_options,
-#    firewall_settings => $firewall_settings,
-#  }
+  cloud::loadbalancer::bind_api { 'redis_cluster':
+    enable              => $enable_redis,
+    port                => $redis_port,
+    options             => merge($common_tcp_options, 
+                                {
+                                    'balance'   => 'first',
+                                    'option'    => ['tcp-check',],
+                                    'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
+                                },
+                                $redis_options),
+  }
 
   if (member(any2array($keepalived_public_ipvs), $galera_ip)) {
     warning('Exposing Galera cluster to public network is a security issue.')
