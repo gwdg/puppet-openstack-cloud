@@ -519,10 +519,6 @@
 #  (optional) An array of Galera IP
 #  Defaults to ['127.0.0.1']
 #
-# [*galera_slave*]
-#  (optional) A boolean to configure galera slave
-#  Defaults to false
-#
 # [*firewall_settings*]
 #   (optional) Allow to add custom parameters to firewall rules
 #   Should be an hash.
@@ -557,6 +553,8 @@ class cloud::loadbalancer(
   $enable_sensu_dashboard           = false,
   $enable_sensu_api                 = false,
   $enable_redis                     = false,
+  $enable_galera                    = false,
+  $enable_galera_readonly           = false,
 
   $haproxy_auth                     = 'admin:changeme',
 
@@ -593,6 +591,7 @@ class cloud::loadbalancer(
   $horizon_ssl_options              = {},
   $rabbitmq_options                 = {},
   $galera_options                   = {},
+  $galera_readonly_options          = {},
   $elasticsearch_options            = {},
   $kibana_options                   = {},
   $logstash_syslog_options          = {},
@@ -616,6 +615,8 @@ class cloud::loadbalancer(
   $ks_swift_public_port             = 8080,
   $ks_trove_public_port             = 8779,
   $rabbitmq_port                    = 5672,
+  $galera_port                      = 3306,
+  $galera_readonly_port             = 3307,
 
   $horizon_port                     = 80,
   $horizon_ssl_port                 = 443,
@@ -641,7 +642,6 @@ class cloud::loadbalancer(
 
   $vip_monitor_ip                   = false,
   $galera_ip                        = ['127.0.0.1'],
-  $galera_slave                     = false,
   $firewall_settings                = {},
 
   # New settings
@@ -1026,42 +1026,42 @@ class cloud::loadbalancer(
   if (member(any2array($keepalived_public_ipvs), $galera_ip)) {
     warning('Exposing Galera to public network is a security issue.')
   }
-  haproxy::listen { 'galera':
-    ipaddress    => $galera_ip,
-    ports        => 3306,
-    options      => {
-      'maxconn'        => $galera_connections,
-      'mode'           => 'tcp',
-      'balance'        => 'roundrobin',
-      'option'         => ['tcpka', 'tcplog', 'httpchk'], #httpchk mandatory expect 200 on port 9000
-      'timeout client' => '90m',
-      'timeout server' => '90m',
-    },
-    bind_options => $galera_bind_options,
+
+  cloud::loadbalancer::bind_api { 'galera':
+    enable              => $enable_galera,
+    port                => $galera_port,
+    options             => merge($common_tcp_options,
+                                {
+                                    'maxconn'        => $galera_connections,
+                                    'mode'           => 'tcp',
+                                    'balance'        => 'roundrobin',
+                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9000
+                                    'timeout client' => '90m',
+                                    'timeout server' => '90m',
+                                },
+                                $galera_options),
   }
 
-  if $galera_slave {
+#  if $::cloud::manage_firewall {
+#    cloud::firewall::rule{ '100 allow galera-slave binding access':
+#      port   => '3307',
+#      extras => $firewall_settings,
+#    }
+#  }
 
-    if $::cloud::manage_firewall {
-      cloud::firewall::rule{ '100 allow galera-slave binding access':
-        port   => '3307',
-        extras => $firewall_settings,
-      }
-    }
-
-    haproxy::listen { 'galera_readonly':
-      ipaddress    => $galera_ip,
-      ports        => 3307,
-      options      => {
-        'maxconn'        => $galera_connections,
-        'mode'           => 'tcp',
-        'balance'        => 'roundrobin',
-        'option'         => ['tcpka', 'tcplog', 'httpchk'], #httpchk mandatory expect 200 on port 9000
-        'timeout client' => '90m',
-        'timeout server' => '90m',
-      },
-      bind_options => $galera_bind_options,
-    }
+  cloud::loadbalancer::bind_api { 'galera_readonly':
+    enable              => $enable_galera_readonly,
+    port                => $galera_readonly_port,
+    options             => merge($common_tcp_options,
+                                {   
+                                    'maxconn'        => $galera_connections,
+                                    'mode'           => 'tcp',
+                                    'balance'        => 'roundrobin',
+                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9000
+                                    'timeout client' => '90m',
+                                    'timeout server' => '90m',
+                                },
+                                $galera_readonly_options),
   }
 
   # Allow HAProxy to bind to a non-local IP address
