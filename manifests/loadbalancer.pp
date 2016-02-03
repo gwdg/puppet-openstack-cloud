@@ -820,7 +820,7 @@ class cloud::loadbalancer(
     }
   }
 
-  # Instanciate HAproxy binding
+  # HAproxy bindings
 
   cloud::loadbalancer::bind_api { 'keystone_api_cluster':
     enable              => $enable_keystone_api,
@@ -854,26 +854,22 @@ class cloud::loadbalancer(
     options             => merge($common_http_options, $metadata_options),
   }
 
-#  cloud::loadbalancer::binding { 'sensu_dashboard':
-#    ip                => $sensu_dashboard,
-#    port              => $sensu_dashboard_port,
-#    bind_options      => $sensu_dashboard_bind_options,
-#    firewall_settings => $firewall_settings,
-#    options           => {
-#      'balance' => 'source',
-#    },
-#  }
+  cloud::loadbalancer::bind_api { 'sensu_dashboard':
+    enable              => $enable_sensu_dashboard,
+    port                => $sensu_dashboard_port,
+    options             => merge($common_http_options, $sensu_dashboard_options),
+  }
 
-#  cloud::loadbalancer::binding { 'sensu_api':
-#    ip                => $sensu_api,
-#    port              => $sensu_api_port,
-#    bind_options      => $sensu_api_bind_options,
-#    firewall_settings => $firewall_settings,
-#    options           => {
-#      'balance' => 'source',
-#      'rspadd'  => ['Access-Control-Allow-Origin:\ *', 'Access-Control-Allow-Headers:\ origin,\ x-requested-with,\ content-type', 'Access-Control-Allow-Methods:\ PUT,\ GET,\ POST,\ DELETE,\ OPTIONS'],
-#    },
-#  }
+  cloud::loadbalancer::bind_api { 'sensu_api':
+    enable              => $enable_sensu_api,
+    port                => $sensu_api_port,
+    options             => merge($common_http_options,
+                                {
+                                    'balance' => 'source',
+                                    'rspadd'  => ['Access-Control-Allow-Origin:\ *', 'Access-Control-Allow-Headers:\ origin,\ x-requested-with,\ content-type', 'Access-Control-Allow-Methods:\ PUT,\ GET,\ POST,\ DELETE,\ OPTIONS'],
+                                },
+                                $sensu_api_options),
+  }
 
 #  cloud::loadbalancer::bind_api { 'spice_cluster':
 #    port                => $spice_port,
