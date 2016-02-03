@@ -907,67 +907,66 @@ class cloud::loadbalancer(
     options             => merge($common_http_options, $rabbitmq_management_options),
   }
 
-#  cloud::loadbalancer::binding { 'trove_api_cluster':
-#    ip                => $trove_api,
-#    port              => $ks_trove_public_port,
-#    options           => $common_tcp_options,
-#    bind_options      => $trove_bind_options,
-#    firewall_settings => $firewall_settings,
-#  }
+  cloud::loadbalancer::bind_api { 'trove_api_cluster':
+    enable              => $enable_trove_api,
+    public_access       => true,
+    port                => $ks_trove_public_port,
+    options             => merge($common_http_options, $trove_options),
+  }
 
   cloud::loadbalancer::bind_api { 'glance_api_cluster':
     enable              => $enable_glance_api,
-    port                => $ks_glance_api_public_port,
     public_access       => true,
+    port                => $ks_glance_api_public_port,
     options             => merge($common_http_options, $glance_api_options),
   }
 
   cloud::loadbalancer::bind_api { 'glance_registry_cluster':
     enable              => $enable_glance_registry,
-    port                => $ks_glance_registry_internal_port,
     public_access       => true,
+    port                => $ks_glance_registry_internal_port,
     options             => merge($common_http_options, $glance_registry_options),
   }
 
   cloud::loadbalancer::bind_api { 'neutron_api_cluster':
     enable              => $enable_neutron_api,
-    port                => $ks_neutron_public_port,
     public_access       => true,
+    port                => $ks_neutron_public_port,
     options             => merge($common_http_options, $neutron_options),
   }
 
   cloud::loadbalancer::bind_api { 'cinder_api_cluster':
     enable              => $enable_cinder_api,
-    port                => $ks_cinder_public_port,
     public_access       => true,
+    port                => $ks_cinder_public_port,
     options             => merge($common_http_options, $cinder_options),
   }
 
   cloud::loadbalancer::bind_api { 'ceilometer_api_cluster':
     enable              => $enable_ceilometer_api,
-    port                => $ks_ceilometer_public_port,
     public_access       => true,
+    port                => $ks_ceilometer_public_port,
     options             => merge($common_http_options, $ceilometer_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_api_cluster':
     enable              => $enable_heat_api,
-    port                => $ks_heat_public_port,
     public_access       => true,
+    port                => $ks_heat_public_port,
     options             => merge($common_http_options, $heat_api_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cfn_api_cluster':
     enable              => $enable_heat_cfn_api,
-    port                => $ks_heat_cfn_public_port,
     public_access       => true,
+    port                => $ks_heat_cfn_public_port,
     options             => merge($common_http_options, $heat_cfn_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cloudwatch_api_cluster':
     enable              => $enable_heat_cloudwatch_api,
-    port                => $ks_heat_cloudwatch_public_port,
     public_access       => true,
+    port                => $ks_heat_cloudwatch_public_port,
     options             => merge($common_http_options, $heat_cloudwatch_options),
   }
 
