@@ -18,46 +18,45 @@
 # cloud::loadbalancer::bind_api
 #
 define cloud::loadbalancer::bind_api(
+  $enable           = false,
   $port             = undef,
   $public_access    = false,
   $public_port      = undef,
   $options          = {}
 ){
 
-  if $public_access or $public_port {
+  if $enable {
+    if $public_access or $public_port {
 
-    # Derive public port
-    if $public_port {
-       $public_port_real = $public_port
+      # Derive public port
+      if $public_port {
+         $public_port_real = $public_port
+      }
+      else {
+         $public_port_real = $port
+      }
+
+      # Define public + internal endpoints
+      haproxy::listen { $title:
+        bind                => {
+          # Internal binding via http
+          "${::cloud::loadbalancer::vip_internal_ip}:${port}"               => [],
+
+          # Public binding always via https
+          "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
+        },
+        options             => $options,
+      }
+    } else {
+
+      # Define only an internal endpoint
+      haproxy::listen { $title:
+        bind                => {
+          # Internal binding via http
+          "${::cloud::loadbalancer::vip_internal_ip}:${port}"   => [],
+        },
+        options             => $options,
+      } 
     }
-    else {
-       $public_port_real = $port
-    }
-
-    # Define public + internal endpoints
-    haproxy::listen { $title:
-
-      bind                => {
-        # Internal binding via http
-        "${::cloud::loadbalancer::vip_internal_ip}:${port}"   => [],
-
-        # Public binding always via https
-        "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
-      },
-
-      options             => $options,
-    }
-  } else {
-
-    # Define only an internal endpoint
-    haproxy::listen { $title:
-
-      bind                => {
-        # Internal binding via http
-        "${::cloud::loadbalancer::vip_internal_ip}:${port}"   => [],
-      },
-
-      options             => $options,
-    } 
   }
 }

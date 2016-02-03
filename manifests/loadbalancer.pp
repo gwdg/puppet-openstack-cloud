@@ -530,32 +530,33 @@
 #
 class cloud::loadbalancer(
 
-  $swift_api                        = true,
-  $ceilometer_api                   = true,
-  $cinder_api                       = true,
-  $glance_api                       = true,
-  $glance_registry                  = true,
-  $neutron_api                      = true,
-  $heat_api                         = true,
-  $heat_cfn_api                     = true,
-  $heat_cloudwatch_api              = true,
-  $nova_api                         = true,
-  $ec2_api                          = true,
-  $metadata_api                     = true,
-  $keystone_api                     = true,
-  $keystone_api_admin               = true,
-  $trove_api                        = true,
-  $horizon                          = true,
-  $horizon_ssl                      = false,
-  $rabbitmq                         = false,
-  $spice                            = false,
-  $novnc                            = true,
-  $elasticsearch                    = true,
-  $kibana                           = true,
-  $logstash_syslog                  = true,
-  $sensu_dashboard                  = true,
-  $sensu_api                        = true,
-  $redis                            = true,
+  $enable_swift_api                 = false,
+  $enable_ceilometer_api            = false,
+  $enable_cinder_api                = false,
+  $enable_glance_api                = false,
+  $enable_glance_registry           = false,
+  $enable_neutron_api               = false,
+  $enable_heat_api                  = false,
+  $enable_heat_cfn_api              = false,
+  $enable_heat_cloudwatch_api       = false,
+  $enable_nova_api                  = false,
+  $enable_ec2_api                   = false,
+  $enable_metadata_api              = false,
+  $enable_keystone_api              = false,
+  $enable_keystone_api_admin        = false,
+  $enable_trove_api                 = false,
+  $enable_horizon                   = false,
+  $enable_horizon_ssl               = false,
+  $enable_rabbitmq                  = false,
+  $enable_rabbitmq_management       = false,
+  $enable_spice                     = false,
+  $enable_novnc                     = false,
+  $enable_elasticsearch             = false,
+  $enable_kibana                    = false,
+  $enable_logstash_syslog           = false,
+  $enable_sensu_dashboard           = false,
+  $enable_sensu_api                 = false,
+  $enable_redis                     = false,
 
   $haproxy_auth                     = 'admin:changeme',
 
@@ -822,28 +823,33 @@ class cloud::loadbalancer(
   # Instanciate HAproxy binding
 
   cloud::loadbalancer::bind_api { 'keystone_api_cluster':
-    port                => $ks_keystone_public_port,
+    enable              => $enable_keystone_api,
     public_access       => true,
+    port                => $ks_keystone_public_port,
     options             => merge($common_http_options, $keystone_options),
   }
 
   cloud::loadbalancer::bind_api { 'keystone_api_admin_cluster':
+    enable              => $enable_keystone_api_admin,
     port                => $ks_keystone_admin_port,
     options             => merge($common_http_options, $keystone_admin_options),
   }
 
   cloud::loadbalancer::bind_api { 'nova_api_cluster':
-    port                => $ks_nova_public_port,
+    enable              => $enable_nova_api,
     public_access       => true,
+    port                => $ks_nova_public_port,
     options             => merge($common_http_options, $nova_options),
   }
 
   cloud::loadbalancer::bind_api { 'ec2_api_cluster':
+    enable              => $enable_ec2_api,
     port                => $ks_ec2_public_port,
     options             => merge($common_http_options, $ec2_options),
   }
 
   cloud::loadbalancer::bind_api { 'metadata_api_cluster':
+    enable              => $enable_metadata_api,
     port                => $ks_metadata_public_port,
     options             => merge($common_http_options, $metadata_options),
   }
@@ -876,12 +882,14 @@ class cloud::loadbalancer(
 #  }
 
   cloud::loadbalancer::bind_api { 'novnc_cluster':
-    port                => $novnc_port,
+    enable              => $enable_novnc,
     public_access       => true,
+    port                => $novnc_port,
     options             => merge($common_http_options, $novnc_options),
   }
 
   cloud::loadbalancer::bind_api { 'rabbitmq_cluster':
+    enable              => $enable_rabbitmq,
     port                => $rabbitmq_port,
     options             => merge($common_tcp_options, 
                                 {
@@ -897,6 +905,7 @@ class cloud::loadbalancer(
   }
 
   cloud::loadbalancer::bind_api { 'rabbitmq_management_cluster':
+    enable              => $enable_rabbitmq_management,
     port                => $rabbitmq_management_port,
     options             => merge($common_http_options, $rabbitmq_management_options),
   }
@@ -910,54 +919,63 @@ class cloud::loadbalancer(
 #  }
 
   cloud::loadbalancer::bind_api { 'glance_api_cluster':
+    enable              => $enable_glance_api,
     port                => $ks_glance_api_public_port,
     public_access       => true,
     options             => merge($common_http_options, $glance_api_options),
   }
 
   cloud::loadbalancer::bind_api { 'glance_registry_cluster':
+    enable              => $enable_glance_registry,
     port                => $ks_glance_registry_internal_port,
     public_access       => true,
     options             => merge($common_http_options, $glance_registry_options),
   }
 
   cloud::loadbalancer::bind_api { 'neutron_api_cluster':
+    enable              => $enable_neutron_api,
     port                => $ks_neutron_public_port,
     public_access       => true,
     options             => merge($common_http_options, $neutron_options),
   }
 
   cloud::loadbalancer::bind_api { 'cinder_api_cluster':
+    enable              => $enable_cinder_api,
     port                => $ks_cinder_public_port,
     public_access       => true,
     options             => merge($common_http_options, $cinder_options),
   }
 
   cloud::loadbalancer::bind_api { 'ceilometer_api_cluster':
+    enable              => $enable_ceilometer_api,
     port                => $ks_ceilometer_public_port,
     public_access       => true,
     options             => merge($common_http_options, $ceilometer_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_api_cluster':
+    enable              => $enable_heat_api,
     port                => $ks_heat_public_port,
     public_access       => true,
     options             => merge($common_http_options, $heat_api_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cfn_api_cluster':
+    enable              => $enable_heat_cfn_api,
     port                => $ks_heat_cfn_public_port,
     public_access       => true,
     options             => merge($common_http_options, $heat_cfn_options),
   }
 
   cloud::loadbalancer::bind_api { 'heat_cloudwatch_api_cluster':
+    enable              => $enable_heat_cloudwatch_api,
     port                => $ks_heat_cloudwatch_public_port,
     public_access       => true,
     options             => merge($common_http_options, $heat_cloudwatch_options),
   }
 
   cloud::loadbalancer::bind_api { 'horizon_cluster':
+    enable              => $enable_horizon,
     port                => $horizon_port,
     public_port         => $horizon_ssl_port,
     options             => merge($common_http_options,
@@ -981,6 +999,7 @@ class cloud::loadbalancer(
 #  }
 
   cloud::loadbalancer::bind_api { 'kibana':
+    enable              => $enable_kibana,
     port                => $kibana_port,
     options             => merge($common_http_options, 
                                 {
@@ -992,6 +1011,7 @@ class cloud::loadbalancer(
   }
 
   cloud::loadbalancer::bind_api { 'logstash_syslog':
+    enable              => $enable_logstash_syslog,
     port                => $logstash_syslog_port,
     options             => merge($common_tcp_options, $logstash_syslog_options),
   }
