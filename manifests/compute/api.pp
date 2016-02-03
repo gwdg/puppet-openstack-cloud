@@ -124,7 +124,7 @@ class cloud::compute::api(
   include 'nova::cron::archive_deleted_rows'
 
   @@haproxy::balancermember{"${::fqdn}-compute_api_ec2":
-    listening_service => 'ec2_api_cluster',
+    listening_service => 'ec2_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_ec2_public_port,
@@ -132,7 +132,7 @@ class cloud::compute::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-compute_api_nova":
-    listening_service => 'nova_api_cluster',
+    listening_service => 'nova_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_nova_public_port,
@@ -140,7 +140,7 @@ class cloud::compute::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-compute_api_metadata":
-    listening_service => 'metadata_api_cluster',
+    listening_service => 'metadata_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_metadata_public_port,

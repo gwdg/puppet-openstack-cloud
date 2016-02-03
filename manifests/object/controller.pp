@@ -168,7 +168,7 @@ cache = swift.cache')
   }
 
   @@haproxy::balancermember{"${::fqdn}-swift_api":
-      listening_service => 'swift_api_cluster',
+      listening_service => 'swift_api',
       server_names      => $::hostname,
       ipaddresses       => $api_eth,
       ports             => $ks_swift_internal_port,

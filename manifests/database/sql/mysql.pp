@@ -567,7 +567,7 @@ class cloud::database::sql::mysql (
   }
 
   @@haproxy::balancermember{$::fqdn:
-    listening_service => 'galera_cluster',
+    listening_service => 'galera',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => '3306',
@@ -576,7 +576,7 @@ class cloud::database::sql::mysql (
   }
 
   @@haproxy::balancermember{"${::fqdn}-readonly":
-    listening_service => 'galera_readonly_cluster',
+    listening_service => 'galera_readonly',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => '3306',

@@ -189,7 +189,7 @@ class cloud::dashboard(
   }
 
   @@haproxy::balancermember{"${::fqdn}-horizon":
-    listening_service => 'horizon_cluster',
+    listening_service => 'horizon',
     server_names      => $::hostname,
     ipaddresses       => $lb_eth,
     ports             => $horizon_port,
@@ -206,7 +206,7 @@ class cloud::dashboard(
     }
 
     @@haproxy::balancermember{"${::fqdn}-horizon-ssl":
-      listening_service => 'horizon_ssl_cluster',
+      listening_service => 'horizon_ssl',
       server_names      => $::hostname,
       ipaddresses       => $lb_eth,
       ports             => $horizon_ssl_port,

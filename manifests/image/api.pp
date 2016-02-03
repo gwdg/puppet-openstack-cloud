@@ -316,7 +316,7 @@ class cloud::image::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-glance_api":
-    listening_service => 'glance_api_cluster',
+    listening_service => 'glance_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_glance_api_internal_port,

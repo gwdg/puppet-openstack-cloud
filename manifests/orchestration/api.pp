@@ -89,7 +89,7 @@ class cloud::orchestration::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-heat_api":
-    listening_service => 'heat_api_cluster',
+    listening_service => 'heat_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_heat_internal_port,
@@ -97,7 +97,7 @@ class cloud::orchestration::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-heat_cfn_api":
-    listening_service => 'heat_cfn_api_cluster',
+    listening_service => 'heat_cfn_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_heat_cfn_internal_port,
@@ -105,7 +105,7 @@ class cloud::orchestration::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-heat_cloudwatch_api":
-    listening_service => 'heat_cloudwatch_api_cluster',
+    listening_service => 'heat_cloudwatch_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_heat_cloudwatch_internal_port,

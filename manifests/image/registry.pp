@@ -154,7 +154,7 @@ class cloud::image::registry(
   }
 
   @@haproxy::balancermember{"${::fqdn}-glance_registry":
-    listening_service => 'glance_registry_cluster',
+    listening_service => 'glance_registry',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_glance_registry_internal_port,

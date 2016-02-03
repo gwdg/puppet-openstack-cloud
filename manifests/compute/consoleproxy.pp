@@ -86,7 +86,7 @@ class cloud::compute::consoleproxy(
   }
 
   @@haproxy::balancermember{"${::fqdn}-compute_${console}":
-    listening_service => "${console}_cluster",
+    listening_service => "${console}",
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $port,

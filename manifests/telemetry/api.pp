@@ -108,7 +108,7 @@ class cloud::telemetry::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-ceilometer_api":
-    listening_service => 'ceilometer_api_cluster',
+    listening_service => 'ceilometer_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_ceilometer_internal_port,

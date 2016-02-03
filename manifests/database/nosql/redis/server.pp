@@ -42,7 +42,7 @@ class cloud::database::nosql::redis::server(
   include ::redis
 
   @@haproxy::balancermember{"${::fqdn}-redis":
-    listening_service => 'redis_cluster',
+    listening_service => 'redis',
     server_names      => $::hostname,
     ipaddresses       => $bind_ip,
     ports             => $port,

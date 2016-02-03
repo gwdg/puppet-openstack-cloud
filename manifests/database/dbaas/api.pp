@@ -94,7 +94,7 @@ class cloud::database::dbaas::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-trove_api":
-    listening_service => 'trove_api_cluster',
+    listening_service => 'trove_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_trove_public_port,

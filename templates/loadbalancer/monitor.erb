@@ -1,79 +1,79 @@
 <%- if @enable_swift_api -%>
-acl swift_api_dead nbsrv(swift_api_cluster) lt 1
+acl swift_api_dead nbsrv(swift_api) lt 1
 monitor fail if swift_api_dead
 <%- end -%>
 <%- if @enable_keystone_api -%>
-acl keystone_api_dead nbsrv(keystone_api_cluster) lt 1
+acl keystone_api_dead nbsrv(keystone_api) lt 1
 monitor fail if keystone_api_dead
 <% end -%>
 <%- if @enable_keystone_api_admin -%>
-acl keystone_api_admin_dead nbsrv(keystone_api_admin_cluster) lt 1
+acl keystone_api_admin_dead nbsrv(keystone_api_admin) lt 1
 monitor fail if keystone_api_admin_dead
 <% end -%>
 <%- if @enable_galera -%>
-acl galera_dead nbsrv(galera_cluster) lt 1
+acl galera_dead nbsrv(galera) lt 1
 monitor fail if galera_dead
 <%- end -%>
 <%- if @enable_neutron_api -%>
-acl neutron_api_dead nbsrv(neutron_api_cluster) lt 1
+acl neutron_api_dead nbsrv(neutron_api) lt 1
 monitor fail if neutron_api_dead
 <%- end -%>
 <%- if @enable_cinder_api -%>
-acl cinder_api_dead nbsrv(cinder_api_cluster) lt 1
+acl cinder_api_dead nbsrv(cinder_api) lt 1
 monitor fail if cinder_api_dead
 <%- end -%>
 <%- if @enable_nova_api -%>
-acl nova_api_dead nbsrv(nova_api_cluster) lt 1
+acl nova_api_dead nbsrv(nova_api) lt 1
 monitor fail if nova_api_dead
 <%- end -%>
 <%- if @enable_ec2_api -%>
-acl ec2_api_dead nbsrv(ec2_api_cluster) lt 1
+acl ec2_api_dead nbsrv(ec2_api) lt 1
 monitor fail if ec2_api_dead
 <%- end -%>
 <%- if @enable_metadata_api -%>
-acl metadata_api_dead nbsrv(metadata_api_cluster) lt 1
+acl metadata_api_dead nbsrv(metadata_api) lt 1
 monitor fail if metadata_api_dead
 <%- end -%>
 <%- if @enable_spice -%>
-acl spice_dead nbsrv(spice_cluster) lt 1
+acl spice_dead nbsrv(spice) lt 1
 monitor fail if spice_dead
 <%- end -%>
 <%- if @enable_rabbitmq -%>
-acl rabbitmq_dead nbsrv(rabbitmq_cluster) lt 1
+acl rabbitmq_dead nbsrv(rabbitmq) lt 1
 monitor fail if rabbitmq_dead
-acl rabbitmq_management_dead nbsrv(rabbitmq_management_cluster) lt 1
+acl rabbitmq_management_dead nbsrv(rabbitmq_management) lt 1
 monitor fail if rabbitmq_management_dead
 <%- end -%>
 <%- if @enable_glance_api -%>
-acl glance_api_dead nbsrv(glance_api_cluster) lt 1
+acl glance_api_dead nbsrv(glance_api) lt 1
 monitor fail if glance_api_dead
 <%- end -%>
 <%- if @enable_glance_registry -%>
-acl glance_registry_dead nbsrv(glance_registry_cluster) lt 1
+acl glance_registry_dead nbsrv(glance_registry) lt 1
 monitor fail if glance_registry_dead
 <%- end -%>
 <%- if @enable_ceilometer_api -%>
-acl ceilometer_api_dead nbsrv(ceilometer_api_cluster) lt 1
+acl ceilometer_api_dead nbsrv(ceilometer_api) lt 1
 monitor fail if ceilometer_api_dead
 <%- end -%>
 <%- if @enable_heat_api -%>
-acl heat_api_dead nbsrv(heat_api_cluster) lt 1
+acl heat_api_dead nbsrv(heat_api) lt 1
 monitor fail if heat_api_dead
 <%- end -%>
 <%- if @enable_heat_cfn_api -%>
-acl heat_cfn_api_dead nbsrv(heat_cfn_api_cluster) lt 1
+acl heat_cfn_api_dead nbsrv(heat_cfn_api) lt 1
 monitor fail if heat_cfn_api_dead
 <%- end -%>
 <%- if @enable_heat_cloudwatch_api -%>
-acl heat_cloudwatch_api_dead nbsrv(heat_cloudwatch_api_cluster) lt 1
+acl heat_cloudwatch_api_dead nbsrv(heat_cloudwatch_api) lt 1
 monitor fail if heat_cloudwatch_api_dead
 <%- end -%>
 <%- if @enable_horizon -%>
-acl horizon_dead nbsrv(horizon_cluster) lt 1
+acl horizon_dead nbsrv(horizon) lt 1
 monitor fail if horizon_dead
 <%- end -%>
 <%- if @enable_trove_api -%>
-acl trove_api_dead nbsrv(trove_api_cluster) lt 1
+acl trove_api_dead nbsrv(trove_api) lt 1
 monitor fail if trove_api_dead
 <%- end -%>
 

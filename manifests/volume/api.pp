@@ -116,7 +116,7 @@ class cloud::volume::api(
   }
 
   @@haproxy::balancermember{"${::fqdn}-cinder_api":
-    listening_service => 'cinder_api_cluster',
+    listening_service => 'cinder_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_cinder_internal_port,

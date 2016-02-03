@@ -356,7 +356,7 @@ class cloud::network::controller(
   }
 
   @@haproxy::balancermember{"${::fqdn}-neutron_api":
-    listening_service => 'neutron_api_cluster',
+    listening_service => 'neutron_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_neutron_public_port,

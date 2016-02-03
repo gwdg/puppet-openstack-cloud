@@ -555,7 +555,7 @@ class cloud::identity (
   }
 
   @@haproxy::balancermember{"${::fqdn}-keystone_api":
-    listening_service => 'keystone_api_cluster',
+    listening_service => 'keystone_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_keystone_public_port,
@@ -563,7 +563,7 @@ class cloud::identity (
   }
 
   @@haproxy::balancermember{"${::fqdn}-keystone_api_admin":
-    listening_service => 'keystone_api_admin_cluster',
+    listening_service => 'keystone_api_admin',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_keystone_admin_port,

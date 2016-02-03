@@ -195,7 +195,7 @@ class cloud::messaging(
     }
 
     @@haproxy::balancermember{"${::fqdn}-rabbitmq":
-      listening_service => 'rabbitmq_cluster',
+      listening_service => 'rabbitmq',
       server_names      => $::hostname,
       ipaddresses       => $rabbitmq_ip,
       ports             => $rabbitmq_port,
@@ -205,7 +205,7 @@ class cloud::messaging(
     }
 
     @@haproxy::balancermember{"${::fqdn}-rabbitmq-management":
-      listening_service => 'rabbitmq_management_cluster',
+      listening_service => 'rabbitmq_management',
       server_names      => $::hostname,
       ipaddresses       => $rabbitmq_ip,
       ports             => $rabbitmq_management_port,
