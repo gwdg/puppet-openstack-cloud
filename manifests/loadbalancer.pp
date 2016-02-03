@@ -996,12 +996,9 @@ class cloud::loadbalancer(
     options             => merge($common_http_options, $kibana_options),
   }
 
-  cloud::loadbalancer::binding { 'logstash_syslog':
-    ip                => $logstash_syslog,
-    port              => $logstash_syslog_port,
-    options           => $common_tcp_options,
-    bind_options      => $logstash_syslog_bind_options,
-    firewall_settings => $firewall_settings,
+  cloud::loadbalancer::bind_api { 'logstash_syslog':
+    port                => $logstash_syslog_port,
+    options             => merge($common_tcp_options, $logstash_syslog_bind_options),
   }
 
 #  cloud::loadbalancer::binding { 'redis_cluster':
