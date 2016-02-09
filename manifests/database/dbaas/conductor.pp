@@ -56,7 +56,7 @@ class cloud::database::dbaas::conductor(
   include 'cloud::database::dbaas'
 
   class { 'trove::conductor':
-    auth_url   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
+    auth_url   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
     debug      => $debug,
     verbose    => $verbose,
     use_syslog => $use_syslog

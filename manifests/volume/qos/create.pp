@@ -24,7 +24,7 @@
 #
 # [*os_auth_url*]
 #   (Optional) The keystone auth url.
-#   Defaults to 'http://127.0.0.1:5000/v2.0/'.
+#   Defaults to 'http://127.0.0.1:5000'.
 #
 # [*os_region_name*]
 #   (Optional) The keystone region name.
@@ -38,7 +38,7 @@ define cloud::volume::qos::create (
   $properties     = undef,
   $os_tenant_name = 'admin',
   $os_username    = 'admin',
-  $os_auth_url    = 'http://127.0.0.1:5000/v2.0/',
+  $os_auth_url    = 'http://127.0.0.1:5000',
   $os_region_name = undef,
   ) {
 

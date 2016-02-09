@@ -131,7 +131,7 @@ class cloud::dashboard(
 ) {
 
   # We build the param needed for horizon class
-  $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}/v2.0"
+  $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}"
 
   # Apache2 specific configuration
   # FIXME(piotr): we add the headers for ssl termination via haproxy, so don't do it here

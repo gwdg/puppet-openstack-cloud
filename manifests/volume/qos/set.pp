@@ -23,7 +23,7 @@
 #   (optional) The keystone user name. Defaults to 'admin.
 #
 # [*os_auth_url*]
-#   (optional) The keystone auth url. Defaults to 'http://127.0.0.1:5000/v2.0/'.
+#   (optional) The keystone auth url. Defaults to 'http://127.0.0.1:5000'.
 #
 # [*os_region_name*]
 #   (optional) The keystone region name. Default is unset.
@@ -37,7 +37,7 @@ define cloud::volume::qos::set (
   $os_password,
   $os_tenant_name = 'admin',
   $os_username    = 'admin',
-  $os_auth_url    = 'http://127.0.0.1:5000/v2.0/',
+  $os_auth_url    = 'http://127.0.0.1:5000',
   $os_region_name = undef,
   $value,
   ) {
