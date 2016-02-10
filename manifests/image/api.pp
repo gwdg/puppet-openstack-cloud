@@ -217,16 +217,6 @@ class cloud::image::api(
     known_stores             => $known_stores,
   }
 
-  # TODO(EmilienM) Disabled for now
-  # Follow-up: https://github.com/enovance/puppet-openstack-cloud/issues/160
-  #
-  # class { 'glance::notify::rabbitmq':
-  #   rabbit_password => $rabbit_password,
-  #   rabbit_userid   => 'glance',
-  #   rabbit_host     => $rabbit_host,
-  # }
-
-
   glance_api_config {
     'DEFAULT/notifier_driver':          value => 'noop';
     'DEFAULT/container_formats':        value => $container_formats;
@@ -266,7 +256,6 @@ class cloud::image::api(
 
   } elsif ($backend == 'nfs') {
 
-    # FIXME (Piotr): Use the nfs module to mount the necessary nfs shares
     include ::nfs::client
 
     nfs::client::mount { '/var/lib/glance/images':
