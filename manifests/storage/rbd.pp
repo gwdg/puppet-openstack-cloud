@@ -44,6 +44,7 @@ class cloud::storage::rbd (
 
 ) {
   if $enable {
+
     # Install ceph client packages
     $packages = ['python-rbd', 'ceph-common']
 
@@ -61,14 +62,6 @@ class cloud::storage::rbd (
       content => template('cloud/storage/ceph/ceph.conf.erb'),
       require => Package['ceph']
     }
-
-#  class { 'ceph::conf':
-#    fsid            => $fsid,
-#    auth_type       => 'cephx',
-#    cluster_network => $cluster_network,
-#    public_network  => $public_network,
-#    enable_service  => true
-#  }
 
     Exec {
       path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin'
