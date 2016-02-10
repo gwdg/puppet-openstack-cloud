@@ -75,48 +75,13 @@ define cloud::volume::backend::rbd (
     volume_tmp_dir                   => '/tmp'
   }
 
-  # If Cinder & Nova reside on the same node, we need a group
-  # where nova & cinder users have read permissions.
-  #
-  # pete: won't happen in our deployment, so disable for now
-#  ensure_resource('group', 'cephkeyring', {
-#    ensure => 'present'
-#  })
-
-#  ensure_resource ('exec','add-cinder-to-group', {
-#    'command' => 'usermod -a -G cephkeyring cinder',
-#    'path'    => ['/usr/sbin', '/usr/bin', '/bin', '/sbin'],
-#    'unless'  => 'groups cinder | grep cephkeyring'
-#  })
-
   # Configure Ceph keyring
-#  Ceph::Key <<| title == $rbd_user |>>
-
   ceph::key { "client.${rbd_user}":
     secret          => $rbd_key,
     user            => 'cinder',
     group           => 'cinder',
     keyring_path    => "/etc/ceph/ceph.client.${rbd_user}.keyring"
   }
-
-#  concat { $rbd_ceph_conf:
-#    ensure => present,
-#  }
-
-#  $clients = [$rbd_user]
-#  concat::fragment { 'ceph-cinder-client-os':
-#    target  => $rbd_ceph_conf,
-#    order   => '95',
-#    content => template('cloud/storage/ceph/ceph-client.conf.erb')
-#  }
-
-
-#  ensure_resource('file', "/etc/ceph/ceph.client.${rbd_user}.keyring", {
-#    owner => 'root',
-#    group => 'cephkeyring',
-#    mode => '0440',
-#    require => Ceph::Key[$rbd_user],
-# })
 
   Concat::Fragment <<| title == 'ceph-client-os' |>>
 
