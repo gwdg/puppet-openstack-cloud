@@ -831,6 +831,7 @@ class cloud::loadbalancer(
 
   cloud::loadbalancer::bind_api { 'keystone_api_admin':
     enable              => $enable_keystone_api_admin,
+    public_access       => true,
     port                => $ks_keystone_admin_port,
     options             => merge($common_http_options, $keystone_admin_options),
   }
