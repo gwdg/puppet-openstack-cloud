@@ -162,8 +162,11 @@ class cloud::image::api(
 
   $api_eth                           = '127.0.0.1',
   $openstack_vip                     = '127.0.0.1',
+
   $glance_rbd_pool                   = 'images',
   $glance_rbd_user                   = 'glance',
+  $glance_rbd_key                    = 'key',
+
   $verbose                           = true,
   $debug                             = true,
   $log_facility                      = 'LOG_LOCAL0',
@@ -224,20 +227,27 @@ class cloud::image::api(
 
   if ($backend == 'rbd') {
 
+    # Handle ceph.conf + ceph packages
+    include ::cloud::storage::rbd
+
+    # Configure Glance rbd backend
     class { 'glance::backend::rbd':
-      rbd_store_user => $glance_rbd_user,
-      rbd_store_pool => $glance_rbd_pool
+      rbd_store_user            => $glance_rbd_user,
+      rbd_store_pool            => $glance_rbd_pool,
+      rbd_store_chunk_size      => 8,
+      rados_connect_timeout     => 0,
     }
 
-    Ceph::Key <<| title == $glance_rbd_user |>> ->
-    file { '/etc/ceph/ceph.client.glance.keyring':
-      owner   => 'glance',
-      group   => 'glance',
-      mode    => '0400',
-      require => Ceph::Key[$glance_rbd_user],
-      notify  => Service['glance-api','glance-registry']
+    # Set client key for cephx
+    ceph::key { "client.${glance_rbd_user}":
+        secret          => $glance_rbd_key,
+        user            => 'glance',
+        group           => 'glance',
+        keyring_path    => "/etc/ceph/ceph.client.${glance_rbd_user}.keyring",
+        notify          => Service['glance-api','glance-registry'],
     }
-    Concat::Fragment <<| title == 'ceph-client-os' |>>
+
+#    Concat::Fragment <<| title == 'ceph-client-os' |>>
 
   } elsif ($backend == 'file') {
 
