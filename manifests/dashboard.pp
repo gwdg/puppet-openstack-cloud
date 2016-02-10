@@ -128,6 +128,7 @@ class cloud::dashboard(
 
   # New parameters
   $lb_eth                    = '127.0.0.1',
+  $memcache_servers          = false,
 ) {
 
   # We build the param needed for horizon class
@@ -151,13 +152,23 @@ class cloud::dashboard(
   }
   $neutron_options_real = merge ($neutron_options, $neutron_extra_options)
 
+  # Use memcache servers for caching if set, else in memory caching
+  if $memcache_servers {
+    $cache_server_ip    = $memcache_servers
+    $cache_backend      = 'django.core.cache.backends.memcached.MemcachedCache'
+  } else {
+    $cache_server_ip    = false
+    $cache_backend      = 'django.core.cache.backends.locmem.LocMemCache'
+  }
+
   include ::cloud::util::apache_common
   class { 'horizon':
     secret_key              => $secret_key,
     servername              => $servername,
     bind_address            => $api_eth,
     keystone_url            => $keystone_url,
-    cache_server_ip         => false,
+    cache_server_ip         => $cache_server_ip,
+    cache_backend           => $cache_backend,
     django_debug            => $debug,
     neutron_options         => $neutron_options_real,
     listen_ssl              => $listen_ssl,
