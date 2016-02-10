@@ -328,11 +328,27 @@ Host *
 
     $libvirt_disk_cachemodes_real = ['network=writeback']
 
-    # when nova uses ceph for instances storage
+    # Special setup for ceph-based nova ephemeral storage
     if $vm_rbd {
+
+      # Create special dirs for logs /  per instance ceph admin sockets
+      file { ['/var/run/ceph', '/var/run/ceph/guests/', '/var/log/qemu/']:
+        ensure  => directory,
+        mode    => '0770',
+        owner   => 'libvirt-qemu',
+        group   => 'libvirtd',
+        require => Package['libvirt-bin'],
+        before  => Class['nova::compute::rbd'],
+      }
+
       class { 'nova::compute::rbd':
-        libvirt_rbd_user        => $cinder_rbd_user,
-        libvirt_images_rbd_pool => $nova_rbd_pool
+        libvirt_rbd_user            => $cinder_rbd_user,
+        libvirt_images_rbd_pool     => $nova_rbd_pool,
+        ephemeral_storage           => $vm_rbd,
+
+        # Prevent nova::compute::rbd from trying to get / manage ceph keys on its own (would need admin priviliges, which sucks)
+        # Instead just copy / paste and do the relevant stuff here
+        libvirt_rbd_secret_uuid     => false,
       }
     } else {
       # when nova only needs to attach ceph volumes to instances
@@ -345,7 +361,7 @@ Host *
       'libvirt/rbd_secret_uuid': value => $nova_rbd_secret_uuid;
     }
 
-    # Create key for rbd user
+    # Create key for rbd user (reuse Cinder key)
     ceph::key { "client.${cinder_rbd_user}":
       secret          => $cinder_rbd_key,
       user            => 'nova',
@@ -353,6 +369,7 @@ Host *
       keyring_path    => "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring"
     }
 
+    # Setup virsh secret file
     file { '/etc/ceph/secret.xml':
       content => template('cloud/storage/ceph/secret-compute.xml.erb'),
       tag     => 'ceph_compute_secret_file',

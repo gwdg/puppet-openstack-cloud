@@ -11,12 +11,21 @@ cluster_network = <%= @cluster_network %>
 
 osd crush update on start = false
 
+<% if @compute_node -%>
+[client]
+    rbd cache = true
+    rbd cache writethrough until flush = true
+    admin socket = /var/run/ceph/guests/$cluster-$type.$id.$pid.$cctid.asok
+    log file = /var/log/qemu/qemu-guest-$pid.log
+    rbd concurrent management ops = 20
+<% end -%>
+
 [client.cinder]
-        keyring = /etc/ceph/ceph.client.cinder.keyring
+    keyring = /etc/ceph/ceph.client.cinder.keyring
 
 [client.cinder-backup]
-        keyring = /etc/ceph/ceph.client.cinder-backup.keyring
+    keyring = /etc/ceph/ceph.client.cinder-backup.keyring
 
 [client.glance]
-        keyring = /etc/ceph/ceph.client.glance.keyring
+    keyring = /etc/ceph/ceph.client.glance.keyring
 

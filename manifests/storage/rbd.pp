@@ -32,6 +32,9 @@ class cloud::storage::rbd (
 
   $enable               = false,
 
+  # Special ceph.conf client setup for VMs
+  $compute_node         = false,
+
   $fsid                 = undef,
 
   $mon_initial_members  = [],
