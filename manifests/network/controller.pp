@@ -232,6 +232,7 @@ class cloud::network::controller(
   $contrail_api_server_port      = '8082',
   $contrail_multi_tenancy        = true,
   $contrail_extensions           = [''],
+  $lbaas_package_ensure          = 'latest',
 ) {
 
   include 'cloud::network'
@@ -333,6 +334,15 @@ class cloud::network::controller(
       shared                    => true,
       router_external           => true
     }
+  }
+
+  if $::cloud::network::lbaas_enabled {
+    Package['neutron'] -> Package['python-neutron-lbaas']
+    ensure_resource( 'package', 'python-neutron-lbaas', {
+      ensure => $lbaas_package_ensure,
+      name   => python-neutron-lbaas,
+      tag    => ['openstack', 'neutron-package'],
+    })
   }
 
   # Note(EmilienM):

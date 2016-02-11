@@ -72,6 +72,8 @@ class cloud::network(
   $dhcp_lease_duration        = '120',
   $plugin                     = 'ml2',
   $service_plugins            = ['neutron.services.loadbalancer.plugin.LoadBalancerPlugin','neutron.services.metering.metering_plugin.MeteringPlugin','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin'],
+  $lbaas_enabled              = false,
+  $lbaas_service_provider     = 'LOADBALANCER:Haproxy:neutron_lbaas.services.loadbalancer.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default',
 ) {
 
   # Disable twice logging if syslog is enabled
@@ -99,6 +101,12 @@ class cloud::network(
     }
     default: {
       fail("${plugin} plugin is not supported.")
+    }
+  }
+
+  if $lbaas_enabled {
+    neutron_lbaas_service_config {
+      'service_providers/service_provider': value => $lbaas_service_provider;
     }
   }
 
