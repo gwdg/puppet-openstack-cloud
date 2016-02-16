@@ -82,7 +82,7 @@ class cloud::database::dbaas::api(
     use_syslog        => $use_syslog,
     bind_host         => $api_eth,
     bind_port         => $ks_trove_public_port,
-    auth_url          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    auth_url          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     keystone_password => $ks_trove_password,
   }
 

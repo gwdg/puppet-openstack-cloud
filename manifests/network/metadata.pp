@@ -80,7 +80,7 @@ class cloud::network::metadata(
     shared_secret    => $neutron_metadata_proxy_shared_secret,
     debug            => $debug,
     metadata_ip      => $nova_metadata_server,
-    auth_url         => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
+    auth_url         => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0",
     auth_password    => $ks_neutron_password,
     auth_region      => $auth_region,
     metadata_workers => $::neutron::agents::metadata::metadata_workers,

@@ -133,7 +133,7 @@ class cloud::telemetry(
   }
 
   class { 'ceilometer::agent::auth':
-    auth_url      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    auth_url      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     auth_password => $ks_ceilometer_password,
     auth_region   => $region
   }

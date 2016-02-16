@@ -68,7 +68,7 @@
 #
 # [*nova_admin_auth_url*]
 #   (optional) Authorization URL for connection to nova in admin context.
-#   Defaults to 'http://127.0.0.1:5000'
+#   Defaults to 'http://127.0.0.1:5000/v2.0'
 #
 # [*nova_admin_username*]
 #   (optional) Username for connection to nova in admin context
@@ -206,7 +206,7 @@ class cloud::network::controller(
   $ks_neutron_public_port        = 9696,
   $api_eth                       = '127.0.0.1',
   $nova_url                      = 'http://127.0.0.1:8774/v2',
-  $nova_admin_auth_url           = 'http://127.0.0.1:5000',
+  $nova_admin_auth_url           = 'http://127.0.0.1:5000/v2.0',
   $nova_admin_username           = 'nova',
   $nova_admin_tenant_name        = 'services',
   $nova_admin_password           = 'novapassword',
@@ -285,7 +285,7 @@ class cloud::network::controller(
         database_user     => $neutron_db_user,
         database_password => $neutron_db_password,
         database_host     => $neutron_db_host,
-        keystone_auth_url => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
+        keystone_auth_url => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0/",
         keystone_password => $ks_neutron_password,
         vswitch_plugin    => 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2',
       }
@@ -305,7 +305,7 @@ class cloud::network::controller(
         api_server_port            => $contrail_api_server_port,
         multi_tenancy              => $contrail_multi_tenancy,
         contrail_extensions        => $contrail_extensions,
-        keystone_auth_url          => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
+        keystone_auth_url          => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0/",
         keystone_admin_user        => $ks_keystone_admin_user,
         keystone_admin_tenant_name => $ks_admin_tenant,
         keystone_admin_password    => $ks_keystone_admin_password,

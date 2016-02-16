@@ -260,7 +260,7 @@ class cloud::image::api(
     class { 'glance::backend::swift':
       swift_store_user                    => 'services:glance',
       swift_store_key                     => $ks_glance_password,
-      swift_store_auth_address            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357",
+      swift_store_auth_address            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357/v2.0/",
       swift_store_create_container_on_put => true,
     }
 
