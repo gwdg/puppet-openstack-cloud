@@ -491,7 +491,7 @@ class cloud::identity (
     admin_url           => $heat_admin_url,                                                                                                                                                                 
 
     region              => $region,
-    password            => $heat_password    
+    password            => $heat_password,    
 
     configure_delegated_roles => true
   }
