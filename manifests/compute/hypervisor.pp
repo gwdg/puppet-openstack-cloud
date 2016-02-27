@@ -458,10 +458,10 @@ Host *
 #    'cinder/catalog_info':          value => 'volume:cinder:internalURL';
   }
 
-  class { 'ceilometer::agent::compute': 
-		# Make sure group libvirtd exists
-		require => Class['nova::compute::libvirt'],
-	}
+	# Make sure group libvirtd exists before trying to set it as additional group for ceilometer user
+	Package['libvirt-bin'] -> User['ceilometer']
+
+  class { 'ceilometer::agent::compute': }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow instances console access':
