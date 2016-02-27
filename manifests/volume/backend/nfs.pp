@@ -78,6 +78,11 @@ define cloud::volume::backend::nfs(
     nfs_shares_config    => $nfs_shares_config,
     nfs_used_ratio       => $nfs_used_ratio,
     nfs_oversub_ratio    => $nfs_oversub_ratio,
+
+    # Prevent permission problems by disabling nas_secure_file_* stuff
+    extra_options        => { "${name}/nas_secure_file_operations"  => { 'value' => false },
+                              "${name}/nas_secure_file_permissions" => { 'value' => false },
+                            }
   }
 
   @cinder::type { $volume_backend_name:
