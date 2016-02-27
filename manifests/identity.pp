@@ -374,7 +374,7 @@ class cloud::identity (
       type      => 'ssh-rsa',
 #      key       => template('cloud/ssh/id_rsa.pub'),
       key       => 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC9JY0WdPrv9pF7mVZZ7mHPN9HnG+Cm/og0TcddFe1uV6/5wRsUPPb6fYpKNX4+sAuhGJ/hg70X08nLWbdlv6WKyYWQoIwOgP1K4VxFUOuu1aJsyL0iRcPXGaO/xXPcXLcqmhI5ORHPlohJAAp5veM3UsJbeBf14rFYXCATH9YGAhjTr1oP5GkPaeB7cEhjQKGyoGS7lorpbNjdmZ17vZX6Geklm0BtqZQgOvQquvS4L10B90PyhXzCVx/wvzd7PtWj7HTd1s5zF5+vzt1fhbOX5fIwCp2TtSeJ0Ht/gzLx+ninQxxPjVWnFhiZEfi7h7jdisQto5Mt8wxXmwY4Ie3r',
-      require   => User['keystone'],
+      require   => Package['keystone'],
     }
 
     # Restrict keystone account to just scp
@@ -382,7 +382,7 @@ class cloud::identity (
 
     exec { 'keystone-change-shell-to-rssh':
       command   => "/usr/bin/chsh -s /usr/bin/rssh keystone",
-      require   => [ Package['rssh'], User['keystone'] ],
+      require   => [ Package['rssh'], Package['keystone'] ],
     }
 
     exec { 'enable-rssh-scp': 
