@@ -263,6 +263,7 @@ class cloud::identity (
   # New stuff
   $keystone_master_name         = undef,
   $use_ldap                     = false,
+  $ldap_backends                = {},
 ){
 
   $encoded_user     = uriescape($keystone_db_user)
@@ -306,6 +307,8 @@ class cloud::identity (
 
     token_driver          => $token_driver,
     token_expiration      => $ks_token_expiration,
+
+    using_domain_config   => true,
   }
 
   keystone_config {
@@ -314,7 +317,8 @@ class cloud::identity (
 
   # Keystone LDAP
   if $use_ldap {
-    include 'keystone::ldap'
+#    include 'keystone::ldap'
+    create_resources('keystone::ldap_backend', $ldap_backends)
   }
 
   # Keystone Endpoints + Users
