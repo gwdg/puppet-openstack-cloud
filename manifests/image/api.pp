@@ -230,6 +230,11 @@ class cloud::image::api(
     # Handle ceph.conf + ceph packages
     include ::cloud::storage::rbd
 
+    package { 'ceph':
+      ensure  => $package_ensure,
+      name    => 'ceph-common',
+    } 
+
     # Configure Glance rbd backend
     class { 'glance::backend::rbd':
       rbd_store_user            => $glance_rbd_user,
