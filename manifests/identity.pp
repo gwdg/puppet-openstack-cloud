@@ -312,7 +312,11 @@ class cloud::identity (
   }
 
   keystone_config {
-    'ec2/driver':       value => 'keystone.contrib.ec2.backends.sql.Ec2';
+    'ec2/driver':           value => 'keystone.contrib.ec2.backends.sql.Ec2';
+
+    # Make sure identity / assignment is configured for sql in keystone.conf (ldap is done via domain specific configuration)
+    'identity/driver':      value => 'keystone.identity.backends.sql.Identity';
+    'assignment/driver':    value => 'keystone.assignment.backends.sql.Assignment';
   }
 
   # Keystone LDAP
