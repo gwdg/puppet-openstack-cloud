@@ -50,6 +50,8 @@ class cloud::auth_file(
   $neutron_endpoint_type    = 'publicURL',
 ) {
 
+  include ::openstacklib::openstackclient
+
   file { '/root/openrc':
     owner   => 'root',
     group   => 'root',
