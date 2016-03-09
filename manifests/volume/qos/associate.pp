@@ -52,10 +52,10 @@ define cloud::volume::qos::associate (
     $region_env = []
   }
 
-  exec {"cinder qos-associate ${qos_name} associate with ${volume_type}":
+  exec {"openstack volume qos associate ${qos_name} with ${volume_type}":
     path        => ['/usr/bin', '/bin'],
-    command     => "cinder qos-associate \$(cinder qos-list | awk '{if (\$4 == \"${qos_name}\") print \$2}') \$(cinder type-list | awk '{if (\$4 == \"${volume_type}\") print \$2}')",
-    unless      => "cinder qos-get-association \$(cinder qos-list | awk '{if (\$4 == \"${qos_name}\") print \$2}') | grep -Eq '\\bvolume_type\\b.*\\b${volue_type}\\b'",
+    command     => "openstack volume qos associate ${qos_name} ${volume_type}",
+    unless      => "openstack volume qos show ${qos_name} -f value -c associations | grep -Eq '\\b${volume_type}\\b'",
     environment => concat($qos_env, $region_env),
     require     => Package['python-cinderclient']
   }

@@ -59,9 +59,9 @@ define cloud::volume::qos::create (
     $region_env = []
   }
 
-  exec {"cinder qos-create ${qos_name}":
-    command     => "cinder qos-create ${qos_name} consumer=front-end",
-    unless      => "cinder qos-list | grep -qP '\\b${qos_name}\\b'",
+  exec {"openstack volume qos create ${qos_name}":
+    command     => "openstack volume qos create ${qos_name} --consumer=front-end",
+    unless      => "openstack volume qos list -c Name -f value | grep -qE '\\b${qos_name}\\b'",
     environment => concat($qos_env, $region_env),
     require     => Package['python-cinderclient'],
     path        => ['/usr/bin', '/bin'],
@@ -72,7 +72,7 @@ define cloud::volume::qos::create (
  # notify{"properties for qos: ${properties}": }
  
   if $properties {
-    Exec["cinder qos-create ${qos_name}"] ->
+    Exec["openstack volume qos create ${qos_name}"] ->
     Cloud::Volume::Qos::Set<| qos_name == $qos_name |>    
 
     create_resources(

@@ -60,10 +60,10 @@ define cloud::volume::qos::set (
     $region_env = []
   }
 
-  exec {"cinder qos-key ${qos_name} set ${key}=${value}":
+  exec {"openstack volume qos set ${qos_name} property ${key}=${value}":
     path        => ['/usr/bin', '/bin'],
-    command     => "cinder qos-key \$(cinder qos-list | awk '{if (\$4 == \"${qos_name}\") print \$2}') set ${key}=${value}",
-    unless      => "cinder qos-list | grep -Eq '\\b${qos_name}\\b.*\\b${key}\\b.{5}\\b${value}\\b'",
+    command     => "openstack volume qos set --property ${key}=${value}",
+    unless      => "openstack volume qos show ${qos_name} -f value -c specs | grep -qE '\\b${key}\\b.{2}\\b${value}\\b.{1}'",
     environment => concat($qos_env, $region_env),
     require     => Package['python-cinderclient']
   }
