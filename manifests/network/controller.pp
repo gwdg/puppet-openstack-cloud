@@ -338,6 +338,8 @@ class cloud::network::controller(
 
   if $::cloud::network::lbaas_enabled {
     Package['neutron'] -> Package['python-neutron-lbaas']
+    Package['python-neutron-lbaas'] -> Neutron_lbaas_service_config <||>
+    
     ensure_resource( 'package', 'python-neutron-lbaas', {
       ensure => $lbaas_package_ensure,
       name   => python-neutron-lbaas,
