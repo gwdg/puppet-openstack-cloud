@@ -105,6 +105,8 @@ class cloud::network(
   }
 
   if $lbaas_enabled {
+    Package['neutron'] -> Neutron_lbaas_service_config <||>
+    
     neutron_lbaas_service_config {
       'service_providers/service_provider': value => $lbaas_service_provider;
     }
