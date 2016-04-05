@@ -334,7 +334,7 @@ class cloud::identity (
     admin_tenant => $ks_admin_tenant,
   }
 
-  keystone_role { $identity_roles_addons: ensure => present }
+#  keystone_role { $identity_roles_addons: ensure => present }
 
   class {'keystone::endpoint':
 
