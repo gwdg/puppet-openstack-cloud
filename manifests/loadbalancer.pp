@@ -532,6 +532,7 @@ class cloud::loadbalancer(
   $enable_glance_api                = false,
   $enable_glance_registry           = false,
   $enable_neutron_api               = false,
+  $enable_magnum_api                = false,
   $enable_heat_api                  = false,
   $enable_heat_cfn_api              = false,
   $enable_heat_cloudwatch_api       = false,
@@ -575,6 +576,7 @@ class cloud::loadbalancer(
   $ec2_options                      = {},
   $glance_api_options               = {},
   $glance_registry_options          = {},
+  $magnum_api_options               = {},
   $heat_cfn_options                 = {},
   $heat_cloudwatch_options          = {},
   $heat_api_options                 = {},
@@ -604,6 +606,7 @@ class cloud::loadbalancer(
   $ks_ec2_public_port               = 8773,
   $ks_glance_api_public_port        = 9292,
   $ks_glance_registry_internal_port = 9191,
+  $ks_magnum_public_port            = 9511,
   $ks_heat_cfn_public_port          = 8000,
   $ks_heat_cloudwatch_public_port   = 8003,
   $ks_heat_public_port              = 8004,
@@ -949,6 +952,13 @@ class cloud::loadbalancer(
     port                => $ks_ceilometer_public_port,
     options             => merge($common_http_options, $ceilometer_options),
   }
+
+  cloud::loadbalancer::bind_api { 'magnum_api':
+    enable              => $enable_magnum_api,
+    public_access       => true,
+    port                => $ks_magnum_public_port,
+    options             => merge($common_http_options, $magnum_api_options),
+  }  
 
   cloud::loadbalancer::bind_api { 'heat_api':
     enable              => $enable_heat_api,
