@@ -38,7 +38,7 @@ class cloud::container(
   $verbose                    = true,
   $debug                      = true,
   $use_syslog                 = true,
-  $log_facility               = 'LOG_LOCAL0'
+  $log_facility               = 'LOG_LOCAL0',
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
   $magnum_db_user             = 'magnum',
