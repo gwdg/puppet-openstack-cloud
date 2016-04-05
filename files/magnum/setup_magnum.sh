@@ -30,6 +30,9 @@ cp /opt/magnum/etc/magnum/magnum.conf.sample /etc/magnum/magnum.conf
 cp /opt/magnum/etc/magnum/policy.json /etc/magnum/policy.json
 cp /opt/magnum/etc/magnum/api-paste.ini /etc/magnum/api-paste.ini
 
+# Create Zertification Directory
+mkdir -p /var/lib/magnum/certificates/
+
 #Create Magnum Services
 cat > /etc/init/magnum-api.conf << EOF
 description "Magnum API"
