@@ -141,10 +141,8 @@ class cloud::orchestration(
   $encoded_password = uriescape($heat_db_password)
 
   class { 'heat':
-    keystone_host         => $ks_keystone_admin_host,
-    keystone_port         => $ks_keystone_admin_port,
-    keystone_protocol     => $ks_keystone_admin_proto,
     keystone_password     => $ks_heat_password,
+    identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     keystone_ec2_uri      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0/ec2tokens",
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}/heat?charset=utf8",
