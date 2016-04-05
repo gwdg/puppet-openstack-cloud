@@ -39,9 +39,16 @@ class cloud::container(
   $debug                      = true,
   $use_syslog                 = true,
   $log_facility               = 'LOG_LOCAL0'
+  $rabbit_hosts               = ['127.0.0.1:5672'],
+  $rabbit_password            = 'rabbitpassword',
+  $magnum_db_user             = 'magnum',
+  $magnum_db_password         = 'magnumpassword',
+  $magnum_db_idle_timeout     = 5000,
+  $magnum_db_host             = '127.0.0.1',
 ){
 
 	include 'mysql::client'
+	include 'magnum::db::sync'
 
 	# Configure logging for magnum
 	class { '::magnum::logging':
@@ -71,26 +78,20 @@ class cloud::container(
     	subscribe => File['/tmp/setup_magnum.sh'],
   	}
 
-	#Install Pip
-	#class { '::python': }
+	$encoded_user     = uriescape($magnum_db_user)
+	$encoded_password = uriescape($magnum_db_password)
 
-	#Install Magnum Api / Magnum Conductor (require Python / Pip) until we have packages
-	#class { '::python::pip':
-    #	pkgname       => 'magnum',
-	#	ensure 	      => 'tags/2.0.0', #branch
-	#	url        	  => 'git+https://github.com/openstack/magnum.git',
-	#	install_args  => '-e',
-	#	require       => Class['::python'],
-	#}
+	class { 'magnum':
+	    rabbit_hosts          => $rabbit_hosts,
+	    rabbit_password       => $rabbit_password,
+	    rabbit_userid         => 'magnum',
+	    database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}/magnum?charset=utf8",
+    	database_idle_timeout => $magnum_db_idle_timeout,
 
-	#Install Magnum Client (require Python / Pip) until we have packages
-	#class { '::python::pip':
-	#	pkgname       => 'magnum-client',
-	#	ensure        => 'tags/2.0.0',#branch
-	#	url           => 'git+https://github.com/openstack/python-magnumclient.git'
-	#	install_args  => '-e',
-	#	require       => Class['::python'],
-	#}
-
-
+    	require               => Exec ['/tmp/setup_magnum.sh']
+	}->
+	magnum_config {
+	    'certificates/cert_manager_type' :   value => 'local';
+	    'certificates/storage_path' :        value => /var/lib/magnum/certificates/;
+  	}
 }
