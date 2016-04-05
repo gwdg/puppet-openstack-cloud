@@ -54,28 +54,43 @@ class cloud::container(
 	    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
 	    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
 	    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
+
+	    require                         => Exec ['/tmp/setup_magnum.sh']
 	}
+
+	file { '/tmp/setup_magnum.sh':
+    	ensure => file,
+    	source => 'puppet:///modules/cloud/magnum/setup_magnum.sh',
+    	owner  => root,
+    	group  => root,
+    	mode   => 'u+x',
+    	audit  => content,
+  	} 
+
+  	exec { '/tmp/setup_magnum.sh':
+    	subscribe => File['/tmp/setup_magnum.sh'],
+  	}
 
 	#Install Pip
-	class { '::python': }
+	#class { '::python': }
 
-	#Install Magnum Api / Magnum Conductor (require Python / Pip)
-	class { '::python::pip':
-		pkgname       => 'magnum',
-		ensure 	      => 'tags/2.0.0', #branch
-		url        	  => 'git+https://github.com/openstack/magnum.git',
-		install_args  => '-e',
-		require       => Class['::python'],
-	}
+	#Install Magnum Api / Magnum Conductor (require Python / Pip) until we have packages
+	#class { '::python::pip':
+    #	pkgname       => 'magnum',
+	#	ensure 	      => 'tags/2.0.0', #branch
+	#	url        	  => 'git+https://github.com/openstack/magnum.git',
+	#	install_args  => '-e',
+	#	require       => Class['::python'],
+	#}
 
-	#Install Magnum Client (require Python / Pip)
-	class { '::python::pip':
-		pkgname       => 'magnum-client',
-		ensure        => 'tags/2.0.0',#branch
-		url           => 'git+https://github.com/openstack/python-magnumclient.git'
-		install_args  => '-e',
-		require       => Class['::python'],
-	}
+	#Install Magnum Client (require Python / Pip) until we have packages
+	#class { '::python::pip':
+	#	pkgname       => 'magnum-client',
+	#	ensure        => 'tags/2.0.0',#branch
+	#	url           => 'git+https://github.com/openstack/python-magnumclient.git'
+	#	install_args  => '-e',
+	#	require       => Class['::python'],
+	#}
 
 
 }
