@@ -34,6 +34,8 @@ cp /opt/magnum/etc/magnum/api-paste.ini /etc/magnum/api-paste.ini
 mkdir -p /var/lib/magnum/certificates/
 
 #Create Magnum Services
+mkdir /var/run/magnum/
+
 cat > /etc/init/magnum-api.conf << EOF
 description "Magnum API"
 author "Maik Srba <maik.srba@gwdg.de>"
