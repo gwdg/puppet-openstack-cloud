@@ -48,7 +48,6 @@ class cloud::container(
 ){
 
 	include 'mysql::client'
-	include 'magnum::db::sync'
 
 	# Configure logging for magnum
 	class { '::magnum::logging':
@@ -65,6 +64,16 @@ class cloud::container(
 	    require                         => Exec ['/tmp/setup_magnum.sh']
 	}
 
+    $encoded_user     = uriescape($magnum_db_user)
+    $encoded_password = uriescape($magnum_db_password)
+
+    class { '::magnum::db': 
+        database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}/magnum?charset=utf8",
+        database_idle_timeout => $magnum_db_idle_timeout,
+
+        require               => Exec ['/tmp/setup_magnum.sh']
+    }
+
 	file { '/tmp/setup_magnum.sh':
     	ensure => file,
     	source => 'puppet:///modules/cloud/magnum/setup_magnum.sh',
@@ -76,22 +85,27 @@ class cloud::container(
 
   	exec { '/tmp/setup_magnum.sh':
     	subscribe => File['/tmp/setup_magnum.sh'],
+        refreshonly => true,
   	}
-
-	$encoded_user     = uriescape($magnum_db_user)
-	$encoded_password = uriescape($magnum_db_password)
 
 	class { 'magnum':
 	    rabbit_hosts          => $rabbit_hosts,
 	    rabbit_password       => $rabbit_password,
 	    rabbit_userid         => 'magnum',
-	    database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}/magnum?charset=utf8",
-    	database_idle_timeout => $magnum_db_idle_timeout,
 
     	require               => Exec ['/tmp/setup_magnum.sh']
 	}->
 	magnum_config {
 	    'certificates/cert_manager_type' :   value => 'local';
-	    'certificates/storage_path' :        value => /var/lib/magnum/certificates/;
+	    'certificates/storage_path' :        value => '/var/lib/magnum/certificates/';
   	}
+
+    exec { 'magnum-db-sync':
+      command     => "magnum-db-manage upgrade",
+      path        => '/usr/bin:/usr/local/bin/',
+      refreshonly => true,
+      subscribe   => [Exec['/tmp/setup_magnum.sh'], Magnum_config['database/connection']],
+    }
+
+    Exec['magnum-manage db_sync'] ~> Service<| title == 'magnum' |>
 }
