@@ -158,6 +158,7 @@ class cloud::identity (
   $swift_enabled                = true,
   $cinder_enabled               = true,
   $trove_enabled                = false,
+  $magnum_enabled               = false,
 
   $identity_roles_addons        = ['SwiftOperator', 'ResellerAdmin'],
 
@@ -249,6 +250,11 @@ class cloud::identity (
   $magnum_admin_url             = undef,
 
   $magnum_password              = 'magnumpassword',
+
+  $magnum_domain_name           = 'magnum'
+  $magnum_domain_admin          = 'magnum_admin',
+  $magnum_domain_admin_email    = 'magnum_admin@localhost',
+  $magnum_domain_password       = 'magnumdomainpassword',
 
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
@@ -528,14 +534,33 @@ class cloud::identity (
     }
   }
 
-  class { 'magnum::keystone::auth':
+  if $magnum_enabled {
+    class { 'magnum::keystone::auth':
 
-    public_url          => $magnum_public_url,
-    internal_url        => $magnum_internal_url,
-    admin_url           => $magnum_admin_url,
+      public_url          => $magnum_public_url,
+      internal_url        => $magnum_internal_url,
+      admin_url           => $magnum_admin_url,
 
-    region              => $region,
-    password            => $magnum_password
+      region              => $region,
+      password            => $magnum_password
+    }
+
+    ensure_resource('keystone_domain', $magnum_domain_name, {
+      'ensure'  => 'present',
+      'enabled' => true,
+    })
+
+    ensure_resource('keystone_user', "${magnum_domain_admin}::${magnum_domain_name}", {
+        'ensure'   => 'present',
+        'enabled'  => true,
+        'email'    => $magnum_domain_admin_email,
+        'password' => $magnum_domain_password,
+      })
+    }
+    
+    ensure_resource('keystone_user_role', "${magnum_domain_admin}::${magnum_domain_name}@::${magnum_domain_name}", {
+      'roles' => ['admin'],
+    })
   }
 
   # Purge expored tokens every days at midnight
