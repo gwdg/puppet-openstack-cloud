@@ -251,11 +251,6 @@ class cloud::identity (
 
   $magnum_password              = 'magnumpassword',
 
-  $magnum_domain_name           = 'magnum',
-  $magnum_domain_admin          = 'magnum_admin',
-  $magnum_domain_admin_email    = 'magnum_admin@localhost',
-  $magnum_domain_password       = 'magnumdomainpassword',
-
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
   $verbose                      = true,
@@ -545,21 +540,7 @@ class cloud::identity (
       password            => $magnum_password
     }
 
-    ensure_resource('keystone_domain', $magnum_domain_name, {
-      'ensure'  => 'present',
-      'enabled' => true,
-    })
-
-    ensure_resource('keystone_user', "${magnum_domain_admin}::${magnum_domain_name}", {
-      'ensure'   => 'present',
-      'enabled'  => true,
-      'email'    => $magnum_domain_admin_email,
-      'password' => $magnum_domain_password,
-    })
-    
-    ensure_resource('keystone_user_role', "${magnum_domain_admin}::${magnum_domain_name}@::${magnum_domain_name}", {
-      'roles' => ['admin'],
-    })
+    class { 'cloud::container::domain': }
   }
 
   # Purge expored tokens every days at midnight
