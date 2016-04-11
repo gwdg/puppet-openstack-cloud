@@ -251,7 +251,7 @@ class cloud::identity (
 
   $magnum_password              = 'magnumpassword',
 
-  $magnum_domain_name           = 'magnum'
+  $magnum_domain_name           = 'magnum',
   $magnum_domain_admin          = 'magnum_admin',
   $magnum_domain_admin_email    = 'magnum_admin@localhost',
   $magnum_domain_password       = 'magnumdomainpassword',
@@ -551,12 +551,11 @@ class cloud::identity (
     })
 
     ensure_resource('keystone_user', "${magnum_domain_admin}::${magnum_domain_name}", {
-        'ensure'   => 'present',
-        'enabled'  => true,
-        'email'    => $magnum_domain_admin_email,
-        'password' => $magnum_domain_password,
-      })
-    }
+      'ensure'   => 'present',
+      'enabled'  => true,
+      'email'    => $magnum_domain_admin_email,
+      'password' => $magnum_domain_password,
+    })
     
     ensure_resource('keystone_user_role', "${magnum_domain_admin}::${magnum_domain_name}@::${magnum_domain_name}", {
       'roles' => ['admin'],
