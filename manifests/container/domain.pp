@@ -33,8 +33,7 @@ class cloud::container::domain (
       'enabled'  => true,
       'email'    => $magnum_domain_admin_email,
       'password' => $magnum_domain_password,
-    })
-  }
+  })
     
   ensure_resource('keystone_user_role', "${magnum_domain_admin}::${magnum_domain_name}@::${magnum_domain_name}", {
     'roles' => ['admin'],
