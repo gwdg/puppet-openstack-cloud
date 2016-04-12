@@ -28,7 +28,8 @@ class cloud::auth_file(
   $user             = 'admin',
   $password         = undef,
   $project          = 'admin',
-  $interface_type   = 'internal'
+  $interface_type   = 'internal',
+  $domain_id        = 'default'
 ) {
 
   include ::openstacklib::openstackclient

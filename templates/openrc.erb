@@ -8,7 +8,9 @@ export OS_TOKEN='<%= @admin_token.gsub(/'/){ %q(\') } %>'
 export OS_URL='http://<%= @keystone_host %>:35357/v3/'
 <% else -%>
 export OS_PROJECT_NAME='<%= @project %>'
+export OS_PROJECT_DOMAIN_ID='<%= @domain_id %>'
 export OS_USERNAME='<%= @user %>'
+export OS_USER_DOMAIN_ID='<%= @domain_id %>'
 export OS_PASSWORD='<%= @password.gsub(/'/){ %q(\') } %>'
 export OS_AUTH_URL='http://<%= @keystone_host %>:5000/v3/'
 <% end -%>
