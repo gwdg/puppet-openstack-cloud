@@ -17,6 +17,8 @@ class cloud::container::api(
     auth_uri       => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     identity_uri   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     port           => $ks_magnum_internal_port,
+
+    require        => Exec ['/tmp/setup_magnum.sh']
   }
 
   @@haproxy::balancermember{"${::fqdn}-magnum_api":
