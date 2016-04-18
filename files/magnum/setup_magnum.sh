@@ -10,14 +10,14 @@ python /tmp/get-pip.py
 # Install Magnum Api/Conductor
 git clone https://github.com/openstack/magnum.git /opt/magnum
 cd /opt/magnum
-git checkout tags/2.0.0
+git checkout stable/mitaka
 apt-get -y install build-essential libssl-dev libffi-dev python-dev
 pip install -e .
 
 # Install Magnum Client
 git clone https://git.openstack.org/openstack/python-magnumclient /opt/magnumclient
 cd /opt/magnumclient
-git checkout tags/2.0.0
+git checkout stable/mitaka
 sudo pip install -e .
 
 # Generate Base Config
