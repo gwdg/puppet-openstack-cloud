@@ -51,7 +51,7 @@ limit nofile 65535 65535
 
 pre-start script
     for i in lock run log lib ; do
-        mkdir -p /var/$i/magnum
+        mkdir -p /var/\$i/magnum
         #chown magnum /var/$i/magnum
     done
 end script
@@ -60,13 +60,13 @@ script
     [ -x "/usr/local/bin/magnum-api" ] || exit 0
     DAEMON_ARGS=""
     [ -r /etc/default/openstack ] && . /etc/default/openstack
-    [ -r /etc/default/$UPSTART_JOB ] && . /etc/default/$UPSTART_JOB
-    [ "x$USE_SYSLOG" = "xyes" ] && DAEMON_ARGS="$DAEMON_ARGS --use-syslog"
-    [ "x$USE_LOGFILE" != "xno" ] && DAEMON_ARGS="$DAEMON_ARGS --log-file=/var/log/magnum/magnum-api.log"
+    [ -r /etc/default/\$UPSTART_JOB ] && . /etc/default/\$UPSTART_JOB
+    [ "x\$USE_SYSLOG" = "xyes" ] && DAEMON_ARGS="\$DAEMON_ARGS --use-syslog"
+    [ "x\$USE_LOGFILE" != "xno" ] && DAEMON_ARGS="\$DAEMON_ARGS --log-file=/var/log/magnum/magnum-api.log"
 
     exec start-stop-daemon --start --chdir /var/lib/magnum \
         --chuid root:root --make-pidfile --pidfile /var/run/magnum/magnum-api.pid \
-        --exec /usr/local/bin/magnum-api -- --config-file=/etc/magnum/magnum.conf ${DAEMON_ARGS}
+        --exec /usr/local/bin/magnum-api -- --config-file=/etc/magnum/magnum.conf \${DAEMON_ARGS}
 end script
 EOF
 
@@ -85,7 +85,7 @@ limit nofile 65535 65535
 
 pre-start script
     for i in lock run log lib ; do
-        mkdir -p /var/$i/magnum
+        mkdir -p /var/\$i/magnum
         #chown magnum /var/$i/magnum
     done
 end script
@@ -94,12 +94,12 @@ script
     [ -x "/usr/local/bin/magnum-conductor" ] || exit 0
     DAEMON_ARGS=""
     [ -r /etc/default/openstack ] && . /etc/default/openstack
-    [ -r /etc/default/$UPSTART_JOB ] && . /etc/default/$UPSTART_JOB
-    [ "x$USE_SYSLOG" = "xyes" ] && DAEMON_ARGS="$DAEMON_ARGS --use-syslog"
-    [ "x$USE_LOGFILE" != "xno" ] && DAEMON_ARGS="$DAEMON_ARGS --log-file=/var/log/magnum/magnum-conductor.log"
+    [ -r /etc/default/\$UPSTART_JOB ] && . /etc/default/\$UPSTART_JOB
+    [ "x\$USE_SYSLOG" = "xyes" ] && DAEMON_ARGS="\$DAEMON_ARGS --use-syslog"
+    [ "x\$USE_LOGFILE" != "xno" ] && DAEMON_ARGS="\$DAEMON_ARGS --log-file=/var/log/magnum/magnum-conductor.log"
 
     exec start-stop-daemon --start --chdir /var/lib/magnum \
         --chuid root:root --make-pidfile --pidfile /var/run/magnum/magnum-conductor.pid \
-        --exec /usr/local/bin/magnum-conductor -- --config-file=/etc/magnum/magnum.conf ${DAEMON_ARGS}
+        --exec /usr/local/bin/magnum-conductor -- --config-file=/etc/magnum/magnum.conf \${DAEMON_ARGS}
 end script
 EOF
