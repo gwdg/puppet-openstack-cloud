@@ -62,7 +62,7 @@ define cloud::volume::qos::set (
 
   exec {"openstack volume qos set ${qos_name} property ${key}=${value}":
     path        => ['/usr/bin', '/bin'],
-    command     => "openstack volume qos set --property ${key}=${value}",
+    command     => "openstack volume qos set --property ${key}=${value} ${qos_name}",
     unless      => "openstack volume qos show ${qos_name} -f value -c specs | grep -qE '\\b${key}\\b.{2}\\b${value}\\b.{1}'",
     environment => concat($qos_env, $region_env),
     require     => Package['python-cinderclient']
