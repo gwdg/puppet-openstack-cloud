@@ -67,7 +67,6 @@ class cloud::network(
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
   $api_eth                    = '127.0.0.1',
-  $use_syslog                 = true,
   $log_facility               = 'LOG_LOCAL0',
   $dhcp_lease_duration        = '120',
   $plugin                     = 'ml2',
@@ -75,19 +74,6 @@ class cloud::network(
   $lbaas_enabled              = false,
   $lbaas_service_provider     = 'LOADBALANCER:Haproxy:neutron_lbaas.services.loadbalancer.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default',
 ) {
-
-  # Disable twice logging if syslog is enabled
-  if $use_syslog {
-    $log_dir = '/var/log/neutron'
-    neutron_config {
-      'DEFAULT/logging_context_format_string': value => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s';
-      'DEFAULT/logging_default_format_string': value => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s';
-      'DEFAULT/logging_debug_format_suffix': value => '%(funcName)s %(pathname)s:%(lineno)d';
-      'DEFAULT/logging_exception_prefix': value => '%(process)d: TRACE %(name)s %(instance)s';
-    }
-  } else {
-    $log_dir = '/var/log/neutron'
-  }
 
   case $plugin {
     'ml2': {
@@ -126,7 +112,6 @@ class cloud::network(
     dhcp_agents_per_network => '2',
     core_plugin             => $core_plugin,
     service_plugins         => $service_plugins,
-    log_dir                 => $log_dir,
     dhcp_lease_duration     => $dhcp_lease_duration,
     report_interval         => '30',
   }
