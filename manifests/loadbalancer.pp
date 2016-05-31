@@ -153,13 +153,6 @@
 #   If set to false, no binding will be configure
 #   Defaults to true
 #
-# [*ec2_api*]
-#   (optional) Enable or not EC2 public binding.
-#   If true, both public and internal will attempt to be created except if vip_internal_ip is set to false.
-#   If set to ['10.0.0.1'], only IP in the array (or in the string) will be configured in the pool. They must be part of keepalived_ip options.
-#   If set to false, no binding will be configure
-#   Defaults to true
-#
 # [*spice*]
 #   (optional) Enable or not spice binding.
 #   If true, both public and internal will attempt to be created except if vip_internal_ip is set to false.
@@ -263,11 +256,6 @@
 #   Defaults to []
 #
 # [*cinder_bind_options*]
-#   (optional) A hash of options that are inserted into the HAproxy listening
-#   service configuration block.
-#   Defaults to []
-#
-# [*ec2_bind_options*]
 #   (optional) A hash of options that are inserted into the HAproxy listening
 #   service configuration block.
 #   Defaults to []
@@ -394,10 +382,6 @@
 # [*ks_cinder_public_port*]
 #   (optional) TCP port to connect to Cinder API from public network
 #   Defaults to '8776'
-#
-# [*ks_ec2_public_port*]
-#   (optional) TCP port to connect to EC2 API from public network
-#   Defaults to '8773'
 #
 # [*ks_glance_api_public_port*]
 #   (optional) TCP port to connect to Glance API from public network
@@ -537,7 +521,6 @@ class cloud::loadbalancer(
   $enable_heat_cfn_api              = false,
   $enable_heat_cloudwatch_api       = false,
   $enable_nova_api                  = false,
-  $enable_ec2_api                   = false,
   $enable_metadata_api              = false,
   $enable_keystone_api              = false,
   $enable_keystone_api_admin        = false,
@@ -573,7 +556,6 @@ class cloud::loadbalancer(
 
   $ceilometer_options               = {},
   $cinder_options                   = {},
-  $ec2_options                      = {},
   $glance_api_options               = {},
   $glance_registry_options          = {},
   $magnum_api_options               = {},
@@ -603,7 +585,6 @@ class cloud::loadbalancer(
 
   $ks_ceilometer_public_port        = 8777,
   $ks_cinder_public_port            = 8776,
-  $ks_ec2_public_port               = 8773,
   $ks_glance_api_public_port        = 9292,
   $ks_glance_registry_internal_port = 9191,
   $ks_magnum_public_port            = 9511,
@@ -849,12 +830,6 @@ class cloud::loadbalancer(
     public_access       => true,
     port                => $ks_nova_public_port,
     options             => merge($common_http_options, $nova_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'ec2_api':
-    enable              => $enable_ec2_api,
-    port                => $ks_ec2_public_port,
-    options             => merge($common_http_options, $ec2_options),
   }
 
   cloud::loadbalancer::bind_api { 'metadata_api':

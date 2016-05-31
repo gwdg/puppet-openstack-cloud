@@ -44,10 +44,6 @@
 #   (optional) TCP port for bind Nova API.
 #   Defaults to '8774'
 #
-# [*ks_ec2_public_port*]
-#   (optional) TCP port for bind Nova EC2 API.
-#   Defaults to '8773'
-#
 # [*ks_metadata_public_port*]
 #   (optional) TCP port for bind Nova metadata API.
 #   Defaults to '8775'
@@ -73,7 +69,6 @@ class cloud::compute::api(
   $api_eth                              = '127.0.0.1',
 
   $ks_nova_public_port                  = '8774',
-  $ks_ec2_public_port                   = '8773',
   $ks_metadata_public_port              = '8775',
 
   $firewall_settings                    = {},
@@ -115,21 +110,9 @@ class cloud::compute::api(
       port   => $ks_metadata_public_port,
       extras => $firewall_settings,
     }
-    cloud::firewall::rule{ '100 allow nova-ec2 access':
-      port   => $ks_ec2_public_port,
-      extras => $firewall_settings,
-    }
   }
 
   include 'nova::cron::archive_deleted_rows'
-
-  @@haproxy::balancermember{"${::fqdn}-compute_api_ec2":
-    listening_service => 'ec2_api',
-    server_names      => $::hostname,
-    ipaddresses       => $api_eth,
-    ports             => $ks_ec2_public_port,
-    options           => 'check inter 2000 rise 2 fall 5'
-  }
 
   @@haproxy::balancermember{"${::fqdn}-compute_api_nova":
     listening_service => 'nova_api',
