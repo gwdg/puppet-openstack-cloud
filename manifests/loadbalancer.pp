@@ -740,7 +740,7 @@ class cloud::loadbalancer(
 
   keepalived::vrrp::instance { $keepalived_public_id:
     interface               => $keepalived_vrrp_interface_real,
-    virtual_ipaddress       => unique(split(join(flatten([$keepalived_public_ipvs, ['']]), " dev ${keepalived_public_interface},"), ',')),
+    virtual_ipaddress       => $keepalived_public_ipvs,
     virtual_router_id       => $keepalived_public_id,
     state                   => $keepalived_state,
     track_script            => ['haproxy'],
@@ -787,7 +787,7 @@ class cloud::loadbalancer(
       }
       keepalived::vrrp::instance { $keepalived_internal_id:
         interface               => $keepalived_vrrp_interface_internal,
-        virtual_ipaddress       => unique(split(join(flatten([$keepalived_internal_ipvs, ['']]), " dev ${keepalived_internal_interface},"), ',')),
+        virtual_ipaddress       => $keepalived_internal_ipvs,
         virtual_router_id       => $keepalived_internal_id,
         state                   => $keepalived_state,
         track_script            => ['haproxy'],
