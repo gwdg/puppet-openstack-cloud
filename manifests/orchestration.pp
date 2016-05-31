@@ -147,7 +147,6 @@ class cloud::orchestration(
     keystone_ec2_uri      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0/ec2tokens",
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}/heat?charset=utf8",
     database_idle_timeout => $heat_db_idle_timeout,
-    mysql_module          => '2.2',
     rabbit_hosts          => $rabbit_hosts,
     rabbit_password       => $rabbit_password,
     rabbit_userid         => 'heat',
