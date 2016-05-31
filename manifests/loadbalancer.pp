@@ -730,21 +730,25 @@ class cloud::loadbalancer(
     defaults_options    => $haproxy_defaults_options_real,
   }
 
-  keepalived::vrrp_script { 'haproxy':
-    name_is_process => $::cloud::params::keepalived_name_is_process,
-    script          => $::cloud::params::keepalived_vrrp_script,
+  keepalived::vrrp::script { 'haproxy':
+#    name_is_process => $::cloud::params::keepalived_name_is_process,
+#    script          => $::cloud::params::keepalived_vrrp_script,
+    script              => 'killall -0 haproxy',
+    interval            => 2,
+    weight              => 2,
   }
 
-  keepalived::instance { $keepalived_public_id:
-    interface     => $keepalived_vrrp_interface_real,
-    virtual_ips   => unique(split(join(flatten([$keepalived_public_ipvs, ['']]), " dev ${keepalived_public_interface},"), ',')),
-    state         => $keepalived_state,
-    track_script  => ['haproxy'],
-    priority      => $keepalived_priority,
-    preempt_delay => $keepalived_preempt_delay,
-    auth_type     => $keepalived_auth_type,
-    auth_pass     => $keepalived_auth_pass,
-    notify_master => $::cloud::params::start_haproxy_service,
+  keepalived::vrrp::instance { $keepalived_public_id:
+    interface               => $keepalived_vrrp_interface_real,
+    virtual_ipaddress       => unique(split(join(flatten([$keepalived_public_ipvs, ['']]), " dev ${keepalived_public_interface},"), ',')),
+    virtual_router_id       => $keepalived_public_id,
+    state                   => $keepalived_state,
+    track_script            => ['haproxy'],
+    priority                => $keepalived_priority,
+    preempt_delay           => $keepalived_preempt_delay,
+    auth_type               => $keepalived_auth_type,
+    auth_pass               => $keepalived_auth_pass,
+    notify_script_master    => '/etc/init.d/haproxy start',
   }
 
   # If using an internal VIP, allow to use a dedicated interface for VRRP traffic.
@@ -771,7 +775,7 @@ class cloud::loadbalancer(
       content   => template('cloud/loadbalancer/keepalived_setup_routing.sh'),
       require   => Package['keepalived'],
       mode      => '0775',
-      before    => Keepalived::Instance[$keepalived_internal_id],
+      before    => Keepalived::Vrrp::Instance[$keepalived_internal_id],
     }
 
     # Then we validate this is not the same as public binding
@@ -781,17 +785,18 @@ class cloud::loadbalancer(
       } else {
         $keepalived_vrrp_interface_internal = $keepalived_vrrp_interface
       }
-      keepalived::instance { $keepalived_internal_id:
-        interface     => $keepalived_vrrp_interface_internal,
-        virtual_ips   => unique(split(join(flatten([$keepalived_internal_ipvs, ['']]), " dev ${keepalived_internal_interface},"), ',')),
-        state         => $keepalived_state,
-        track_script  => ['haproxy'],
-        priority      => $keepalived_priority,
-        preempt_delay => $keepalived_preempt_delay,
-        auth_type     => $keepalived_auth_type,
-        auth_pass     => $keepalived_auth_pass,
-        notify_master => $::cloud::params::start_haproxy_service,
-        notify_plain  => $keepalived_notify,
+      keepalived::vrrp::instance { $keepalived_internal_id:
+        interface               => $keepalived_vrrp_interface_internal,
+        virtual_ipaddress       => unique(split(join(flatten([$keepalived_internal_ipvs, ['']]), " dev ${keepalived_internal_interface},"), ',')),
+        virtual_router_id       => $keepalived_internal_id,
+        state                   => $keepalived_state,
+        track_script            => ['haproxy'],
+        priority                => $keepalived_priority,
+        preempt_delay           => $keepalived_preempt_delay,
+        auth_type               => $keepalived_auth_type,
+        auth_pass               => $keepalived_auth_pass,
+        notify_script_master    => '/etc/init.d/haproxy start',
+        notify_script           => $keepalived_notify,
       }
     }
   }
