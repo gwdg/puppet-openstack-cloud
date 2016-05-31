@@ -131,12 +131,6 @@ class cloud::compute(
   $upgrade_level            = undef,
 ) {
 
-  if !defined(Resource['nova_config']) {
-    resources { 'nova_config':
-      purge => true;
-    }
-  }
-
   # Configure logging for nova
   class { '::nova::logging':
     use_syslog                      => $use_syslog,
