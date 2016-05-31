@@ -375,7 +375,7 @@ class cloud::identity (
   }
 
   # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)  
-  if $::hostname == $keystone_master_name {
+  if $::fqdn == $keystone_master_name {
 
     # Install ssh key for access from secondary keystone nodes
     ssh_authorized_key { 'keystone@controller':

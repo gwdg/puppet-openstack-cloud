@@ -98,7 +98,7 @@ class cloud::messaging(
   Class['rabbitmq'] -> Rabbitmq_user_permissions <<| |>>
 
   # Differentiate between master and slave nodes to allow automatic cluster join
-  if $::hostname != $rabbitmq_master_name {
+  if $::fqdn != $rabbitmq_master_name {
     $clustername                = "rabbit@${rabbitmq_master_name}.${::domain}"
     $sleep_after_state_change   = "5"
     exec { 'join-rabbitmq-cluster':
