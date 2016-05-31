@@ -344,6 +344,7 @@ class cloud::database::sql::mysql (
     wsrep_group_comm_port           => 4567,
 
     local_ip                        => $api_eth,
+    bind_address                    => $api_eth,
 
     root_password                   => $mysql_root_password,
     create_root_my_cnf              => true,
