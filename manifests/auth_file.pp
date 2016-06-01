@@ -34,7 +34,7 @@ class cloud::auth_file(
 
   include ::openstacklib::openstackclient
 
-  file { '/root/openrc':
+  file { "/root/auth_${user}.sh":
     owner   => 'root',
     group   => 'root',
     mode    => '0700',
