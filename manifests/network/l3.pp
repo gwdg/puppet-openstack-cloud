@@ -47,11 +47,6 @@
 #   (optional) VRRP authentication password. Required if ha_enabled = true.
 #   Defaults to undef
 #
-# [*allow_automatic_l3agent_failover*]
-#   (optional) Automatically reschedule routers from offline L3 agents to online
-#   L3 agents.
-#   Defaults to 'False'
-#
 # [*agent_mode*]
 #   (optional) The working mode for the agent.
 #   'legacy': default behavior (without DVR)
@@ -68,7 +63,6 @@ class cloud::network::l3(
   $ha_enabled                       = false,
   $ha_vrrp_auth_type                = 'PASS',
   $ha_vrrp_auth_password            = undef,
-  $allow_automatic_l3agent_failover = false,
   $agent_mode                       = 'legacy',
 
 ) {
@@ -102,7 +96,6 @@ class cloud::network::l3(
     ha_enabled                       => $ha_enabled,
     ha_vrrp_auth_type                => $ha_vrrp_auth_type,
     ha_vrrp_auth_password            => $ha_vrrp_auth_password,
-    allow_automatic_l3agent_failover => $allow_automatic_l3agent_failover,
     agent_mode                       => $agent_mode,
   }
 
