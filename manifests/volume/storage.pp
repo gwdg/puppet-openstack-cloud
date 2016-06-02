@@ -75,13 +75,17 @@
 #
 class cloud::volume::storage(
   $cinder_backends                         = undef,
+
   $ks_keystone_internal_proto              = 'http',
   $ks_keystone_internal_port               = '5000',
   $ks_keystone_internal_host               = '127.0.0.1',
+
   $ks_glance_internal_proto                = 'http',
   $ks_glance_api_internal_port             = '9292',
   $ks_glance_internal_host                 = '127.0.0.1',
+
   $ks_cinder_password                      = 'secrete',
+
   $cinder_rbd_pool                         = 'volumes',
   $cinder_rbd_user                         = 'cinder',
   $cinder_rbd_secret_uuid                  = undef,
@@ -187,7 +191,17 @@ class cloud::volume::storage(
   }
 
   cinder_config {
-    'DEFAULT/glance_api_servers': value => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}";
-    'DEFAULT/glance_host': value => "${ks_glance_internal_host}";
+    'DEFAULT/glance_api_servers':   value => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}";
+    'DEFAULT/glance_host':          value => "${ks_glance_internal_host}";
+  }
+
+  # Set auth info in cinder.conf (necessary for cinder::type)
+  cinder_config {
+    'DEFAULT/auth_strategy':                value => 'keystone';
+    'keystone_authtoken/auth_uri':          value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3";
+    'keystone_authtoken/identity_uri':      value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}";
+    'keystone_authtoken/admin_tenant_name': value => 'services';
+    'keystone_authtoken/admin_user':        value => 'cinder';
+    'keystone_authtoken/admin_password':    value => $ks_cinder_password, secret => true;
   }
 }
