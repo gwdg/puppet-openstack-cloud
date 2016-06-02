@@ -18,9 +18,6 @@
 # Container common node
 #
 # === Parameters:
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
 #
 # [*debug*]
 #   (optional) Set log output to debug output
@@ -35,7 +32,6 @@
 #   Defaults to 'LOG_LOCAL0'
 #
 class cloud::container(
-  $verbose                    = true,
   $debug                      = true,
   $use_syslog                 = true,
   $log_facility               = 'LOG_LOCAL0',
@@ -53,7 +49,6 @@ class cloud::container(
 	class { '::magnum::logging':
 	    use_syslog                      => $use_syslog,
 	    log_facility                    => $log_facility,
-	    verbose                         => $verbose,
 	    debug                           => $debug,
 
 	    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',

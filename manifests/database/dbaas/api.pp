@@ -23,10 +23,6 @@
 #   (required) Password used by trove for Keystone authentication.
 #   Default: 'trovepassword'
 #
-# [*verbose*]
-#   (optional) Rather to log the trove api service at verbose level.
-#   Default: true
-#
 # [*debug*]
 #   (optional) Rather to log the trove api service at debug level.
 #   Default: true
@@ -63,7 +59,6 @@
 #
 class cloud::database::dbaas::api(
   $ks_trove_password          = 'trovepassword',
-  $verbose                    = true,
   $debug                      = true,
   $use_syslog                 = true,
   $api_eth                    = '127.0.0.1',
@@ -77,7 +72,6 @@ class cloud::database::dbaas::api(
   include 'cloud::database::dbaas'
 
   class { 'trove::api':
-    verbose           => $verbose,
     debug             => $debug,
     use_syslog        => $use_syslog,
     bind_host         => $api_eth,

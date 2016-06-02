@@ -60,10 +60,6 @@
 #   (optional) TCP port to connect to Glance API
 #   Defaults to '9292'
 #
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
-#
 # [*debug*]
 #   (optional) Set log output to debug output
 #   Defaults to true
@@ -115,7 +111,6 @@ class cloud::compute(
   $ks_glance_internal_proto = 'http',
   $glance_api_port          = 9292,
 
-  $verbose                  = true,
   $debug                    = true,
   $use_syslog               = true,
   $log_facility             = 'LOG_LOCAL0',
@@ -135,7 +130,6 @@ class cloud::compute(
   class { '::nova::logging':
     use_syslog                      => $use_syslog,
     log_facility                    => $log_facility,
-    verbose                         => $verbose,
     debug                           => $debug,
 
     logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',

@@ -59,10 +59,6 @@
 #   (optional) Which interface we bind the Glance API server.
 #   Defaults to '127.0.0.1'
 #
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
-#
 # [*debug*]
 #   (optional) Set log output to debug output
 #   Defaults to true
@@ -97,7 +93,6 @@ class cloud::image::registry(
   $ks_glance_password               = 'glancepassword',
 
   $api_eth                          = '127.0.0.1',
-  $verbose                          = true,
   $debug                            = true,
   $log_facility                     = 'LOG_LOCAL0',
   $use_syslog                       = true,
@@ -110,7 +105,6 @@ class cloud::image::registry(
   class { '::glance::registry::logging':
     use_syslog                      => $use_syslog,
     log_facility                    => $log_facility,
-    verbose                         => $verbose,
     debug                           => $debug,
 
     logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',

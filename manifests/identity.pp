@@ -103,10 +103,6 @@
 #   (optional) OpenStack Region Name
 #   Defaults to 'RegionOne'
 #
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
-#
 # [*debug*]
 #   (optional) Set log output to debug output
 #   Defaults to true
@@ -249,7 +245,6 @@ class cloud::identity (
 
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
-  $verbose                      = true,
   $debug                        = true,
   $log_facility                 = 'LOG_LOCAL0',
   $use_syslog                   = true,
@@ -272,7 +267,6 @@ class cloud::identity (
   class { '::keystone::logging':
     use_syslog                      => $use_syslog,
     log_facility                    => $log_facility,
-    verbose                         => $verbose,
     debug                           => $debug,
 
     logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',

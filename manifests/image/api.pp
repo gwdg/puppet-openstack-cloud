@@ -87,10 +87,6 @@
 #   (optional) User name used to acces to the glance rbd pool
 #   Defaults to 'glance'
 #
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
-#
 # [*debug*]
 #   (optional) Set log output to debug output
 #   Defaults to true
@@ -167,7 +163,6 @@ class cloud::image::api(
   $glance_rbd_user                   = 'glance',
   $glance_rbd_key                    = 'key',
 
-  $verbose                           = true,
   $debug                             = true,
   $log_facility                      = 'LOG_LOCAL0',
   $use_syslog                        = true,
@@ -186,7 +181,6 @@ class cloud::image::api(
   class { '::glance::api::logging':
     use_syslog                      => $use_syslog,
     log_facility                    => $log_facility,
-    verbose                         => $verbose,
     debug                           => $debug,
 
     logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',

@@ -79,10 +79,6 @@
 #   (optional) Password to connect to heat queues.
 #   Defaults to 'rabbitpassword'
 #
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
-#
 # [*debug*]
 #   (optional) Set log output to debug output
 #   Defaults to true
@@ -115,7 +111,6 @@ class cloud::orchestration(
   $heat_db_idle_timeout       = 5000,
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
-  $verbose                    = true,
   $debug                      = true,
   $use_syslog                 = true,
   $log_facility               = 'LOG_LOCAL0',
@@ -128,7 +123,6 @@ class cloud::orchestration(
   class { '::heat::logging':
     use_syslog                      => $use_syslog,
     log_facility                    => $log_facility,
-    verbose                         => $verbose,
     debug                           => $debug,
 
     logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',

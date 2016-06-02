@@ -32,10 +32,6 @@
 #   Could be 'http' or 'https'.
 #   Defaults to 'http'
 #
-# [*verbose*]
-#   (optional) Rather to log the trove api service at verbose level.
-#   Default: true
-#
 # [*debug*]
 #   (optional) Rather to log the trove api service at debug level.
 #   Default: true
@@ -48,7 +44,6 @@ class cloud::database::dbaas::conductor(
   $ks_keystone_internal_host  = '127.0.0.1',
   $ks_keystone_internal_port  = '5000',
   $ks_keystone_internal_proto = 'http',
-  $verbose                    = true,
   $debug                      = true,
   $use_syslog                 = true,
 ) {
@@ -58,7 +53,6 @@ class cloud::database::dbaas::conductor(
   class { 'trove::conductor':
     auth_url   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     debug      => $debug,
-    verbose    => $verbose,
     use_syslog => $use_syslog
   }
 

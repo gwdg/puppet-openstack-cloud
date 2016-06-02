@@ -27,10 +27,6 @@
 #   (optional) Password to connect to nova queues.
 #   Defaults to 'rabbitpassword'
 #
-# [*verbose*]
-#   (optional) Set log output to verbose output
-#   Defaults to true
-#
 # [*debug*]
 #   (optional) Set log output to debug output
 #   Defaults to true
@@ -62,7 +58,6 @@
 #   Defaults to ['neutron.services.loadbalancer.plugin.LoadBalancerPlugin','neutron.services.metering.metering_plugin.MeteringPlugin','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin']
 #
 class cloud::network(
-  $verbose                    = true,
   $debug                      = true,
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
@@ -100,7 +95,6 @@ class cloud::network(
 
   class { 'neutron':
     allow_overlapping_ips   => true,
-    verbose                 => $verbose,
     debug                   => $debug,
     rabbit_user             => 'neutron',
     rabbit_hosts            => $rabbit_hosts,
