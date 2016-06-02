@@ -33,12 +33,14 @@
 
 define cloud::volume::qos::set (
   $qos_name,
-  $key            = $name,
+  $key                  = $name,
   $os_password,
-  $os_tenant_name = 'admin',
-  $os_username    = 'admin',
-  $os_auth_url    = 'http://127.0.0.1:5000/v2.0/',
-  $os_region_name = undef,
+  $os_tenant_name       = 'admin',
+  $os_username          = 'admin',
+  $os_auth_url          = 'http://127.0.0.1:5000/v2.0/',
+  $os_region_name       = undef,
+  $os_project_domain_id = 'default',
+  $os_user_domain_id    = 'default',
   $value,
   ) {
 
@@ -51,6 +53,8 @@ define cloud::volume::qos::set (
     "OS_PASSWORD=${os_password}",
     "OS_AUTH_URL=${os_auth_url}",
     "OS_VOLUME_API_VERSION=1",
+    "OS_PROJECT_DOMAIN_ID=${os_project_domain_id}",
+    "OS_USER_DOMAIN_ID=${os_user_domain_id}",
   ]
 
   if $os_region_name {
