@@ -27,21 +27,9 @@
 #   (optional) Password to connect to nova queues.
 #   Defaults to 'rabbitpassword'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
 # [*api_eth*]
 #   (optional) Which interface we bind the Neutron API server.
 #   Defaults to '127.0.0.1'
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
 #
 # [*dhcp_lease_duration*]
 #   (optional) DHCP Lease duration (in seconds)
@@ -58,11 +46,9 @@
 #   Defaults to ['neutron.services.loadbalancer.plugin.LoadBalancerPlugin','neutron.services.metering.metering_plugin.MeteringPlugin','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin']
 #
 class cloud::network(
-  $debug                      = true,
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
   $api_eth                    = '127.0.0.1',
-  $log_facility               = 'LOG_LOCAL0',
   $dhcp_lease_duration        = '120',
   $plugin                     = 'ml2',
   $service_plugins            = ['neutron.services.loadbalancer.plugin.LoadBalancerPlugin','neutron.services.metering.metering_plugin.MeteringPlugin','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin'],

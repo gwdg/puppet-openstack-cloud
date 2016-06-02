@@ -79,18 +79,6 @@
 #   (optional) Password to connect to heat queues.
 #   Defaults to 'rabbitpassword'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
-#
 # [*os_endpoint_type*]
 #   (optional) The type of the OpenStack endpoint (public/internal/admin) URL
 #   Defaults to 'publicURL'
@@ -111,25 +99,10 @@ class cloud::orchestration(
   $heat_db_idle_timeout       = 5000,
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
-  $debug                      = true,
-  $use_syslog                 = true,
-  $log_facility               = 'LOG_LOCAL0',
   $os_endpoint_type           = 'publicURL'
 ) {
 
   include 'mysql::client'
-
-  # Configure logging for heat
-  class { '::heat::logging':
-    use_syslog                      => $use_syslog,
-    log_facility                    => $log_facility,
-    debug                           => $debug,
-
-    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
-    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
-    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
-    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
-  }
 
   $encoded_user     = uriescape($heat_db_user)
   $encoded_password = uriescape($heat_db_password)

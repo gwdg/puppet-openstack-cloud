@@ -103,18 +103,6 @@
 #   (optional) OpenStack Region Name
 #   Defaults to 'RegionOne'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
-#
 # [*token_driver*]
 #   (optional) Driver to store tokens
 #   Defaults to 'keystone.token.persistence.backends.sql.Token'
@@ -245,9 +233,6 @@ class cloud::identity (
 
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
-  $debug                        = true,
-  $log_facility                 = 'LOG_LOCAL0',
-  $use_syslog                   = true,
   $ks_token_expiration          = 3600,
   $token_driver                 = 'keystone.token.persistence.backends.sql.Token',
   $firewall_settings            = {},
@@ -262,18 +247,6 @@ class cloud::identity (
   $encoded_password = uriescape($keystone_db_password)
 
   include 'mysql::client'
-
-  # Configure logging for cinder
-  class { '::keystone::logging':
-    use_syslog                      => $use_syslog,
-    log_facility                    => $log_facility,
-    debug                           => $debug,
-
-    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
-    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
-    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
-    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
-  }
 
 #
 # Configure Keystone:

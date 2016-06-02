@@ -60,18 +60,6 @@
 #   (optional) TCP port to connect to Glance API
 #   Defaults to '9292'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
-#
 # [*neutron_endpoint*]
 #   (optional) Host running auth service.
 #   Defaults to '127.0.0.1'
@@ -111,10 +99,6 @@ class cloud::compute(
   $ks_glance_internal_proto = 'http',
   $glance_api_port          = 9292,
 
-  $debug                    = true,
-  $use_syslog               = true,
-  $log_facility             = 'LOG_LOCAL0',
-
   $neutron_endpoint         = '127.0.0.1',
   $neutron_protocol         = 'http',
   $neutron_password         = 'neutronpassword',
@@ -125,18 +109,6 @@ class cloud::compute(
 
   $upgrade_level            = undef,
 ) {
-
-  # Configure logging for nova
-  class { '::nova::logging':
-    use_syslog                      => $use_syslog,
-    log_facility                    => $log_facility,
-    debug                           => $debug,
-
-    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
-    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
-    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
-    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
-  }
 
   $encoded_user     = uriescape($nova_db_user)
   $encoded_password = uriescape($nova_db_password)

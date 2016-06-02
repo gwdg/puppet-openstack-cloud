@@ -44,18 +44,6 @@
 #   (optional) Password to connect to cinder queues.
 #   Defaults to 'rabbitpassword'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
-#
 # [*storage_availability_zone*]
 #   (optional) The storage availability zone
 #   Defaults to 'nova'
@@ -67,25 +55,10 @@ class cloud::volume(
   $cinder_db_idle_timeout     = 5000,
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
-  $debug                      = true,
-  $log_facility               = 'LOG_LOCAL0',
   $storage_availability_zone  = 'nova',
-  $use_syslog                 = true,
 ) {
 
-  # Configure logging for cinder
-  class { '::cinder::logging':
-    use_syslog                      => $use_syslog,
-    log_facility                    => $log_facility,
-    debug                           => $debug,
-
-    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
-    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
-    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
-    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
-  }
-
-  $encoded_user = uriescape($cinder_db_user)
+  $encoded_user     = uriescape($cinder_db_user)
   $encoded_password = uriescape($cinder_db_password)
 
   include 'mysql::client'

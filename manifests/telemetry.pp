@@ -56,18 +56,6 @@
 #   (optional) Password used by Ceilometer to connect to Keystone API
 #   Defaults to 'ceilometerpassword'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
-#
 # [*region*]
 #   (optional) the keystone region of this node
 #   Defaults to 'RegionOne'
@@ -89,28 +77,9 @@ class cloud::telemetry(
   $ks_ceilometer_password     = 'ceilometerpassword',
 
   $region                     = 'RegionOne',
-
-  $debug                      = true,
-
-  $log_facility               = 'LOG_LOCAL0',
-  $use_syslog                 = true,
-
   $os_endpoint_type           = 'publicURL',
-
   $metering_time_to_live      = 2592000,
 ){
-
-  # Configure logging for ceilometer
-  class { '::ceilometer::logging':
-    use_syslog                      => $use_syslog,
-    log_facility                    => $log_facility,
-    debug                           => $debug,
-
-    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
-    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
-    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
-    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
-  }
 
   class { 'ceilometer':
     metering_secret         => $ceilometer_secret,

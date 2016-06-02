@@ -87,18 +87,6 @@
 #   (optional) User name used to acces to the glance rbd pool
 #   Defaults to 'glance'
 #
-# [*debug*]
-#   (optional) Set log output to debug output
-#   Defaults to true
-#
-# [*use_syslog*]
-#   (optional) Use syslog for logging
-#   Defaults to true
-#
-# [*log_facility*]
-#   (optional) Syslog facility to receive log lines
-#   Defaults to 'LOG_LOCAL0'
-#
 # [*backend*]
 #   (optionnal) Backend to use to store images
 #   Can be 'rbd', 'file', 'nfs' or 'swift'
@@ -163,9 +151,6 @@ class cloud::image::api(
   $glance_rbd_user                   = 'glance',
   $glance_rbd_key                    = 'key',
 
-  $debug                             = true,
-  $log_facility                      = 'LOG_LOCAL0',
-  $use_syslog                        = true,
   $backend                           = 'rbd',
   $known_stores                      = ['rbd', 'http'],
   $filesystem_store_datadir          = '/var/lib/glance/images/',
@@ -176,18 +161,6 @@ class cloud::image::api(
   $firewall_settings                 = {},
   $container_formats                 = 'ami,ari,aki,bare,ovf,ova',
 ) {
-
-  # Configure logging for cinder
-  class { '::glance::api::logging':
-    use_syslog                      => $use_syslog,
-    log_facility                    => $log_facility,
-    debug                           => $debug,
-
-    logging_context_format_string   => '%(process)d: %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s',
-    logging_default_format_string   => '%(process)d: %(levelname)s %(name)s [-] %(instance)s%(message)s',
-    logging_debug_format_suffix     => '%(funcName)s %(pathname)s:%(lineno)d',
-    logging_exception_prefix        => '%(process)d: TRACE %(name)s %(instance)s',
-  }
 
   $encoded_glance_user     = uriescape($glance_db_user)
   $encoded_glance_password = uriescape($glance_db_password)
