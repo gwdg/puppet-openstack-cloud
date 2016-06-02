@@ -61,7 +61,6 @@ class cloud::orchestration::engine(
   $auth_encryption_key            = 'secrete',
 
   $workers                        = 2,
-
 ) {
 
   include 'cloud::orchestration'
@@ -72,11 +71,7 @@ class cloud::orchestration::engine(
     heat_metadata_server_url      => "${ks_heat_public_proto}://${ks_heat_public_host}:${ks_heat_cfn_public_port}",
     heat_waitcondition_server_url => "${ks_heat_public_proto}://${ks_heat_public_host}:${ks_heat_cfn_public_port}/v1/waitcondition",
     heat_watch_server_url         => "${ks_heat_public_proto}://${ks_heat_public_host}:${ks_heat_cloudwatch_public_port}",
-  }
-
-  # Set currently unsupported options in offical puppet module
-  heat_config {
-    'DEFAULT/num_engine_workers':   value => $workers;
+    num_engine_workers            => $workers,
   }
 
 }
