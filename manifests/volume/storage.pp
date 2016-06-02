@@ -129,30 +129,6 @@ class cloud::volume::storage(
       $iscsi_backends = { }
     }
 
-    if has_key($cinder_backends, 'emc_vnx') {
-      $emc_vnx_backends = $cinder_backends['emc_vnx']
-      create_resources('cloud::volume::backend::emc_vnx', $emc_vnx_backends)
-    }
-    else {
-      $emc_vnx_backends = { }
-    }
-
-    if has_key($cinder_backends, 'eqlx') {
-      $eqlx_backends = $cinder_backends['eqlx']
-      create_resources('cloud::volume::backend::eqlx', $eqlx_backends)
-    }
-    else {
-      $eqlx_backends = { }
-    }
-
-    if has_key($cinder_backends, 'glusterfs') {
-      $glusterfs_backends = $cinder_backends['glusterfs']
-      create_resources('cloud::volume::backend::glusterfs', $glusterfs_backends)
-    }
-    else {
-      $glusterfs_backends = { }
-    }
-
     if has_key($cinder_backends, 'nfs') {
       $nfs_backends = $cinder_backends['nfs']
       create_resources('cloud::volume::backend::nfs', $nfs_backends)
@@ -162,7 +138,7 @@ class cloud::volume::storage(
     }
 
     class { 'cinder::backends':
-      enabled_backends => keys(merge($rbd_backends, $netapp_backends, $iscsi_backends, $emc_vnx_backends, $eqlx_backends, $nfs_backends, $glusterfs_backends))
+      enabled_backends => keys(merge($rbd_backends, $netapp_backends, $iscsi_backends, $nfs_backends))
     }
 
     # Manage Volume types.
