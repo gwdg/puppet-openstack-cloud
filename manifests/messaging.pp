@@ -86,7 +86,7 @@ class cloud::messaging(
   $firewall_settings        = {},
 
   # New stuff
-  $rabbitmq_master_name     = 'controller1',
+  $rabbitmq_master_name     = 'controller1.dev.cloud.gwdg.de',
   $rabbitmq_management_port = '15672',
 ){
 
@@ -99,30 +99,13 @@ class cloud::messaging(
 
   # Differentiate between master and slave nodes to allow automatic cluster join
   if $::fqdn != $rabbitmq_master_name {
-    $clustername                = "rabbit@${rabbitmq_master_name}.${::domain}"
+    $clustername                = "rabbit@${rabbitmq_master_name}"
     $sleep_after_state_change   = "5"
     exec { 'join-rabbitmq-cluster':
       command   => "/usr/sbin/rabbitmqctl stop_app; /bin/sleep ${sleep_after_state_change}; /usr/sbin/rabbitmqctl join_cluster rabbit@${rabbitmq_master_name}; /usr/sbin/rabbitmqctl start_app; /bin/sleep ${sleep_after_state_change}",
       unless    => "/usr/sbin/rabbitmqctl -q cluster_status | grep '{cluster_name,<<\"${clustername}\">>}'",
       require   => Class['rabbitmq'],
     }
-  }
-
-  # Packaging issue: https://bugzilla.redhat.com/show_bug.cgi?id=1033305
-  if $::osfamily == 'RedHat' {
-    $package_provider = 'yum'
-    file {'/usr/sbin/rabbitmq-plugins':
-      ensure => link,
-      target => '/usr/lib/rabbitmq/bin/rabbitmq-plugins'
-    }
-
-    file {'/usr/sbin/rabbitmq-env':
-      ensure => link,
-      target => '/usr/lib/rabbitmq/bin/rabbitmq-env'
-    }
-  }
-  else {
-    $package_provider  = $rabbitmq::params::package_provider
   }
 
   class { 'rabbitmq':
@@ -134,7 +117,6 @@ class cloud::messaging(
     node_ip_address          => $rabbitmq_ip,
     port                     => $rabbitmq_port,
     erlang_cookie            => $erlang_cookie,
-    package_provider         => $package_provider,
   }
 
   rabbitmq_vhost { ['/', '/sensu']:
@@ -201,7 +183,7 @@ class cloud::messaging(
       ports             => $rabbitmq_port,
       options           => 
 #        'check inter 5s rise 2 fall 3',
-        inline_template('check inter 5s rise 2 fall 3 <% if @hostname != @rabbitmq_master_name -%>backup<% end %>')
+        inline_template('check inter 5s rise 2 fall 3 <% if @fqdn != @rabbitmq_master_name -%>backup<% end %>')
     }
 
     @@haproxy::balancermember{"${::fqdn}-rabbitmq-management":
@@ -211,7 +193,7 @@ class cloud::messaging(
       ports             => $rabbitmq_management_port,
       options           =>
 #        'check inter 5s rise 2 fall 3',
-        inline_template('check inter 5s rise 2 fall 3 <% if @hostname != @rabbitmq_master_name -%>backup<% end %>')
+        inline_template('check inter 5s rise 2 fall 3 <% if @fqdn != @rabbitmq_master_name -%>backup<% end %>')
     }
   }
 
