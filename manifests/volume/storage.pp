@@ -85,6 +85,8 @@ class cloud::volume::storage(
   $ks_glance_internal_host                 = '127.0.0.1',
 
   $ks_cinder_password                      = 'secrete',
+  $ks_cinder_user                          = 'cinder',
+  $ks_admin_tenant                         = 'services',
 
   $cinder_rbd_pool                         = 'volumes',
   $cinder_rbd_user                         = 'cinder',
@@ -167,24 +169,24 @@ class cloud::volume::storage(
     # It allows to the end-user to choose from which backend he would like to provision a volume.
     # Cinder::Type requires keystone credentials
     Cinder::Type <| |> {
-      os_tenant_name => 'services',
-      os_username    => 'cinder',
+      os_tenant_name => $ks_admin_tenant,
+      os_username    => $ks_cinder_user,
       os_password    => $ks_cinder_password,
       os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0"
     }
     
     # Cloud::Volume::Qos::Create requires keystone credentials
     Cloud::Volume::Qos::Create <| |> {
-      os_tenant_name => 'services',
-      os_username    => 'cinder',
+      os_tenant_name => $ks_admin_tenant,
+      os_username    => $ks_cinder_user,
       os_password    => $ks_cinder_password,
       os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3"
     }
     
     # Cloud::Volume::Qos::Associate requires keystone credentials
     Cloud::Volume::Qos::Associate <| |> {
-      os_tenant_name => 'services',
-      os_username    => 'cinder',
+      os_tenant_name => $ks_admin_tenant,
+      os_username    => $ks_cinder_user,
       os_password    => $ks_cinder_password,
       os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3"
     }
@@ -200,8 +202,8 @@ class cloud::volume::storage(
     'DEFAULT/auth_strategy':                value => 'keystone';
     'keystone_authtoken/auth_uri':          value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3";
     'keystone_authtoken/identity_uri':      value => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}";
-    'keystone_authtoken/admin_tenant_name': value => 'services';
-    'keystone_authtoken/admin_user':        value => 'cinder';
+    'keystone_authtoken/admin_tenant_name': value => $ks_admin_tenant;
+    'keystone_authtoken/admin_user':        value => $ks_cinder_user;
     'keystone_authtoken/admin_password':    value => $ks_cinder_password, secret => true;
   }
 }
