@@ -39,7 +39,7 @@
 class cloud::network::dhcp(
   $veth_mtu            = 1500,
   $debug               = true,
-  $dnsmasq_dns_servers = false,
+  $dnsmasq_dns_servers = undef,
   $firewall_settings   = {},
 ) {
 
@@ -49,17 +49,8 @@ class cloud::network::dhcp(
   class { 'neutron::agents::dhcp':
     debug                    => $debug,
     dnsmasq_config_file      => '/etc/neutron/dnsmasq-neutron.conf',
+    dnsmasq_dns_servers      => $dnsmasq_dns_servers,
     enable_isolated_metadata => true
-  }
-
-  if $dnsmasq_dns_servers {
-    neutron_dhcp_agent_config { 'DEFAULT/dnsmasq_dns_servers':
-      value => join($dnsmasq_dns_servers, ',')
-    }
-  } else {
-    neutron_dhcp_agent_config { 'DEFAULT/dnsmasq_dns_servers':
-      ensure => absent
-    }
   }
 
   file { '/etc/neutron/dnsmasq-neutron.conf':
