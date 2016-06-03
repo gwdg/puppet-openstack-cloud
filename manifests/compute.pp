@@ -150,7 +150,8 @@ class cloud::compute(
 
   class { 'nova::network::neutron':
       neutron_admin_password => $neutron_password,
-      neutron_admin_auth_url => "${neutron_protocol}://${neutron_endpoint}:35357/v2.0",
+      neutron_admin_auth_url => "${neutron_protocol}://${neutron_endpoint}:35357/v3",
+      neutron_auth_plugin    => 'v3password',
       neutron_url            => "${neutron_protocol}://${neutron_endpoint}:9696",
       neutron_region_name    => $neutron_region_name
   }
