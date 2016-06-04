@@ -439,14 +439,18 @@ Host *
   }
 
   class { 'nova::compute::libvirt':
-    libvirt_virt_type        => $libvirt_virt_type,
+    libvirt_virt_type           => $libvirt_virt_type,
     # Needed to support migration but we still use Spice:
-    vncserver_listen         => '0.0.0.0',
-    migration_support        => true,
-    libvirt_disk_cachemodes  => $libvirt_disk_cachemodes_real,
-    libvirt_service_name     => $::cloud::params::libvirt_service_name,
-    libvirt_inject_key       => false,
-    libvirt_inject_partition => '-2',
+    vncserver_listen            => '0.0.0.0',
+    migration_support           => true,
+    libvirt_disk_cachemodes     => $libvirt_disk_cachemodes_real,
+    libvirt_service_name        => $::cloud::params::libvirt_service_name,
+    libvirt_inject_key          => false,
+    libvirt_inject_partition    => '-2',
+
+    # Recheck / remove for Mitaka+ or Ubuntu Xenial
+    virtlock_service_name       => '',
+    virtlog_service_name        => '',
   }
 
   # Extra config for nova-compute
