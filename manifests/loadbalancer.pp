@@ -612,9 +612,9 @@ class cloud::loadbalancer(
   $sensu_dashboard_port             = 3000,
   $sensu_api_port                   = 4568,
   $redis_port                       = 6379,
-  $galera_timeout                   = '90m',
+  $galera_timeout                   = '1m',
   $galera_connections               = '4096',
-  $api_timeout                      = '90m',
+  $api_timeout                      = '1m',
 
   $vip_public_ip                    = false,
   $vip_public_network               = false,
@@ -1026,9 +1026,9 @@ class cloud::loadbalancer(
                                     'maxconn'        => $galera_connections,
                                     'mode'           => 'tcp',
                                     'balance'        => 'roundrobin',
-                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9000
-                                    'timeout client' => '90m',
-                                    'timeout server' => '90m',
+                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9200
+                                    'timeout client' => $galera_timeout,
+                                    'timeout server' => $galera_timeout,
                                 },
                                 $galera_options),
   }
@@ -1048,9 +1048,9 @@ class cloud::loadbalancer(
                                     'maxconn'        => $galera_connections,
                                     'mode'           => 'tcp',
                                     'balance'        => 'roundrobin',
-                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9000
-                                    'timeout client' => '90m',
-                                    'timeout server' => '90m',
+                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9200
+                                    'timeout client' => $galera_timeout,
+                                    'timeout server' => $galera_timeout,
                                 },
                                 $galera_readonly_options),
   }
