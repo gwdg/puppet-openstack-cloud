@@ -37,7 +37,7 @@
 #
 # [*plugin*]
 #   (optional) Neutron plugin name
-#   Supported values: 'ml2', 'n1kv', 'opencontrail'.
+#   Supported values: 'ml2', 'n1kv'
 #   Defaults to 'ml2'
 #
 # [*service_plugins*]
@@ -62,9 +62,6 @@ class cloud::network(
     }
     'n1kv': {
       $core_plugin = 'neutron.plugins.cisco.network_plugin.PluginV2'
-    }
-    'opencontrail': {
-      $core_plugin = 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2'
     }
     default: {
       fail("${plugin} plugin is not supported.")
