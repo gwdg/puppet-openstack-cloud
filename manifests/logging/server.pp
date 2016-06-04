@@ -34,12 +34,12 @@ class cloud::logging::server(
   $firewall_settings     = {},
 ) {
 
-  Class['cloud::database::nosql::elasticsearch'] -> Class['kibana3']
-  Class['cloud::database::nosql::elasticsearch'] -> Class['cloud::logging::agent']
+  Class['::cloud::database::nosql::elasticsearch'] -> Class['::kibana3']
+  Class['::cloud::database::nosql::elasticsearch'] -> Class['::cloud::logging::agent']
 
   include ::kibana3
-  include cloud::database::nosql::elasticsearch
-  include cloud::logging::agent
+  include ::cloud::database::nosql::elasticsearch
+  include ::cloud::logging::agent
 
   # Elasticsearch 1.4 ships with a security setting that prevents Kibana from connecting.
   # We need to allow http cors in fluentd instance.

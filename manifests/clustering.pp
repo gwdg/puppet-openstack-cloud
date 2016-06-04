@@ -100,7 +100,7 @@ class cloud::clustering (
     $set_votequorum = false
   }
 
-  class { 'corosync':
+  class { '::corosync':
     enable_secauth    => $cluster_auth,
     authkey           => $cluster_authkey,
     bind_address      => $cluster_ip,

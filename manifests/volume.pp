@@ -49,6 +49,7 @@
 #   Defaults to 'nova'
 #
 class cloud::volume(
+
   $cinder_db_host             = '127.0.0.1',
   $cinder_db_user             = 'cinder',
   $cinder_db_password         = 'cinderpassword',
@@ -65,7 +66,7 @@ class cloud::volume(
   $encoded_user     = uriescape($cinder_db_user)
   $encoded_password = uriescape($cinder_db_password)
 
-  include 'mysql::client'
+  include ::mysql::client
 
   if $cinder_db_use_slave {
     $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_slave_port}/cinder?charset=utf8"
@@ -73,13 +74,13 @@ class cloud::volume(
     $slave_connection_url = undef
   }
 
-  class { 'cinder::db':
+  class { '::cinder::db':
     database_connection       => "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_port}/cinder?charset=utf8",
     database_slave_connection => $slave_connection_url,
     database_idle_timeout     => $cinder_db_idle_timeout,
   }
 
-  class { 'cinder':
+  class { '::cinder':
     rabbit_userid             => 'cinder',
     rabbit_hosts              => $rabbit_hosts,
     rabbit_password           => $rabbit_password,
@@ -91,7 +92,7 @@ class cloud::volume(
 #    'database/slave_connection':    value => $slave_connection_url;
 #  }
 
-  class { 'cinder::ceilometer': }
+  class { '::cinder::ceilometer': }
 
   # Note(EmilienM):
   # We check if DB tables are created, if not we populate Cinder DB.
@@ -106,5 +107,4 @@ class cloud::volume(
 #    unless  => "/usr/bin/mysql cinder -h ${cinder_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
 #    require => [Package['mysql_client'], Package['cinder-common']]
 #  }
-
 }

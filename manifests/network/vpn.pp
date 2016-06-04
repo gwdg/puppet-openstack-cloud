@@ -17,9 +17,9 @@
 #
 class cloud::network::vpn{
 
-  include 'cloud::network'
-  include 'cloud::network::vswitch'
+  include ::cloud::network
+  include ::cloud::network::vswitch
 
-  class { 'neutron::agents::vpnaas': }
+  class { '::neutron::agents::vpnaas': }
 
 }

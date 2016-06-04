@@ -1,8 +1,8 @@
 #
 class cloud::profile::logstash {
 
-  $logstash_syslog_bind_ip = hiera('cloud::logging::server::logstash_syslog_bind_ip') 
-  $logstash_syslog_port = hiera('cloud::logging::server::logstash_syslog_port') 
+  $logstash_syslog_bind_ip  = hiera('cloud::logging::server::logstash_syslog_bind_ip') 
+  $logstash_syslog_port     = hiera('cloud::logging::server::logstash_syslog_port') 
 
   #temporary until we have a logserver provision over puppet
   @@haproxy::balancermember{"${::fqdn}-logstash-syslog":

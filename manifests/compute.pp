@@ -121,13 +121,13 @@ class cloud::compute(
     $slave_connection_url = undef
   }
 
-  class { 'nova::db':
+  class { '::nova::db':
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:${nova_db_port}/nova?charset=utf8",
     slave_connection      => $slave_connection_url,
     database_idle_timeout => $nova_db_idle_timeout,
   }
 
-  class { 'nova':
+  class { '::nova':
     rabbit_userid               => 'nova',
     rabbit_hosts                => $rabbit_hosts,
     rabbit_password             => $rabbit_password,
@@ -150,7 +150,7 @@ class cloud::compute(
     upgrade_level_scheduler     => $upgrade_level,
   }
 
-  class { 'nova::network::neutron':
+  class { '::nova::network::neutron':
       neutron_admin_password => $neutron_password,
       neutron_admin_auth_url => "${neutron_protocol}://${neutron_endpoint}:35357/v3",
       neutron_auth_plugin    => 'v3password',

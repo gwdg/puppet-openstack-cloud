@@ -639,9 +639,8 @@ class cloud::loadbalancer(
   $haproxy_certs                    = 'api.dev.cloud.gwdg.de_20150716_all.pem',
 ){
 
-  include cloud::params
-  include haproxy::params
-  include cloud::network::contrail::haproxy
+  include ::cloud::params
+  include ::haproxy::params
 
   $common_tcp_options = {
     'mode'           => 'tcp',
@@ -703,8 +702,8 @@ class cloud::loadbalancer(
   $haproxy_defaults_options_real    = merge($::haproxy::params::defaults_options, $haproxy_defaults_options)
 
   # Ensure Keepalived is started before HAproxy to avoid binding errors.
-  class { 'keepalived': } ->
-  class { 'haproxy':
+  class { '::keepalived': } ->
+  class { '::haproxy':
     service_manage      => true,
     package_ensure      => $haproxy_ensure,
     global_options      => $haproxy_global_options_real,

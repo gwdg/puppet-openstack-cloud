@@ -17,9 +17,9 @@
 #
 class cloud::compute::consoleauth {
 
-  include 'cloud::compute'
+  include ::cloud::compute
 
-  class { 'nova::consoleauth':
+  class { '::nova::consoleauth':
     enabled => true,
   }
 

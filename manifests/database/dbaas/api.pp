@@ -69,9 +69,9 @@ class cloud::database::dbaas::api(
   $firewall_settings          = {},
 ) {
 
-  include 'cloud::database::dbaas'
+  include ::cloud::database::dbaas
 
-  class { 'trove::api':
+  class { '::trove::api':
     debug             => $debug,
     use_syslog        => $use_syslog,
     bind_host         => $api_eth,

@@ -17,9 +17,9 @@
 #
 class cloud::compute::cert {
 
-  include 'cloud::compute'
+  include ::cloud::compute
 
-  class { 'nova::cert':
+  class { '::nova::cert':
     enabled => true,
   }
 

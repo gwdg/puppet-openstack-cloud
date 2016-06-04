@@ -17,9 +17,9 @@
 #
 class cloud::compute::conductor {
 
-  include 'cloud::compute'
+  include ::cloud::compute
 
-  class { 'nova::conductor':
+  class { '::nova::conductor':
     enabled => true,
   }
 

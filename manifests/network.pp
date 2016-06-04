@@ -79,7 +79,7 @@ class cloud::network(
     }
   }
 
-  class { 'neutron':
+  class { '::neutron':
     allow_overlapping_ips   => true,
     debug                   => $debug,
     rabbit_user             => 'neutron',

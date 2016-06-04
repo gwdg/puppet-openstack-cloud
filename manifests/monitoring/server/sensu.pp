@@ -90,8 +90,8 @@ class cloud::monitoring::server::sensu (
 
   include cloud::monitoring::agent::sensu
 
-  create_resources('sensu::check', $checks)
-  create_resources('sensu::handler', $handlers)
+  create_resources('::sensu::check', $checks)
+  create_resources('::sensu::handler', $handlers)
 
   if $manage_sensu_plugins {
     create_resources('@@sensu::plugin', $plugins)

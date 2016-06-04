@@ -47,10 +47,10 @@ class cloud::network::metadata(
   $ks_nova_internal_proto               = 'http'
 ) {
 
-  include 'cloud::network'
-  include 'cloud::network::vswitch'
+  include ::cloud::network
+  include ::cloud::network::vswitch
 
-  class { 'neutron::agents::metadata':
+  class { '::neutron::agents::metadata':
     enabled          => $enabled,
     shared_secret    => $neutron_metadata_proxy_shared_secret,
     debug            => $debug,

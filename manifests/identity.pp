@@ -249,7 +249,7 @@ class cloud::identity (
   $encoded_user     = uriescape($keystone_db_user)
   $encoded_password = uriescape($keystone_db_password)
 
-  include 'mysql::client'
+  include ::mysql::client
 
   if $keystone_db_use_slave {
     $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_slave_port}/keystone?charset=utf8"
@@ -257,13 +257,13 @@ class cloud::identity (
     $slave_connection_url = undef
   }
 
-  class { 'keystone::db':
+  class { '::keystone::db':
     database_idle_timeout       => $keystone_db_idle_timeout,
     database_connection         => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_port}/keystone?charset=utf8",
     database_slave_connection   => $slave_connection_url,
   }
 
-  class { 'keystone':
+  class { '::keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
     service_name          => 'httpd',
@@ -291,12 +291,12 @@ class cloud::identity (
   # Keystone LDAP
   if $use_ldap {
 #    include 'keystone::ldap'
-    create_resources('keystone::ldap_backend', $ldap_backends)
+    create_resources('::keystone::ldap_backend', $ldap_backends)
   }
 
   # Keystone Endpoints + Users
 
-  class { 'keystone::roles::admin':
+  class { '::keystone::roles::admin':
 
     email        => $ks_admin_email,
     password     => $ks_admin_password,
@@ -305,7 +305,7 @@ class cloud::identity (
 
 #  keystone_role { $identity_roles_addons: ensure => present }
 
-  class {'keystone::endpoint':
+  class {'::keystone::endpoint':
 
     public_url   => $keystone_public_url,
     internal_url => $keystone_internal_url,
@@ -315,8 +315,8 @@ class cloud::identity (
   }
 
   # Configure keystone to use apache/wsgi
-  include 'cloud::util::apache_common'
-  class {'keystone::wsgi::apache':
+  include cloud::util::apache_common
+  class {'::keystone::wsgi::apache':
     servername  => $::fqdn,
     admin_port  => $ks_keystone_admin_port,
     public_port => $ks_keystone_public_port,
@@ -327,7 +327,7 @@ class cloud::identity (
   }
 
   if $swift_enabled {
-    class {'swift::keystone::auth':
+    class {'::swift::keystone::auth':
 
       public_url        => $swift_public_url,
       internal_url      => $swift_internal_url,
@@ -337,7 +337,7 @@ class cloud::identity (
       region            => $region
     }
 
-    class {'swift::keystone::dispersion':
+    class {'::swift::keystone::dispersion':
       auth_pass         => $ks_swift_dispersion_password
     }
   }
@@ -397,7 +397,7 @@ class cloud::identity (
     }
   }
 
-  class {'ceilometer::keystone::auth':
+  class {'::ceilometer::keystone::auth':
 
     public_url          => $ceilometer_public_url,
     internal_url        => $ceilometer_internal_url,
@@ -407,7 +407,7 @@ class cloud::identity (
     password            => $ceilometer_password
   }
 
-  class { 'nova::keystone::auth':
+  class { '::nova::keystone::auth':
 
     public_url          => $nova_v2_public_url,
     internal_url        => $nova_v2_internal_url,
@@ -421,7 +421,7 @@ class cloud::identity (
     password            => $nova_password
   }                                                                                                                                                                                                         
 
-  class { 'neutron::keystone::auth':
+  class { '::neutron::keystone::auth':
 
     public_url          => $neutron_public_url,
     internal_url        => $neutron_internal_url,
@@ -432,7 +432,7 @@ class cloud::identity (
   }
 
   if $cinder_enabled {
-    class { 'cinder::keystone::auth':
+    class { '::cinder::keystone::auth':
 
       public_url        => $cinder_v1_public_url,
       internal_url      => $cinder_v1_internal_url,
@@ -447,7 +447,7 @@ class cloud::identity (
     }
   }
 
-  class { 'glance::keystone::auth':
+  class { '::glance::keystone::auth':
 
     public_url          => $glance_public_url,
     internal_url        => $glance_internal_url,
@@ -457,7 +457,7 @@ class cloud::identity (
     password            => $glance_password
   }
 
-  class { 'heat::keystone::auth':
+  class { '::heat::keystone::auth':
 
     public_url          => $heat_public_url,                                                                                                                                                                
     internal_url        => $heat_internal_url,
@@ -469,9 +469,9 @@ class cloud::identity (
     configure_delegated_roles => true
   }
   
-  class { 'heat::keystone::domain': }
+  class { '::heat::keystone::domain': }
 
-  class { 'heat::keystone::auth_cfn':
+  class { '::heat::keystone::auth_cfn':
 
     public_url          => $heat_cfn_public_url,
     internal_url        => $heat_cfn_internal_url,
@@ -482,7 +482,7 @@ class cloud::identity (
   }
 
   if $trove_enabled {
-    class {'trove::keystone::auth':
+    class {'::trove::keystone::auth':
 
       public_url        => $trove_public_url,
       internal_url      => $trove_internal_url,
@@ -494,7 +494,7 @@ class cloud::identity (
   }
 
   if $magnum_enabled {
-    class { 'magnum::keystone::auth':
+    class { '::magnum::keystone::auth':
 
       public_url          => $magnum_public_url,
       internal_url        => $magnum_internal_url,
@@ -504,11 +504,11 @@ class cloud::identity (
       password            => $magnum_password
     }
 
-    class { 'cloud::container::domain': }
+    class { '::cloud::container::domain': }
   }
 
   # Purge expored tokens every days at midnight
-  class { 'keystone::cron::token_flush': }
+  class { '::keystone::cron::token_flush': }
 
   # Note(EmilienM):
   # We check if DB tables are created, if not we populate Keystone DB.

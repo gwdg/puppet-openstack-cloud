@@ -43,9 +43,9 @@ class cloud::storage::rbd::osd (
   $firewall_settings = {},
 ) {
 
-  include 'cloud::storage::rbd'
+  include ::cloud::storage::rbd
 
-  class { 'ceph::osd' :
+  class { '::ceph::osd' :
     public_address  => $public_address,
     cluster_address => $cluster_address,
   }
@@ -60,7 +60,7 @@ class cloud::storage::rbd::osd (
     }
   }
   elsif is_hash($devices) {
-    create_resources('ceph::osd::device', $devices)
+    create_resources('::ceph::osd::device', $devices)
   }
 
   if $::cloud::manage_firewall {

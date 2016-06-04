@@ -87,7 +87,7 @@ class cloud::image::registry(
   $firewall_settings                = {},
 ) {
 
-  include 'mysql::client'
+  include ::mysql::client
 
   $encoded_user     = uriescape($glance_db_user)
   $encoded_password = uriescape($glance_db_password)
@@ -98,13 +98,13 @@ class cloud::image::registry(
     $slave_connection_url = undef
   }
 
-  class { 'glance::registry::db':
+  class { '::glance::registry::db':
     database_connection         => "mysql://${encoded_user}:${encoded_password}@${glance_db_host}:${glance_db_port}/glance?charset=utf8",
     database_slave_connection   => $slave_connection_url,
     database_idle_timeout       => $glance_db_idle_timeout,
   }
 
-  class { 'glance::registry':
+  class { '::glance::registry':
 
     auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
     identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",

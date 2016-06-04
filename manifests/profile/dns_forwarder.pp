@@ -7,14 +7,14 @@ class cloud::profile::dns_forwarder(
 
 ) {
 
-  include dns::server
+  include ::dns::server
 
   # Forwarders
   dns::server::options { '/etc/bind/named.conf.options':
     forwarders => $forwarders,
   }
 
-  create_resources('dns::zone',         $zones)
-  create_resources('dns::record::a',    $records)
+  create_resources('::dns::zone',         $zones)
+  create_resources('::dns::record::a',    $records)
 
 }

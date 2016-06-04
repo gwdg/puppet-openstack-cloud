@@ -73,11 +73,11 @@ class cloud::object::storage(
   $firewall_settings     = {},
 ) {
 
-  include 'cloud::object'
+  include ::cloud::object
 
-  include 'cloud::object::tweaking'
+  include ::cloud::object::tweaking
 
-  class { 'swift::storage':
+  class { '::swift::storage':
     storage_local_net_ip => $storage_eth,
   }
 
@@ -128,8 +128,8 @@ allow_versions = on
   swift::storage::filter::recon { $swift_components : }
   swift::storage::filter::healthcheck { $swift_components : }
 
-  create_resources("swift::storage::${fstype}", $device_config_hash)
-  ensure_resource('cloud::object::set_io_scheduler', keys($device_config_hash))
+  create_resources("::swift::storage::${fstype}", $device_config_hash)
+  ensure_resource('::cloud::object::set_io_scheduler', keys($device_config_hash))
 
   @@ring_container_device { "${storage_eth}:${container_port}/${ring_container_device}":
     zone   => $swift_zone,

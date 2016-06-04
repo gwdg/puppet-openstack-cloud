@@ -18,8 +18,8 @@
 class cloud::telemetry::alarmnotifier(
 ){
 
-  include 'cloud::telemetry'
+  include ::cloud::telemetry
 
-  class { 'ceilometer::alarm::notifier': }
+  class { '::ceilometer::alarm::notifier': }
 
 }

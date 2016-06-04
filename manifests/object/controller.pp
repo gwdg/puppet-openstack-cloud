@@ -78,15 +78,18 @@
 #   Default to {}
 #
 class cloud::object::controller(
+
   $ks_keystone_admin_host       = '127.0.0.1',
   $ks_keystone_admin_port       = 35357,
   $ks_keystone_internal_host    = '127.0.0.1',
   $ks_keystone_internal_port    = 5000,
-  $ks_swift_dispersion_password = 'dispersion',
-  $ks_swift_internal_port       = 8080,
   $ks_keystone_internal_proto   = 'http',
   $ks_keystone_admin_proto      = 'http',
+
+  $ks_swift_dispersion_password = 'dispersion',
+  $ks_swift_internal_port       = 8080,
   $ks_swift_password            = 'swiftpassword',
+
   $statsd_host                  = '127.0.0.1',
   $statsd_port                  = 4125,
   $memcache_servers             = ['127.0.0.1:11211'],
@@ -94,9 +97,9 @@ class cloud::object::controller(
   $firewall_settings            = {},
 ) {
 
-  include 'cloud::object'
+  include ::cloud::object
 
-  class { 'swift::proxy':
+  class { '::swift::proxy':
     proxy_local_net_ip => $api_eth,
     port               => $ks_swift_internal_port,
     pipeline           => [
@@ -114,27 +117,27 @@ log_statsd_default_sample_rate = 1
 '),
   }
 
-  class{'swift::proxy::cache':
+  class { '::swift::proxy::cache':
     memcache_servers => inline_template(
       '<%= scope.lookupvar("memcache_servers").join(",") %>'),
   }
-  class { 'swift::proxy::account_quotas': }
-  class { 'swift::proxy::bulk': }
-  class { 'swift::proxy::catch_errors': }
-  class { 'swift::proxy::container_quotas': }
-  class { 'swift::proxy::formpost': }
-  class { 'swift::proxy::healthcheck': }
-  class { 'swift::proxy::proxy_logging': }
-  class { 'swift::proxy::ratelimit': }
-  class { 'swift::proxy::slo': }
-  class { 'swift::proxy::staticweb': }
-  class { 'swift::proxy::tempurl': }
+  class { '::swift::proxy::account_quotas': }
+  class { '::swift::proxy::bulk': }
+  class { '::swift::proxy::catch_errors': }
+  class { '::swift::proxy::container_quotas': }
+  class { '::swift::proxy::formpost': }
+  class { '::swift::proxy::healthcheck': }
+  class { '::swift::proxy::proxy_logging': }
+  class { '::swift::proxy::ratelimit': }
+  class { '::swift::proxy::slo': }
+  class { '::swift::proxy::staticweb': }
+  class { '::swift::proxy::tempurl': }
 
-  class { 'swift::proxy::keystone':
+  class { '::swift::proxy::keystone':
     operator_roles => ['admin', 'SwiftOperator', 'ResellerAdmin'],
   }
 
-  class { 'swift::proxy::authtoken':
+  class { '::swift::proxy::authtoken':
     admin_password      => $ks_swift_password,
     auth_host           => $ks_keystone_admin_host,
     auth_port           => $ks_keystone_admin_port,
@@ -142,16 +145,16 @@ log_statsd_default_sample_rate = 1
     delay_auth_decision => inline_template('1
 cache = swift.cache')
   }
-  class { 'swift::proxy::swift3':
+  class { '::swift::proxy::swift3':
     ensure => 'latest',
   }
-  class { 'swift::proxy::s3token':
+  class { '::swift::proxy::s3token':
     auth_host     => $ks_keystone_admin_host,
     auth_port     => $ks_keystone_admin_port,
     auth_protocol => $ks_keystone_internal_proto
   }
 
-  class { 'swift::dispersion':
+  class { '::swift::dispersion':
     auth_url      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     swift_dir     => '/etc/swift',
     auth_pass     => $ks_swift_dispersion_password,

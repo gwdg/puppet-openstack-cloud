@@ -191,7 +191,9 @@ class cloud::network::controller(
   $ks_keystone_admin_token          = undef,
   $ks_keystone_public_port          = 5000,
   $ks_neutron_public_port           = 9696,
+
   $api_eth                          = '127.0.0.1',
+
   $nova_url                         = 'http://127.0.0.1:8774/v2',
   $nova_admin_auth_url              = 'http://127.0.0.1:5000/v2.0',
   $nova_admin_username              = 'nova',
@@ -199,6 +201,7 @@ class cloud::network::controller(
   $nova_admin_password              = 'novapassword',
   $nova_region_name                 = 'RegionOne',
   $manage_ext_network               = false,
+
   $firewall_settings                = {},
   $flat_networks                    = ['public'],
   $tenant_network_types             = ['gre'],
@@ -209,17 +212,19 @@ class cloud::network::controller(
   $l3_ha                            = false,
   $router_distributed               = false,
   $allow_automatic_l3agent_failover = false,
+
   # only needed by cisco n1kv plugin
   $n1kv_vsm_ip                      = '127.0.0.1',
   $n1kv_vsm_password                = 'secrete',
+
   # only needed by ml2 plugin
   $tunnel_id_ranges                 = ['1:10000'],
   $vni_ranges                       = ['1:10000'],
   $lbaas_package_ensure             = 'latest',
 ) {
 
-  include 'cloud::network'
-  include 'mysql::client'
+  include ::cloud::network
+  include ::mysql::client
   include ::neutron::quota
 
   $encoded_user = uriescape($neutron_db_user)
@@ -240,13 +245,13 @@ class cloud::network::controller(
     $slave_connection_url = undef
   }
 
-  class { 'neutron::db':
+  class { '::neutron::db':
     database_connection         => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_port}/neutron?charset=utf8",
     database_slave_connection   => $slave_connection_url,
     database_idle_timeout       => $neutron_db_idle_timeout,
   }
 
-  class { 'neutron::server':
+  class { '::neutron::server':
 
     auth_password                       => $ks_neutron_password,
     auth_uri                            => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_public_port}",
@@ -268,7 +273,7 @@ class cloud::network::controller(
   case $plugin {
     'ml2': {
       $core_plugin = 'neutron.plugins.ml2.plugin.Ml2Plugin'
-      class { 'neutron::plugins::ml2':
+      class { '::neutron::plugins::ml2':
         type_drivers          => $type_drivers,
         tenant_network_types  => $tenant_network_types,
         network_vlan_ranges   => $provider_vlan_ranges,
@@ -282,7 +287,7 @@ class cloud::network::controller(
 
     'n1kv': {
       $core_plugin = 'neutron.plugins.cisco.network_plugin.PluginV2'
-      class { 'neuton::plugins::cisco':
+      class { '::neuton::plugins::cisco':
         database_user     => $neutron_db_user,
         database_password => $neutron_db_password,
         database_host     => $neutron_db_host,
@@ -304,7 +309,7 @@ class cloud::network::controller(
     }
   }
 
-  class { 'neutron::server::notifications':
+  class { '::neutron::server::notifications':
     nova_url               => $nova_url,
     nova_admin_auth_url    => $nova_admin_auth_url,
     nova_admin_username    => $nova_admin_username,

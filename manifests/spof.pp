@@ -52,10 +52,10 @@ class cloud::spof(
       fail('cluster_members is a required parameter.')
     }
 
-    class { 'pacemaker':
+    class { '::pacemaker':
       hacluster_pwd => $cluster_password
     }
-    class { 'pacemaker::corosync':
+    class { '::pacemaker::corosync':
       cluster_name     => 'openstack',
       cluster_members  => $cluster_members,
       settle_timeout   => 10,
@@ -63,13 +63,13 @@ class cloud::spof(
       settle_try_sleep => 5,
       manage_fw        => false
     }
-    class {'pacemaker::stonith':
+    class {'::pacemaker::stonith':
       disable => true
     }
     pacemaker::resource::systemd { 'openstack-ceilometer-central': }
   } else {
 
-    class { 'corosync':
+    class { '::corosync':
       enable_secauth    => false,
       authkey           => '/var/lib/puppet/ssl/certs/ca.pem',
       bind_address      => $cluster_ip,
@@ -118,9 +118,8 @@ class cloud::spof(
     }
   }
 
-
   # Run OpenStack SPOF service and disable them since they will be managed by Corosync.
-  class { 'cloud::telemetry::centralagent':
+  class { '::cloud::telemetry::centralagent':
     enabled => false,
   }
 

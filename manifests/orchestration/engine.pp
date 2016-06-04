@@ -63,9 +63,9 @@ class cloud::orchestration::engine(
   $workers                        = 2,
 ) {
 
-  include 'cloud::orchestration'
+  include ::cloud::orchestration
 
-  class { 'heat::engine':
+  class { '::heat::engine':
     enabled                       => $enabled,
     auth_encryption_key           => $auth_encryption_key,
     heat_metadata_server_url      => "${ks_heat_public_proto}://${ks_heat_public_host}:${ks_heat_cfn_public_port}",

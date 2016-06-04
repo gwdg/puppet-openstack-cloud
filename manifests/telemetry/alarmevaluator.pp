@@ -18,8 +18,8 @@
 class cloud::telemetry::alarmevaluator(
 ){
 
-  include 'cloud::telemetry'
+  include ::cloud::telemetry
 
-  class { 'ceilometer::alarm::evaluator': }
+  class { '::ceilometer::alarm::evaluator': }
 
 }

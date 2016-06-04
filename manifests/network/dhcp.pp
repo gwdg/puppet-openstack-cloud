@@ -43,10 +43,10 @@ class cloud::network::dhcp(
   $firewall_settings   = {},
 ) {
 
-  include 'cloud::network'
-  include 'cloud::network::vswitch'
+  include ::cloud::network
+  include ::cloud::network::vswitch
 
-  class { 'neutron::agents::dhcp':
+  class { '::neutron::agents::dhcp':
     debug                    => $debug,
     dnsmasq_config_file      => '/etc/neutron/dnsmasq-neutron.conf',
     dnsmasq_dns_servers      => $dnsmasq_dns_servers,

@@ -48,12 +48,11 @@ class cloud::database::dbaas::conductor(
   $use_syslog                 = true,
 ) {
 
-  include 'cloud::database::dbaas'
+  include ::cloud::database::dbaas
 
-  class { 'trove::conductor':
+  class { '::trove::conductor':
     auth_url   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     debug      => $debug,
     use_syslog => $use_syslog
   }
-
 }

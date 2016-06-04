@@ -63,7 +63,7 @@ define cloud::volume::backend::rbd (
 ) {
 
   # Create ceph.conf on node
-  include cloud::storage::rbd
+  include ::cloud::storage::rbd
 
   cinder::backend::rbd { $volume_backend_name:
     rbd_pool                         => $rbd_pool,

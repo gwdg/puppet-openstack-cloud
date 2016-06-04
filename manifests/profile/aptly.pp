@@ -4,7 +4,7 @@ class cloud::profile::aptly(
 
   # ----- Setup apache for serving apt repos managed by aptly
 
-  class { 'apache':
+  class { '::apache':
     default_mods    => false,
     default_vhost   => false,
     purge_configs   => true,

@@ -27,13 +27,13 @@ class cloud::compute::scheduler(
   $scheduler_default_filters = false
 ){
 
-  include 'cloud::compute'
+  include ::cloud::compute
 
-  class { 'nova::scheduler':
+  class { '::nova::scheduler':
     enabled => true,
   }
 
-  class { 'nova::scheduler::filter':
+  class { '::nova::scheduler::filter':
     scheduler_default_filters => $scheduler_default_filters,
   }
 

@@ -26,7 +26,7 @@ class cloud::object(
   $swift_hash_suffix = undef
 ) {
 
-  class { 'swift':
+  class { '::swift':
     swift_hash_suffix => $swift_hash_suffix,
   }
 

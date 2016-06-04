@@ -67,15 +67,14 @@ class cloud::network::l3(
 
 ) {
 
-  include 'cloud::network'
-  include 'cloud::network::vswitch'
+  include ::cloud::network
+  include ::cloud::network::vswitch
 
   if $ha_enabled and $agent_mode != 'legacy' {
     fail 'ha_enabled requires agent_mode to be set to legacy'
   }
 
   if ! $ext_provider_net {
-
 
 #    vs_bridge{'br-ex':
 #      external_ids => 'bridge-id=br-ex',
@@ -90,7 +89,7 @@ class cloud::network::l3(
     $external_network_bridge_real = ''
   }
 
-  class { 'neutron::agents::l3':
+  class { '::neutron::agents::l3':
     debug                            => $debug,
     external_network_bridge          => $external_network_bridge_real,
     ha_enabled                       => $ha_enabled,
@@ -99,7 +98,7 @@ class cloud::network::l3(
     agent_mode                       => $agent_mode,
   }
 
-  class { 'neutron::agents::metering':
+  class { '::neutron::agents::metering':
     debug => $debug,
   }
 

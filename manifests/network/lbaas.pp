@@ -32,11 +32,11 @@ class cloud::network::lbaas(
   $manage_haproxy_pkg = true
 ) {
 
-  include 'cloud::network'
-  include 'cloud::network::vswitch'
+  include ::cloud::network
+  include ::cloud::network::vswitch
 
   if $::cloud::network::lbaas_enabled {
-	  class { 'neutron::agents::lbaas':
+	  class { '::neutron::agents::lbaas':
 	    manage_haproxy_package => $manage_haproxy_pkg,
 	    debug                  => $debug,
 	  }

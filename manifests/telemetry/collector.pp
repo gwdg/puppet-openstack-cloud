@@ -33,7 +33,7 @@ class cloud::telemetry::collector(
   $replica_set_name         = 'ceilometer',
 ){
 
-  include 'cloud::telemetry'
+  include ::cloud::telemetry
 
   $s_mongo_nodes = join($mongo_nodes, ',')
 
@@ -41,11 +41,11 @@ class cloud::telemetry::collector(
 #    before => Class['ceilometer::db']
 #  }
 
-  class { 'ceilometer::db':
+  class { '::ceilometer::db':
     database_connection => "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}",
     sync_db             => true,
   }
 
-  class { 'ceilometer::collector': }
+  class { '::ceilometer::collector': }
 
 }

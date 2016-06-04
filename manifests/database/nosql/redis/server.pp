@@ -55,5 +55,4 @@ class cloud::database::nosql::redis::server(
       extras => $firewall_settings,
     }
   }
-
 }

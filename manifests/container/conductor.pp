@@ -4,6 +4,5 @@ class cloud::container::conductor(
 
 
 ){
-
-	include 'cloud::container'
+	include ::cloud::container
 }

@@ -174,13 +174,13 @@ class cloud::image::api(
     $slave_connection_url = undef
   }
 
-  class { 'glance::api::db':
+  class { '::glance::api::db':
     database_connection         => "mysql://${encoded_user}:${encoded_password}@${glance_db_host}:${glance_db_port}/glance?charset=utf8",
     database_idle_timeout       => $glance_db_idle_timeout,
     database_slave_connection   => $slave_connection_url,
   }
 
-  class { 'glance::api':
+  class { '::glance::api':
 
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
@@ -215,7 +215,7 @@ class cloud::image::api(
     } 
 
     # Configure Glance rbd backend
-    class { 'glance::backend::rbd':
+    class { '::glance::backend::rbd':
       rbd_store_user            => $glance_rbd_user,
       rbd_store_pool            => $glance_rbd_pool,
       rbd_store_chunk_size      => 8,
@@ -235,13 +235,13 @@ class cloud::image::api(
 
   } elsif ($backend == 'file') {
 
-    class { 'glance::backend::file':
+    class { '::glance::backend::file':
       filesystem_store_datadir => $filesystem_store_datadir
     }
 
   } elsif ($backend == 'swift') {
 
-    class { 'glance::backend::swift':
+    class { '::glance::backend::swift':
       swift_store_user                    => 'services:glance',
       swift_store_key                     => $ks_glance_password,
       swift_store_auth_address            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357/v2.0/",
@@ -280,7 +280,7 @@ class cloud::image::api(
       require   => Package['glance-api'],                                                                                                                                                                   
     }
 
-    class { 'glance::backend::file':
+    class { '::glance::backend::file':
       filesystem_store_datadir => $filesystem_store_datadir
     }
 
@@ -288,8 +288,8 @@ class cloud::image::api(
     fail("${backend} is not a Glance supported backend.")
   }
 
-  class { 'glance::cache::cleaner': }
-  class { 'glance::cache::pruner': }
+  class { '::glance::cache::cleaner': }
+  class { '::glance::cache::pruner': }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow glance-api access':

@@ -53,21 +53,21 @@ class cloud::orchestration::api(
   $firewall_settings                = {},
 ) {
 
-  include 'cloud::orchestration'
+  include ::cloud::orchestration
 
-  class { 'heat::api':
+  class { '::heat::api':
     bind_host => $api_eth,
     bind_port => $ks_heat_internal_port,
     workers   => $workers
   }
 
-  class { 'heat::api_cfn':
+  class { '::heat::api_cfn':
     bind_host => $api_eth,
     bind_port => $ks_heat_cfn_internal_port,
     workers   => $workers
   }
 
-  class { 'heat::api_cloudwatch':
+  class { '::heat::api_cloudwatch':
     bind_host => $api_eth,
     bind_port => $ks_heat_cloudwatch_internal_port,
     workers   => $workers

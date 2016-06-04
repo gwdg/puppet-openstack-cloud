@@ -74,6 +74,7 @@
 #   Defaults to '5'
 #
 class cloud::volume::storage(
+
   $cinder_backends                         = undef,
 
   $ks_keystone_internal_proto              = 'http',
@@ -96,18 +97,18 @@ class cloud::volume::storage(
   $cinder_rbd_max_clone_depth              = '5',
 ) {
 
-  include 'cloud::volume'
+  include ::cloud::volume
 
-  include 'cinder::volume'
+  include ::cinder::volume
 
   # Needed as dep. of cinder::type
-  include 'cinder::client'
+  include ::cinder::client
 
   if $cinder_backends {
 
     if has_key($cinder_backends, 'rbd') {
       $rbd_backends = $cinder_backends['rbd']
-      create_resources('cloud::volume::backend::rbd', $rbd_backends)
+      create_resources('::cloud::volume::backend::rbd', $rbd_backends)
     }
     else {
       $rbd_backends = { }
@@ -115,7 +116,7 @@ class cloud::volume::storage(
 
     if has_key($cinder_backends, 'netapp') {
       $netapp_backends = $cinder_backends['netapp']
-      create_resources('cloud::volume::backend::netapp', $netapp_backends)
+      create_resources('::cloud::volume::backend::netapp', $netapp_backends)
     }
     else {
       $netapp_backends = { }
@@ -123,7 +124,7 @@ class cloud::volume::storage(
 
     if has_key($cinder_backends, 'iscsi') {
       $iscsi_backends = $cinder_backends['iscsi']
-      create_resources('cloud::volume::backend::iscsi', $iscsi_backends)
+      create_resources('::cloud::volume::backend::iscsi', $iscsi_backends)
     }
     else {
       $iscsi_backends = { }
@@ -131,13 +132,13 @@ class cloud::volume::storage(
 
     if has_key($cinder_backends, 'nfs') {
       $nfs_backends = $cinder_backends['nfs']
-      create_resources('cloud::volume::backend::nfs', $nfs_backends)
+      create_resources('::cloud::volume::backend::nfs', $nfs_backends)
     }
     else {
       $nfs_backends = { }
     }
 
-    class { 'cinder::backends':
+    class { '::cinder::backends':
       enabled_backends => keys(merge($rbd_backends, $netapp_backends, $iscsi_backends, $nfs_backends))
     }
 

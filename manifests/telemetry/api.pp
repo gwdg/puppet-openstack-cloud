@@ -61,18 +61,18 @@ class cloud::telemetry::api(
   $replica_set_name               = 'ceilometer',
 ){
 
-  include 'cloud::telemetry'
+  include ::cloud::telemetry
 
-  unless defined(Class['ceilometer::db']) {
+  unless defined(Class['::ceilometer::db']) {
     $s_mongo_nodes = join($mongo_nodes, ',')
 
-    class { 'ceilometer::db':
+    class { '::ceilometer::db':
       database_connection => "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}",
       sync_db             => true,
     }
   }
 
-  class { 'ceilometer::api':
+  class { '::ceilometer::api':
     keystone_auth_uri     => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
     keystone_identity_uri => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     keystone_password     => $ks_ceilometer_password,
@@ -83,7 +83,7 @@ class cloud::telemetry::api(
 # Purge datas older than one month
 # Run the script once a day but with a random time to avoid
 # issues with MongoDB access
-  class { 'ceilometer::expirer':
+  class { '::ceilometer::expirer':
     minute       => '0',
     hour         => '0',
   }

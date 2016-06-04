@@ -34,9 +34,9 @@ class cloud::telemetry::centralagent(
   $coordination_url = undef,
 ){
 
-  include 'cloud::telemetry'
+  include ::cloud::telemetry
 
-  class { 'ceilometer::agent::central':
+  class { '::ceilometer::agent::central':
     enabled          => $enabled,
     coordination_url => $coordination_url,
   }

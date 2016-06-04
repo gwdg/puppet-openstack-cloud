@@ -26,7 +26,7 @@ define cloud::loadbalancer::binding (
   $firewall_settings = {},
 ){
 
-  include cloud::loadbalancer
+  include ::cloud::loadbalancer
 
   # join all VIP together
   $vip_public_ip_array   = any2array($::cloud::loadbalancer::vip_public_ip)

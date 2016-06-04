@@ -9,9 +9,9 @@ class cloud::container::api(
   $ks_magnum_password         = 'magnumpassword',
 ){
 
-  include 'cloud::container'
+  include ::cloud::container
 
-  class { 'magnum::api':
+  class { '::magnum::api':
     admin_password => $ks_magnum_password,
     host           => $api_eth,
     auth_uri       => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",

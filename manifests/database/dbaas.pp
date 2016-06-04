@@ -70,9 +70,9 @@ class cloud::database::dbaas(
   $encoded_user     = uriescape($trove_db_user)
   $encoded_password = uriescape($trove_db_password)
 
-  include 'mysql::client'
+  include ::mysql::client
 
-  class { 'trove':
+  class { '::trove':
     database_connection          => "mysql://${encoded_user}:${encoded_password}@${trove_db_host}/trove?charset=utf8",
     database_idle_timeout        => $trove_db_idle_timeout,
     mysql_module                 => '2.2',

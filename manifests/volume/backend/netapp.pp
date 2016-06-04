@@ -117,6 +117,7 @@
 #   Defaults to undef
 
 define cloud::volume::backend::netapp (
+
   $netapp_login,
   $netapp_password,
   $netapp_server_hostname,
@@ -129,13 +130,13 @@ define cloud::volume::backend::netapp (
   $netapp_vfiler                = '',
   $netapp_volume_list           = '',
   $netapp_vserver               = '',
+
   $expiry_thres_minutes         = '720',
   $thres_avl_size_perc_start    = '20',
   $thres_avl_size_perc_stop     = '60',
   $nfs_shares_config            = '',
   $nfs_mount_options            = undef,
 ) {
-
 
   cinder::backend::netapp { $name:
     netapp_server_hostname    => $netapp_server_hostname,

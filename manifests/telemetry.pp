@@ -81,7 +81,7 @@ class cloud::telemetry(
   $metering_time_to_live      = 2592000,
 ){
 
-  class { 'ceilometer':
+  class { '::ceilometer':
     metering_secret         => $ceilometer_secret,
 
     rabbit_hosts            => $rabbit_hosts,
@@ -95,7 +95,7 @@ class cloud::telemetry(
     'service_credentials/os_endpoint_type': value => $os_endpoint_type;
   }
 
-  class { 'ceilometer::agent::auth':
+  class { '::ceilometer::agent::auth':
     auth_url      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     auth_password => $ks_ceilometer_password,
     auth_region   => $region

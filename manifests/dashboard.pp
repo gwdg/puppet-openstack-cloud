@@ -162,7 +162,7 @@ class cloud::dashboard(
   }
 
   include ::cloud::util::apache_common
-  class { 'horizon':
+  class { '::horizon':
     secret_key              => $secret_key,
     servername              => $servername,
     bind_address            => $api_eth,
@@ -223,7 +223,5 @@ class cloud::dashboard(
       ports             => $horizon_ssl_port,
       options           => "check inter 2000 rise 2 fall 5 cookie ${::hostname}"
     }
-
   }
-
 }

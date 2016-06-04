@@ -93,9 +93,9 @@ class cloud::messaging(
   # we ensure having an array
   $array_rabbit_names = any2array($rabbit_names)
 
-  Class['rabbitmq'] -> Rabbitmq_vhost <<| |>>
-  Class['rabbitmq'] -> Rabbitmq_user <<| |>>
-  Class['rabbitmq'] -> Rabbitmq_user_permissions <<| |>>
+  Class['::rabbitmq'] -> Rabbitmq_vhost <<| |>>
+  Class['::rabbitmq'] -> Rabbitmq_user <<| |>>
+  Class['::rabbitmq'] -> Rabbitmq_user_permissions <<| |>>
 
   # Differentiate between master and slave nodes to allow automatic cluster join
   if $::fqdn != $rabbitmq_master_name {
@@ -108,7 +108,7 @@ class cloud::messaging(
     }
   }
 
-  class { 'rabbitmq':
+  class { '::rabbitmq':
     delete_guest_user        => true,
     config_cluster           => true,
     cluster_nodes            => $array_rabbit_names,

@@ -26,11 +26,12 @@
 #   Defaults to 'cinder-volumes'.
 #
 define cloud::volume::backend::iscsi (
+
   $iscsi_ip_address,
+
   $volume_group        = 'cinder-volumes',
   $volume_backend_name = $name,
 ) {
-
 
   cinder::backend::iscsi { $name:
     iscsi_ip_address => $iscsi_ip_address,

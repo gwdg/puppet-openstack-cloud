@@ -47,10 +47,10 @@ class cloud::logging::agent(
   $logrotate_rule = $cloud::params::logging_agent_logrotate_rule,
 ) inherits cloud::params {
 
-  include cloud::logging
+  include ::cloud::logging
 
   if $syslog_enable {
-    include rsyslog::client
+    include ::rsyslog::client
   }
 
   file { '/var/db':
@@ -63,11 +63,11 @@ class cloud::logging::agent(
     require => Class['fluentd'],
   }
 
-  ensure_resource('fluentd::configfile', keys($sources))
-  ensure_resource('fluentd::configfile', keys($matches))
-  create_resources('fluentd::source', $sources, {'require' => 'File[/var/db/td-agent]', 'notify' => 'Service[td-agent]'})
-  create_resources('fluentd::match', $matches, {'notify'   => 'Service[td-agent]'})
-  create_resources('fluentd::install_plugin', $plugins)
-  create_resources('logrotate::rule', $logrotate_rule)
+  ensure_resource('::fluentd::configfile', keys($sources))
+  ensure_resource('::fluentd::configfile', keys($matches))
+  create_resources('::fluentd::source', $sources, {'require' => 'File[/var/db/td-agent]', 'notify' => 'Service[td-agent]'})
+  create_resources('::fluentd::match', $matches, {'notify'   => 'Service[td-agent]'})
+  create_resources('::fluentd::install_plugin', $plugins)
+  create_resources('::logrotate::rule', $logrotate_rule)
 
 }

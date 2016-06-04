@@ -184,9 +184,7 @@ class cloud(
   }
 
   # motd
-  file
-  {
-    '/etc/motd':
+  file { '/etc/motd':
       ensure  => file,
       mode    => '0644',
       content => template('cloud/motd.txt'),
@@ -214,7 +212,7 @@ class cloud(
 
   # Security Limits
   include ::limits
-  create_resources('limits::limits', $limits)
+  create_resources('::limits::limits', $limits)
 
   # Some Ubuntu specific stuff
 #  if $::operatingsystem == 'Ubuntu' {
@@ -226,11 +224,11 @@ class cloud(
 
   # sysctl values
   include ::sysctl::base
-  create_resources('sysctl::value', $sysctl)
+  create_resources('::sysctl::value', $sysctl)
 
   # SELinux
   if $::osfamily == 'RedHat' {
-    class {'cloud::selinux' :
+    class {'::cloud::selinux' :
       mode      => $selinux_mode,
       booleans  => $selinux_booleans,
       modules   => $selinux_modules,
@@ -261,7 +259,7 @@ class cloud(
   }
 
   if $::osfamily == 'RedHat' and $rhn_registration {
-    create_resources('rhn_register', {
+    create_resources('::rhn_register', {
       "rhn-${::hostname}" => $rhn_registration
     } )
   }
@@ -288,7 +286,7 @@ class cloud(
     #     proto: tcp
     #     action: accept
     #
-    create_resources('cloud::firewall::rule', $firewall_rules)
+    create_resources('::cloud::firewall::rule', $firewall_rules)
 
     ensure_resource('class', 'cloud::firewall::pre', {
       'firewall_settings' => $firewall_pre_extras,

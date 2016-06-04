@@ -176,11 +176,11 @@ class cloud::network::vswitch(
   $n1kv_version               = 'present',
 ) {
 
-  include 'cloud::network'
+  include ::cloud::network
 
   case $driver {
     'ml2_ovs': {
-      class { 'neutron::agents::ml2::ovs':
+      class { '::neutron::agents::ml2::ovs':
         enable_tunneling           => $enable_tunneling,
         l2_population              => $l2_population,
         polling_interval           => '15',
@@ -196,7 +196,7 @@ class cloud::network::vswitch(
     }
 
     'ml2_lb': {
-      class { 'neutron::agents::ml2::linuxbridge':
+      class { '::neutron::agents::ml2::linuxbridge':
         l2_population    => $l2_population,
         polling_interval => '15',
         tunnel_types     => $tunnel_types,
@@ -211,7 +211,7 @@ class cloud::network::vswitch(
     'n1kv_vem': {
       # We don't check if we are on Red Hat system
       # (already done by puppet-neutron)
-      class { 'neutron::agents::n1kv_vem':
+      class { '::neutron::agents::n1kv_vem':
         n1kv_vsm_ip          => $n1kv_vsm_ip,
         n1kv_vsm_domain_id   => $n1kv_vsm_domain_id,
         host_mgmt_intf       => $host_mgmt_intf,

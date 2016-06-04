@@ -35,56 +35,56 @@ class cloud::container(
 
 ){
 
-	include 'mysql::client'
+  include ::mysql::client
 
-    $encoded_user     = uriescape($magnum_db_user)
-    $encoded_password = uriescape($magnum_db_password)
+  $encoded_user     = uriescape($magnum_db_user)
+  $encoded_password = uriescape($magnum_db_password)
 
-    if $magnum_db_use_slave {
-      $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}:${magnum_db_slave_port}/magnum?charset=utf8"
-    } else {
-      $slave_connection_url = undef
-    }
+  if $magnum_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}:${magnum_db_slave_port}/magnum?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
 
-    class { '::magnum::db': 
-        database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}:${magnum_db_port}/magnum?charset=utf8",
-        slave_connection      => $slave_connection_url,
-        database_idle_timeout => $magnum_db_idle_timeout,
-        require               => Exec ['/tmp/setup_magnum.sh']
-    }
+  class { '::magnum::db': 
+    database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}:${magnum_db_port}/magnum?charset=utf8",
+    slave_connection      => $slave_connection_url,
+    database_idle_timeout => $magnum_db_idle_timeout,
+    require               => Exec ['/tmp/setup_magnum.sh']
+  }
 
-	file { '/tmp/setup_magnum.sh':
-    	ensure => file,
-    	source => 'puppet:///modules/cloud/magnum/setup_magnum.sh',
-    	owner  => root,
-    	group  => root,
-    	mode   => 'u+x',
-    	audit  => content,
-  	} 
+  file { '/tmp/setup_magnum.sh':
+    ensure => file,
+    source => 'puppet:///modules/cloud/magnum/setup_magnum.sh',
+    owner  => root,
+    group  => root,
+    mode   => 'u+x',
+    audit  => content,
+  } 
 
-  	exec { '/tmp/setup_magnum.sh':
-    	subscribe => File['/tmp/setup_magnum.sh'],
-        refreshonly => true,
-  	}
+  exec { '/tmp/setup_magnum.sh':
+    subscribe => File['/tmp/setup_magnum.sh'],
+    refreshonly => true,
+  }
 
-	class { 'magnum':
-	    rabbit_hosts          => $rabbit_hosts,
-	    rabbit_password       => $rabbit_password,
-	    rabbit_userid         => 'magnum',
+  class { '::magnum':
+	rabbit_hosts          => $rabbit_hosts,
+	rabbit_password       => $rabbit_password,
+	rabbit_userid         => 'magnum',
 
-    	require               => Exec ['/tmp/setup_magnum.sh']
-	}->
-	magnum_config {
-	    'certificates/cert_manager_type' :   value => 'local';
-	    'certificates/storage_path' :        value => '/var/lib/magnum/certificates/';
-  	}
+    require               => Exec ['/tmp/setup_magnum.sh']
+  }->
+  magnum_config {
+	'certificates/cert_manager_type' :   value => 'local';
+	'certificates/storage_path' :        value => '/var/lib/magnum/certificates/';
+  }
 
-    exec { 'magnum-db-sync':
-      command     => "magnum-db-manage upgrade",
-      path        => '/usr/bin:/usr/local/bin/',
-      refreshonly => true,
-      subscribe   => [Exec['/tmp/setup_magnum.sh'], Magnum_config['database/connection']],
-    }
+  exec { 'magnum-db-sync':
+    command     => "magnum-db-manage upgrade",
+    path        => '/usr/bin:/usr/local/bin/',
+    refreshonly => true,
+    subscribe   => [Exec['/tmp/setup_magnum.sh'], Magnum_config['database/connection']],
+  }
 
-    Exec['magnum-manage db_sync'] ~> Service<| title == 'magnum' |>
+  Exec['magnum-manage db_sync'] ~> Service<| title == 'magnum' |>
 }

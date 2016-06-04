@@ -84,12 +84,14 @@
 #   Defaults to 'publicURL'
 #
 class cloud::orchestration(
+
   $ks_keystone_internal_host  = '127.0.0.1',
   $ks_keystone_internal_port  = '5000',
   $ks_keystone_internal_proto = 'http',
   $ks_keystone_admin_host     = '127.0.0.1',
   $ks_keystone_admin_port     = '35357',
   $ks_keystone_admin_proto    = 'http',
+
   $ks_heat_public_host        = '127.0.0.1',
   $ks_heat_public_proto       = 'http',
   $ks_heat_password           = 'heatpassword',
@@ -104,10 +106,11 @@ class cloud::orchestration(
 
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
+
   $os_endpoint_type           = 'publicURL'
 ) {
 
-  include 'mysql::client'
+  include ::mysql::client
 
   $encoded_user     = uriescape($heat_db_user)
   $encoded_password = uriescape($heat_db_password)
@@ -118,14 +121,13 @@ class cloud::orchestration(
     $slave_connection_url = undef
   }
 
-  class { 'heat::db':
+  class { '::heat::db':
     database_connection         => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_port}/heat?charset=utf8",
     database_slave_connection   => $slave_connection_url,
     database_idle_timeout       => $heat_db_idle_timeout,
-
   }
 
-  class { 'heat':
+  class { '::heat':
 
     keystone_password     => $ks_heat_password,
     identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",

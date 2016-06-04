@@ -17,9 +17,9 @@
 #
 class cloud::volume::scheduler{
 
-  include 'cloud::volume'
+  include ::cloud::volume
 
-  class { 'cinder::scheduler':
+  class { '::cinder::scheduler':
     scheduler_driver => 'cinder.scheduler.filter_scheduler.FilterScheduler'
   }
 

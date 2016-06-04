@@ -145,13 +145,13 @@ class cloud::compute::hypervisor(
   $filesystem_store_datadir   = '/var/lib/nova/instances',
 ) inherits cloud::params {
 
-  include 'cloud::compute'
-  include 'cloud::params'
-  include 'cloud::telemetry'
-  include 'cloud::network'
+  include ::cloud::compute
+  include ::cloud::params
+  include ::cloud::telemetry
+  include ::cloud::network
 
   if $include_vswitch {
-    include 'cloud::network::vswitch'
+    include ::cloud::network::vswitch
   }
 
   if $libvirt_virt_type == 'kvm' and ! $::vtx {
@@ -242,7 +242,7 @@ Host *
   case $console {
     'spice': {
       $vnc_enabled = false
-      class { 'nova::compute::spice':
+      class { '::nova::compute::spice':
         server_listen              => '0.0.0.0',
         server_proxyclient_address => $server_proxyclient_address,
         proxy_host                 => $ks_console_public_host,
@@ -257,15 +257,10 @@ Host *
       fail("unsupported console type ${console}")
     }
   }
-  class { 'nova::compute':
+  class { '::nova::compute':
     enabled                       => true,
     vnc_enabled                   => $vnc_enabled,
     vncserver_proxyclient_address => $server_proxyclient_address,
-
-    # Set directly in nova modul through hiera (nova::vncproxy::common::vncproxy_base_url)
-#    vncproxy_host                 => $ks_console_public_host,
-#    vncproxy_protocol             => $ks_console_public_proto,
-#    vncproxy_port                 => $novnc_port,
 
     virtio_nic                    => false,
     neutron_enabled               => true,
@@ -320,11 +315,11 @@ Host *
 
   Service<| title == 'libvirt-bin' |> { enable => true }
 
-  class { 'nova::compute::neutron': }
+  class { '::nova::compute::neutron': }
 
   if $vm_rbd or $volume_rbd {
 
-    include 'cloud::storage::rbd'
+    include ::cloud::storage::rbd
 
     $libvirt_disk_cachemodes_real = ['network=writeback']
 
@@ -338,10 +333,10 @@ Host *
         owner   => 'libvirt-qemu',
         group   => 'libvirtd',
         require => Package['libvirt-bin'],
-        before  => Class['nova::compute::rbd'],
+        before  => Class['::nova::compute::rbd'],
       }
 
-      class { 'nova::compute::rbd':
+      class { '::nova::compute::rbd':
         libvirt_rbd_user            => $cinder_rbd_user,
         libvirt_images_rbd_pool     => $nova_rbd_pool,
         ephemeral_storage           => $vm_rbd,
@@ -438,7 +433,7 @@ Host *
     $libvirt_disk_cachemodes_real = []
   }
 
-  class { 'nova::compute::libvirt':
+  class { '::nova::compute::libvirt':
     libvirt_virt_type           => $libvirt_virt_type,
     # Needed to support migration but we still use Spice:
     vncserver_listen            => '0.0.0.0',
@@ -465,7 +460,7 @@ Host *
 	# Make sure group libvirtd exists before trying to set it as additional group for ceilometer user
 	Package['libvirt-bin'] -> User['ceilometer']
 
-  class { 'ceilometer::agent::compute': }
+  class { '::ceilometer::agent::compute': }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow instances console access':

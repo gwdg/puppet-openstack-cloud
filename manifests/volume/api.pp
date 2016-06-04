@@ -83,13 +83,13 @@ class cloud::volume::api(
   $firewall_settings           = {},
 ) {
 
-  include 'cloud::volume'
+  include ::cloud::volume
 
   if ! $default_volume_type {
     fail('default_volume_type should be defined when running Cinder Multi-Backend.')
   }
 
-  class { 'cinder::api':
+  class { '::cinder::api':
     keystone_password      => $ks_cinder_password,
     auth_uri               => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3",
     identity_uri           => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
@@ -102,7 +102,7 @@ class cloud::volume::api(
 
   }
 
-  class { 'cinder::glance':
+  class { '::cinder::glance':
     glance_api_servers     => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}",
     glance_request_timeout => '10',
     glance_num_retries     => '10'

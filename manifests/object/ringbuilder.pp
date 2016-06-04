@@ -42,20 +42,20 @@ class cloud::object::ringbuilder(
   $swift_rsync_max_connections = 5,
 ) {
 
-  include cloud::object
+  include ::cloud::object
 
   if $enabled {
     Ring_object_device <<| |>>
     Ring_container_device <<| |>>
     Ring_account_device <<| |>>
 
-    class {'swift::ringbuilder' :
+    class {'::swift::ringbuilder' :
       part_power     => 15,
       replicas       => $replicas,
       min_part_hours => 24,
     }
 
-    class {'swift::ringserver' :
+    class {'::swift::ringserver' :
       local_net_ip    => $rsyncd_ipaddress,
       max_connections => $swift_rsync_max_connections,
     }

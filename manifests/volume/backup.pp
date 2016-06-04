@@ -32,9 +32,9 @@ class cloud::volume::backup(
   $backup_ceph_user = 'cinder'
 ) {
 
-  include 'cloud::volume'
+  include ::cloud::volume
 
-  class { 'cinder::backup': }
+  class { '::cinder::backup': }
 
   # TODO(EmilienM) Disabled for now: http://git.io/kfTmcA
   # class { 'cinder::backup::ceph':

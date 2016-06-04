@@ -246,7 +246,7 @@ class cloud::database::sql::mysql (
 #    Mysql_user <| |> -> File['/root/.my.cnf'] 
 
     # OpenStack DB
-    class { 'keystone::db::mysql':
+    class { '::keystone::db::mysql':
       dbname        => 'keystone',
       user          => $keystone_db_user,
       password      => $keystone_db_password,
@@ -254,7 +254,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $keystone_db_allowed_hosts,
     }
 
-    class { 'glance::db::mysql':
+    class { '::glance::db::mysql':
       dbname        => 'glance',
       user          => $glance_db_user,
       password      => $glance_db_password,
@@ -262,7 +262,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $glance_db_allowed_hosts,
     }
 
-    class { 'nova::db::mysql':
+    class { '::nova::db::mysql':
       dbname        => 'nova',
       user          => $nova_db_user,
       password      => $nova_db_password,
@@ -270,7 +270,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $nova_db_allowed_hosts,
     }
 
-    class { 'cinder::db::mysql':
+    class { '::cinder::db::mysql':
       dbname        => 'cinder',
       user          => $cinder_db_user,
       password      => $cinder_db_password,
@@ -278,7 +278,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $cinder_db_allowed_hosts,
     }
 
-    class { 'neutron::db::mysql':
+    class { '::neutron::db::mysql':
       dbname        => 'neutron',
       user          => $neutron_db_user,
       password      => $neutron_db_password,
@@ -286,7 +286,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $neutron_db_allowed_hosts,
     }
 
-    class { 'heat::db::mysql':
+    class { '::heat::db::mysql':
       dbname        => 'heat',
       user          => $heat_db_user,
       password      => $heat_db_password,
@@ -294,7 +294,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $heat_db_allowed_hosts,
     }
 
-    class { 'trove::db::mysql':
+    class { '::trove::db::mysql':
       dbname        => 'trove',
       user          => $trove_db_user,
       password      => $trove_db_password,
@@ -302,7 +302,7 @@ class cloud::database::sql::mysql (
       allowed_hosts => $trove_db_allowed_hosts,
     }
 
-    class { 'magnum::db::mysql':
+    class { '::magnum::db::mysql':
       dbname        => 'magnum',
       user          => $magnum_db_user,
       password      => $magnum_db_password,
@@ -323,7 +323,7 @@ class cloud::database::sql::mysql (
   }
 
   # Galera setup
-  class { 'galera':
+  class { '::galera':
 
     galera_servers                  => $galera_internal_ips,
     galera_master                   => $galera_master_name,
@@ -359,7 +359,7 @@ class cloud::database::sql::mysql (
 #    },
   }
 
-  class { 'mysql::client':
+  class { '::mysql::client':
     package_name => $mysql_client_package_name,
   }
 

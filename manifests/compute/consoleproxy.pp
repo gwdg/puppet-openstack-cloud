@@ -53,12 +53,12 @@ class cloud::compute::consoleproxy(
   $firewall_settings = {},
 ){
 
-  include 'cloud::compute'
+  include ::cloud::compute
 
   case $console {
     'spice': {
       $port = $spice_port
-      class { 'nova::spicehtml5proxy':
+      class { '::nova::spicehtml5proxy':
         enabled => true,
         host    => $api_eth,
         port    => $port
@@ -66,7 +66,7 @@ class cloud::compute::consoleproxy(
     }
     'novnc': {
       $port = $novnc_port
-      class { 'nova::vncproxy':
+      class { '::nova::vncproxy':
         enabled           => true,
         host              => $api_eth,
         port              => $port,

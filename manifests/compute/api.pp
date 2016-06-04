@@ -75,11 +75,11 @@ class cloud::compute::api(
   $pacemaker_enabled                    = false,
 ){
 
-  include cloud::compute
-  include cloud::params
-  include nova::params
+  include ::cloud::compute
+  include ::cloud::params
+  include ::nova::params
 
-  class { 'nova::api':
+  class { '::nova::api':
 
     enabled                              => true,
 
@@ -112,7 +112,7 @@ class cloud::compute::api(
     }
   }
 
-  include 'nova::cron::archive_deleted_rows'
+  include ::nova::cron::archive_deleted_rows
 
   @@haproxy::balancermember{"${::fqdn}-compute_api_nova":
     listening_service => 'nova_api',

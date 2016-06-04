@@ -43,7 +43,7 @@ class cloud::storage::rbd::monitor (
   $firewall_settings = {},
 ) {
 
-  include 'cloud::storage::rbd'
+  include ::cloud::storage::rbd
 
   ceph::mon { $id:
     monitor_secret => $monitor_secret,
