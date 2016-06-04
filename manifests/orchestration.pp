@@ -118,15 +118,19 @@ class cloud::orchestration(
     $slave_connection_url = undef
   }
 
+  class { 'heat::db':
+    database_connection         => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_port}/heat?charset=utf8",
+    database_slave_connection   => $slave_connection_url,
+    database_idle_timeout       => $heat_db_idle_timeout,
+
+  }
+
   class { 'heat':
+
     keystone_password     => $ks_heat_password,
     identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     keystone_ec2_uri      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0/ec2tokens",
-
-    database_connection   => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_port}/heat?charset=utf8",
-    slave_connection      => $slave_connection_url,
-    database_idle_timeout => $heat_db_idle_timeout,
 
     rabbit_hosts          => $rabbit_hosts,
     rabbit_password       => $rabbit_password,

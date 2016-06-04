@@ -73,17 +73,23 @@ class cloud::volume(
     $slave_connection_url = undef
   }
 
-  class { 'cinder':
+  class { 'cinder::db':
     database_connection       => "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_port}/cinder?charset=utf8",
-    slave_connection          => $slave_connection_url,
+    database_slave_connection => $slave_connection_url,
     database_idle_timeout     => $cinder_db_idle_timeout,
+  }
 
+  class { 'cinder':
     rabbit_userid             => 'cinder',
     rabbit_hosts              => $rabbit_hosts,
     rabbit_password           => $rabbit_password,
     rabbit_virtual_host       => '/',
     storage_availability_zone => $storage_availability_zone
   }
+
+#  cinder_config {
+#    'database/slave_connection':    value => $slave_connection_url;
+#  }
 
   class { 'cinder::ceilometer': }
 

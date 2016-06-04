@@ -257,14 +257,16 @@ class cloud::identity (
     $slave_connection_url = undef
   }
 
+  class { 'keystone::db':
+    database_idle_timeout       => $keystone_db_idle_timeout,
+    database_connection         => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_port}/keystone?charset=utf8",
+    database_slave_connection   => $slave_connection_url,
+  }
+
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
     service_name          => 'httpd',
-
-    database_idle_timeout => $keystone_db_idle_timeout,
-    database_connection   => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_port}/keystone?charset=utf8",
-    slave_connection      => $slave_connection_url,
 
     token_provider        => 'keystone.token.providers.uuid.Provider',
 
@@ -282,8 +284,8 @@ class cloud::identity (
 
   keystone_config {
     # Make sure identity / assignment is configured for sql in keystone.conf (ldap is done via domain specific configuration)
-    'identity/driver':      value => 'keystone.identity.backends.sql.Identity';
-    'assignment/driver':    value => 'keystone.assignment.backends.sql.Assignment';
+    'identity/driver':              value => 'keystone.identity.backends.sql.Identity';
+    'assignment/driver':            value => 'keystone.assignment.backends.sql.Assignment';
   }
 
   # Keystone LDAP

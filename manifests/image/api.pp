@@ -165,8 +165,8 @@ class cloud::image::api(
   $container_formats                 = 'ami,ari,aki,bare,ovf,ova',
 ) {
 
-  $encoded_glance_user     = uriescape($glance_db_user)
-  $encoded_glance_password = uriescape($glance_db_password)
+  $encoded_user     = uriescape($glance_db_user)
+  $encoded_password = uriescape($glance_db_password)
 
   if $glance_db_use_slave {
     $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${glance_db_host}:${glance_db_slave_port}/glance?charset=utf8"
@@ -174,11 +174,13 @@ class cloud::image::api(
     $slave_connection_url = undef
   }
 
-  class { 'glance::api':
+  class { 'glance::api::db':
+    database_connection         => "mysql://${encoded_user}:${encoded_password}@${glance_db_host}:${glance_db_port}/glance?charset=utf8",
+    database_idle_timeout       => $glance_db_idle_timeout,
+    database_slave_connection   => $slave_connection_url,
+  }
 
-    database_connection      => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}:${glance_db_port}/glance?charset=utf8",
-    slave_connection         => $slave_connection_url,
-    database_idle_timeout    => $glance_db_idle_timeout,
+  class { 'glance::api':
 
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
@@ -198,8 +200,8 @@ class cloud::image::api(
   }
 
   glance_api_config {
-    'DEFAULT/notifier_driver':          value => 'noop';
-    'DEFAULT/container_formats':        value => $container_formats;
+    'DEFAULT/notifier_driver':      value => 'noop';
+    'DEFAULT/container_formats':    value => $container_formats;
   }
 
   if ($backend == 'rbd') {

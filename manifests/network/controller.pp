@@ -263,15 +263,17 @@ class cloud::network::controller(
     $slave_connection_url = undef
   }
 
+  class { 'neutron::db':
+    database_connection         => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_port}/neutron?charset=utf8",
+    database_slave_connection   => $slave_connection_url,
+    database_idle_timeout       => $neutron_db_idle_timeout,
+  }
 
   class { 'neutron::server':
+
     auth_password                       => $ks_neutron_password,
     auth_uri                            => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_public_port}",
     identity_uri                        => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
-
-    database_connection                 => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_port}/neutron?charset=utf8",
-    slave_connection                    => $slave_connection_url,
-    database_idle_timeout               => $neutron_db_idle_timeout,
 
     api_workers                         => $::neutron::server::api_workers,
     rpc_workers                         => $::neutron::server::rpc_workers,
@@ -281,6 +283,10 @@ class cloud::network::controller(
     router_distributed                  => $router_distributed,
     allow_automatic_l3agent_failover    => $allow_automatic_l3agent_failover,
   }
+
+#  neutron_config {
+#    'database/slave_connection':    value => $slave_connection_url;
+#  }
 
   case $plugin {
     'ml2': {
