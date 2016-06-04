@@ -121,13 +121,13 @@ class cloud::image::registry(
 #    'database/slave_connection':    value => $slave_connection_url;
 #  }
 
-  exec {'glance_db_sync':
-    command => 'glance-manage db_sync',
-    user    => 'glance',
-    path    => '/usr/bin',
-    unless  => "/usr/bin/mysql glance -h ${glance_db_host} -u ${encoded_glance_user} -p${encoded_glance_password} -e \"show tables\" | /bin/grep Tables",
-    require => [Package['mysql_client'], Package['glance-registry']]
-  }
+#  exec {'glance_db_sync':
+#    command => 'glance-manage db_sync',
+#    user    => 'glance',
+#    path    => '/usr/bin',
+#    unless  => "/usr/bin/mysql glance -h ${glance_db_host} -u ${encoded_glance_user} -p${encoded_glance_password} -e \"show tables\" | /bin/grep Tables",
+#    require => [Package['mysql_client'], Package['glance-registry']]
+#  }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow glance-registry access':
