@@ -87,10 +87,12 @@
 class cloud::compute(
 
   $nova_db_host             = '127.0.0.1',
-  $nova_db_use_slave        = false,
   $nova_db_user             = 'nova',
   $nova_db_password         = 'novapassword',
   $nova_db_idle_timeout     = 5000,
+  $nova_db_use_slave        = false,
+  $nova_db_port             = 3306,
+  $nova_db_slave_port       = 3307,
 
   $rabbit_hosts             = ['127.0.0.1:5672'],
   $rabbit_password          = 'rabbitpassword',
@@ -114,13 +116,13 @@ class cloud::compute(
   $encoded_password = uriescape($nova_db_password)
 
   if $nova_db_use_slave {
-    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:3307/nova?charset=utf8"
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:${nova_db_slave_port}/nova?charset=utf8"
   } else {
     $slave_connection_url = undef
   }
 
   class { 'nova::db':
-    database_connection   => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}/nova?charset=utf8",
+    database_connection   => "mysql://${encoded_user}:${encoded_password}@${nova_db_host}:${nova_db_port}/nova?charset=utf8",
     slave_connection      => $slave_connection_url,
     database_idle_timeout => $nova_db_idle_timeout,
   }

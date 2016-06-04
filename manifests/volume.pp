@@ -53,6 +53,10 @@ class cloud::volume(
   $cinder_db_user             = 'cinder',
   $cinder_db_password         = 'cinderpassword',
   $cinder_db_idle_timeout     = 5000,
+  $cinder_db_use_slave        = false,
+  $cinder_db_port             = 3306,
+  $cinder_db_slave_port       = 3307,
+
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
   $storage_availability_zone  = 'nova',
@@ -63,9 +67,17 @@ class cloud::volume(
 
   include 'mysql::client'
 
+  if $cinder_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_slave_port}/cinder?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
+
   class { 'cinder':
-    database_connection       => "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}/cinder?charset=utf8",
+    database_connection       => "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_port}/cinder?charset=utf8",
+    slave_connection          => $slave_connection_url,
     database_idle_timeout     => $cinder_db_idle_timeout,
+
     rabbit_userid             => 'cinder',
     rabbit_hosts              => $rabbit_hosts,
     rabbit_password           => $rabbit_password,

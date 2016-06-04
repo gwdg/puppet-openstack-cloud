@@ -70,11 +70,14 @@ class cloud::image::registry(
   $glance_db_user                   = 'glance',
   $glance_db_password               = 'glancepassword',
   $glance_db_idle_timeout           = 5000,
+  $glance_db_use_slave              = false,
+  $glance_db_port                   = 3306,
+  $glance_db_slave_port             = 3307,
 
   $ks_keystone_internal_host        = '127.0.0.1',
   $ks_keystone_internal_proto       = 'http',
-  $ks_keystone_internal_port         = 5000,
-  $ks_keystone_admin_port            = 35357,
+  $ks_keystone_internal_port        = 5000,
+  $ks_keystone_admin_port           = 35357,
 
   $ks_glance_internal_host          = '127.0.0.1',
   $ks_glance_registry_internal_port = '9191',
@@ -89,9 +92,16 @@ class cloud::image::registry(
   $encoded_glance_user     = uriescape($glance_db_user)
   $encoded_glance_password = uriescape($glance_db_password)
 
+  if $glance_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${glance_db_host}:${glance_db_slave_port}/glance?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
+
   class { 'glance::registry':
 
-    database_connection   => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}/glance?charset=utf8",
+    database_connection   => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}:${glance_db_port}/glance?charset=utf8",
+    slave_connection      => $slave_connection_url,
     database_idle_timeout => $glance_db_idle_timeout,
 
     auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",

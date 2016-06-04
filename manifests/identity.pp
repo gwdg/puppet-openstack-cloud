@@ -150,6 +150,9 @@ class cloud::identity (
   $keystone_db_user             = 'keystone',
   $keystone_db_password         = 'keystonepassword',
   $keystone_db_idle_timeout     = 5000,
+  $keystone_db_use_slave        = false,
+  $keystone_db_port             = 3306,
+  $keystone_db_slave_port       = 3307,
 
   $ks_admin_email               = 'no-reply@keystone.openstack',
   $ks_admin_password            = 'adminpassword',
@@ -248,18 +251,20 @@ class cloud::identity (
 
   include 'mysql::client'
 
-#
-# Configure Keystone:
-#
-# Commented out vars are set directly from hiera
-#
+  if $keystone_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_slave_port}/keystone?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
+
   class { 'keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
     service_name          => 'httpd',
 
     database_idle_timeout => $keystone_db_idle_timeout,
-    database_connection   => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}/keystone?charset=utf8",
+    database_connection   => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_port}/keystone?charset=utf8",
+    slave_connection      => $slave_connection_url,
 
     token_provider        => 'keystone.token.providers.uuid.Provider',
 

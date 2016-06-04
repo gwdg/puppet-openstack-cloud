@@ -190,10 +190,15 @@
 #   Defaults to ['linuxbridge', 'openvswitch','l2population']
 #
 class cloud::network::controller(
+
   $neutron_db_host                  = '127.0.0.1',
   $neutron_db_user                  = 'neutron',
   $neutron_db_password              = 'neutronpassword',
   $neutron_db_idle_timeout          = 5000,
+  $neutron_db_use_slave             = false,
+  $neutron_db_port                  = 3306,
+  $neutron_db_slave_port            = 3307,
+
   $ks_neutron_password              = 'neutronpassword',
   $ks_keystone_admin_host           = '127.0.0.1',
   $ks_keystone_admin_proto          = 'http',
@@ -252,14 +257,25 @@ class cloud::network::controller(
     fail 'l3_ha does not work with l2population mechanism driver in Juno.'
   }
 
+  if $neutron_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_slave_port}/neutron?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
+
+
   class { 'neutron::server':
     auth_password                       => $ks_neutron_password,
     auth_uri                            => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_public_port}",
     identity_uri                        => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
-    database_connection                 => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}/neutron?charset=utf8",
+
+    database_connection                 => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_port}/neutron?charset=utf8",
+    slave_connection                    => $slave_connection_url,
     database_idle_timeout               => $neutron_db_idle_timeout,
+
     api_workers                         => $::neutron::server::api_workers,
     rpc_workers                         => $::neutron::server::rpc_workers,
+
     agent_down_time                     => '60',
     l3_ha                               => $l3_ha,
     router_distributed                  => $router_distributed,

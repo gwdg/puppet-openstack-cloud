@@ -129,6 +129,9 @@ class cloud::image::api(
   $glance_db_user                    = 'glance',
   $glance_db_password                = 'glancepassword',
   $glance_db_idle_timeout            = 5000,
+  $glance_db_use_slave               = false,
+  $glance_db_port                    = 3306,
+  $glance_db_slave_port              = 3307,
 
   $ks_keystone_internal_host         = '127.0.0.1',
   $ks_keystone_internal_proto        = 'http',
@@ -165,16 +168,23 @@ class cloud::image::api(
   $encoded_glance_user     = uriescape($glance_db_user)
   $encoded_glance_password = uriescape($glance_db_password)
 
+  if $glance_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${glance_db_host}:${glance_db_slave_port}/glance?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
+
   class { 'glance::api':
 
-    database_connection      => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}/glance?charset=utf8",
+    database_connection      => "mysql://${encoded_glance_user}:${encoded_glance_password}@${glance_db_host}:${glance_db_port}/glance?charset=utf8",
+    slave_connection         => $slave_connection_url,
     database_idle_timeout    => $glance_db_idle_timeout,
 
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
 
-    auth_uri                => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
-    identity_uri            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+    auth_uri                 => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    identity_uri             => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
 
     registry_client_protocol => $ks_glance_registry_internal_proto,
     keystone_password        => $ks_glance_password,

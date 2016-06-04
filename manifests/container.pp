@@ -21,13 +21,18 @@
 #
 class cloud::container(
 
-  $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword',
+  $rabbit_hosts             = ['127.0.0.1:5672'],
+  $rabbit_password          = 'rabbitpassword',
 
-  $magnum_db_user             = 'magnum',
-  $magnum_db_password         = 'magnumpassword',
-  $magnum_db_idle_timeout     = 5000,
-  $magnum_db_host             = '127.0.0.1',
+  $magnum_db_user           = 'magnum',
+  $magnum_db_password       = 'magnumpassword',
+  $magnum_db_idle_timeout   = 5000,
+  $magnum_db_host           = '127.0.0.1',
+
+  $magnum_db_use_slave      = false,
+  $magnum_db_port           = 3306,
+  $magnum_db_slave_port     = 3307,
+
 ){
 
 	include 'mysql::client'
@@ -35,10 +40,16 @@ class cloud::container(
     $encoded_user     = uriescape($magnum_db_user)
     $encoded_password = uriescape($magnum_db_password)
 
-    class { '::magnum::db': 
-        database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}/magnum?charset=utf8",
-        database_idle_timeout => $magnum_db_idle_timeout,
+    if $magnum_db_use_slave {
+      $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}:${magnum_db_slave_port}/magnum?charset=utf8"
+    } else {
+      $slave_connection_url = undef
+    }
 
+    class { '::magnum::db': 
+        database_connection   => "mysql://${encoded_user}:${encoded_password}@${magnum_db_host}:${magnum_db_port}/magnum?charset=utf8",
+        slave_connection      => $slave_connection_url,
+        database_idle_timeout => $magnum_db_idle_timeout,
         require               => Exec ['/tmp/setup_magnum.sh']
     }
 

@@ -93,10 +93,15 @@ class cloud::orchestration(
   $ks_heat_public_host        = '127.0.0.1',
   $ks_heat_public_proto       = 'http',
   $ks_heat_password           = 'heatpassword',
+
   $heat_db_host               = '127.0.0.1',
   $heat_db_user               = 'heat',
   $heat_db_password           = 'heatpassword',
   $heat_db_idle_timeout       = 5000,
+  $heat_db_use_slave          = false,
+  $heat_db_port               = 3306,
+  $heat_db_slave_port         = 3307,
+
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
   $os_endpoint_type           = 'publicURL'
@@ -107,13 +112,22 @@ class cloud::orchestration(
   $encoded_user     = uriescape($heat_db_user)
   $encoded_password = uriescape($heat_db_password)
 
+  if $heat_db_use_slave {
+    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_slave_port}/heat?charset=utf8"
+  } else {
+    $slave_connection_url = undef
+  }
+
   class { 'heat':
     keystone_password     => $ks_heat_password,
     identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     keystone_ec2_uri      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0/ec2tokens",
-    database_connection   => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}/heat?charset=utf8",
+
+    database_connection   => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_port}/heat?charset=utf8",
+    slave_connection      => $slave_connection_url,
     database_idle_timeout => $heat_db_idle_timeout,
+
     rabbit_hosts          => $rabbit_hosts,
     rabbit_password       => $rabbit_password,
     rabbit_userid         => 'heat',
