@@ -132,7 +132,6 @@ class cloud::orchestration(
     keystone_password     => $ks_heat_password,
     identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
-    keystone_ec2_uri      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0/ec2tokens",
 
     rabbit_hosts          => $rabbit_hosts,
     rabbit_password       => $rabbit_password,
