@@ -108,7 +108,7 @@
 #
 # [*plugin*]
 #   (optional) Neutron plugin name
-#   Supported values: 'ml2', 'n1kv', 'opencontrail'.
+#   Supported values: 'ml2', 'n1kv'
 #   Defaults to 'ml2'
 #
 # [*l3_ha*]
@@ -165,24 +165,6 @@
 #   List of colon-separated id ranges
 #   Defaults to ['1:10000']
 #
-# [*contrail_api_server_ip*]
-#   (optional) IP address of the Contrail API
-#   Defaults to 127.0.0.1
-#
-# [*contrail_api_server_port*]
-#   (optional) Port of the Contrail API
-#   Defaults to 8082
-#
-# [*contrail_multi_tenancy*]
-#   (optional) Should Contrail support multi tenancy
-#   Boolean.
-#   Defaults to true
-#
-# [*contrail_extensions*]
-#   (optional) Array of extensions enabled for Contrail
-#   Array of extensions
-#   Defaults to ['']
-#
 # [*mechanism_drivers*]
 #   (optional) Neutron mechanism drivers to run
 #   List of drivers.
@@ -233,11 +215,6 @@ class cloud::network::controller(
   # only needed by ml2 plugin
   $tunnel_id_ranges                 = ['1:10000'],
   $vni_ranges                       = ['1:10000'],
-  # only needed by opencontrail plugin
-  $contrail_api_server_ip           = '127.0.0.1',
-  $contrail_api_server_port         = '8082',
-  $contrail_multi_tenancy           = true,
-  $contrail_extensions              = [''],
   $lbaas_package_ensure             = 'latest',
 ) {
 
@@ -319,21 +296,6 @@ class cloud::network::controller(
         "N1KV:${n1kv_vsm_ip}/password":  value  => $n1kv_vsm_password;
         # TODO (EmilienM) not sure about this one:
         'database/connection':           value => "mysql://${neutron_db_user}:${neutron_db_password}@${neutron_db_host}/neutron";
-      }
-    }
-
-    'opencontrail': {
-      $core_plugin = 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2'
-      class { 'neutron::plugins::opencontrail':
-        api_server_ip              => $contrail_api_server_ip ,
-        api_server_port            => $contrail_api_server_port,
-        multi_tenancy              => $contrail_multi_tenancy,
-        contrail_extensions        => $contrail_extensions,
-        keystone_auth_url          => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0/",
-        keystone_admin_user        => $ks_keystone_admin_user,
-        keystone_admin_tenant_name => $ks_admin_tenant,
-        keystone_admin_password    => $ks_keystone_admin_password,
-        keystone_admin_token       => $ks_keystone_admin_token,
       }
     }
 
