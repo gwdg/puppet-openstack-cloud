@@ -644,7 +644,7 @@ class cloud::loadbalancer(
 
   $common_tcp_options = {
     'mode'           => 'tcp',
-    'option'         => ['tcpka', 'tcplog', 'forwardfor'],
+    'option'         => ['tcpka', 'tcplog'],
     'balance'        => 'source',
     'timeout server' => $api_timeout,
     'timeout client' => $api_timeout,
@@ -875,8 +875,6 @@ class cloud::loadbalancer(
                                 {
                                     'option'          => ['tcpka', 'tcplog', 'forwardfor', 'clitcpka'],
                                     # Timeouts must be > /proc/sys/net/ipv4/tcp_keepalive_time (= 2h on Ubuntu 14.04), to allow for client tcp to send keepalives
-                                    'timeout server'  => '180m',
-                                    'timeout client'  => '180m',
                                     'timeout server'  => $api_timeout,
                                     'timeout client'  => $api_timeout,
                                     'balance'         => 'roundrobin',
