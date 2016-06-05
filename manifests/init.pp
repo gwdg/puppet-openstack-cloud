@@ -179,8 +179,8 @@ class cloud(
   create_resources(group,   $groups)
   create_resources(user,    $users)
 
-  if ! ($::osfamily in [ 'RedHat', 'Debian' ]) {
-    fail("OS family unsuppored yet (${::osfamily}), module puppet-openstack-cloud only support RedHat or Debian")
+  if ! ($::osfamily in [ 'Debian' ]) {
+    fail("OS family unsuppored yet (${::osfamily}), module puppet-openstack-cloud only support Debian")
   }
 
   # motd
@@ -227,15 +227,15 @@ class cloud(
   create_resources('::sysctl::value', $sysctl)
 
   # SELinux
-  if $::osfamily == 'RedHat' {
-    class {'::cloud::selinux' :
-      mode      => $selinux_mode,
-      booleans  => $selinux_booleans,
-      modules   => $selinux_modules,
-      directory => $selinux_directory,
-      stage     => 'setup',
-    }
-  }
+#  if $::osfamily == 'RedHat' {
+#    class {'::cloud::selinux' :
+#      mode      => $selinux_mode,
+#      booleans  => $selinux_booleans,
+#      modules   => $selinux_modules,
+#      directory => $selinux_directory,
+#      stage     => 'setup',
+#    }
+#  }
 
   # Strong root password for all servers
   if $manage_root_password {
@@ -248,7 +248,6 @@ class cloud(
   }
 
   $cron_service_name = $::osfamily ? {
-    'RedHat' => 'crond',
     default  => 'cron',
   }
 
@@ -256,12 +255,6 @@ class cloud(
     ensure => running,
     name   => $cron_service_name,
     enable => true
-  }
-
-  if $::osfamily == 'RedHat' and $rhn_registration {
-    create_resources('::rhn_register', {
-      "rhn-${::hostname}" => $rhn_registration
-    } )
   }
 
   if $manage_firewall {

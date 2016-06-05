@@ -110,12 +110,6 @@ class cloud::network::l3(
         'unless'  => '/bin/ls /etc/rc*.d | /bin/grep disable-tso',
         'onlyif'  => '/usr/bin/test -f /etc/init.d/disable-tso'
       })
-    } elsif $::osfamily == 'RedHat' {
-      ensure_resource ('exec','enable-tso-script', {
-        'command' => '/usr/sbin/chkconfig disable-tso on',
-        'unless'  => '/bin/ls /etc/rc*.d | /bin/grep disable-tso',
-        'onlyif'  => '/usr/bin/test -f /etc/init.d/disable-tso'
-      })
     }
     ensure_resource ('exec','start-tso-script', {
       'command' => '/etc/init.d/disable-tso start',

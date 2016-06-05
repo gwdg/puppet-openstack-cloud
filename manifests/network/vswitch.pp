@@ -189,10 +189,6 @@ class cloud::network::vswitch(
         local_ip                   => $tunnel_eth,
         enable_distributed_routing => $enable_distributed_routing
       }
-
-      if $::osfamily == 'RedHat' {
-        kmod::load { 'ip_gre': }
-      }
     }
 
     'ml2_lb': {
@@ -201,10 +197,6 @@ class cloud::network::vswitch(
         polling_interval => '15',
         tunnel_types     => $tunnel_types,
         local_ip         => $tunnel_eth
-      }
-
-      if $::osfamily == 'RedHat' {
-        kmod::load { 'ip_gre': }
       }
     }
 

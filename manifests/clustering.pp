@@ -79,26 +79,8 @@ class cloud::clustering (
   $firewall_settings        = {},
 ) {
 
-  if $::osfamily == 'RedHat' {
-    $packages = ['corosync', 'pacemaker', 'pcs']
-    $set_votequorum = true
-
-    Service['pcsd'] -> Cs_property<||>
-    Service['pacemaker'] -> Cs_property<||>
-
-    service { 'pcsd':
-      ensure  => 'running',
-      enable  => true,
-      require => Class['corosync'],
-    } -> service { 'pacemaker':
-      ensure  => 'running',
-      enable  => true,
-      require => Class['corosync'],
-    }
-  } else {
-    $packages = ['corosync', 'pacemaker']
-    $set_votequorum = false
-  }
+  $packages = ['corosync', 'pacemaker']
+  $set_votequorum = false
 
   class { '::corosync':
     enable_secauth    => $cluster_auth,

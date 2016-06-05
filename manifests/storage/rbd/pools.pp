@@ -137,11 +137,7 @@ class cloud::storage::rbd::pools(
         tag     => 'ceph_compute_secret_file',
       }
 
-      if $::osfamily == 'RedHat' {
-        $libvirt_package_name = 'libvirt'
-      } else {
-        $libvirt_package_name = 'libvirt-bin'
-      }
+      $libvirt_package_name = 'libvirt-bin'
 
       @@exec { 'get_or_set_virsh_secret':
         command => 'virsh secret-define --file /etc/ceph/secret.xml',

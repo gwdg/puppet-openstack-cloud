@@ -267,31 +267,11 @@ Host *
     default_availability_zone     => $::cloud::compute::availability_zone,
   }
 
-  if $::osfamily == 'RedHat' {
-    file { '/etc/libvirt/qemu.conf':
-      ensure => file,
-      source => 'puppet:///modules/cloud/qemu/qemu.conf',
-      owner  => root,
-      group  => root,
-      mode   => '0644',
-      notify => Service['libvirtd']
-    }
-    if $vm_rbd and ($::operatingsystemmajrelease < 7) {
-      fail("RBD image backend in Nova is not supported in RHEL ${::operatingsystemmajrelease}.")
-    }
-  }
-
   # Disabling TSO/GSO/GRO
   if $manage_tso {
     if $::osfamily == 'Debian' {
       ensure_resource ('exec','enable-tso-script', {
         'command' => '/usr/sbin/update-rc.d disable-tso defaults',
-        'unless'  => '/bin/ls /etc/rc*.d | /bin/grep disable-tso',
-        'onlyif'  => '/usr/bin/test -f /etc/init.d/disable-tso'
-      })
-    } elsif $::osfamily == 'RedHat' {
-      ensure_resource ('exec','enable-tso-script', {
-        'command' => '/usr/sbin/chkconfig disable-tso on',
         'unless'  => '/bin/ls /etc/rc*.d | /bin/grep disable-tso',
         'onlyif'  => '/usr/bin/test -f /etc/init.d/disable-tso'
       })
@@ -370,11 +350,7 @@ Host *
       tag     => 'ceph_compute_secret_file',
     }
 
-    if $::osfamily == 'RedHat' {
-      $libvirt_package_name = 'libvirt'
-    } else {
-      $libvirt_package_name = 'libvirt-bin'
-    }
+    $libvirt_package_name = 'libvirt-bin'
 
     Exec {
       path => '/bin:/sbin:/usr/bin:/usr/sbin'

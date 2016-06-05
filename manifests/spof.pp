@@ -47,75 +47,52 @@ class cloud::spof(
   $firewall_settings = {},
 ) {
 
-  if $::osfamily == 'RedHat' {
-    if ! $cluster_members {
-      fail('cluster_members is a required parameter.')
-    }
+  class { '::corosync':
+    enable_secauth    => false,
+    authkey           => '/var/lib/puppet/ssl/certs/ca.pem',
+    bind_address      => $cluster_ip,
+    multicast_address => $multicast_address
+  }
 
-    class { '::pacemaker':
-      hacluster_pwd => $cluster_password
-    }
-    class { '::pacemaker::corosync':
-      cluster_name     => 'openstack',
-      cluster_members  => $cluster_members,
-      settle_timeout   => 10,
-      settle_tries     => 2,
-      settle_try_sleep => 5,
-      manage_fw        => false
-    }
-    class {'::pacemaker::stonith':
-      disable => true
-    }
-    pacemaker::resource::systemd { 'openstack-ceilometer-central': }
-  } else {
+  corosync::service { 'pacemaker':
+    version => '0',
+  }
 
-    class { '::corosync':
-      enable_secauth    => false,
-      authkey           => '/var/lib/puppet/ssl/certs/ca.pem',
-      bind_address      => $cluster_ip,
-      multicast_address => $multicast_address
-    }
-
-    corosync::service { 'pacemaker':
-      version => '0',
-    }
-
-    Package['corosync'] ->
-    cs_property {
-      'no-quorum-policy':         value => 'ignore';
-      'stonith-enabled':          value => 'false';
-      'pe-warn-series-max':       value => 1000;
-      'pe-input-series-max':      value => 1000;
-      'cluster-recheck-interval': value => '5min';
-    } ->
-    file { '/usr/lib/ocf/resource.d/heartbeat/ceilometer-agent-central':
-      source => 'puppet:///modules/cloud/heartbeat/ceilometer-agent-central',
-      mode   => '0755',
-      owner  => 'root',
-      group  => 'root',
-    } ->
-    cs_primitive { 'ceilometer-agent-central':
-      primitive_class => 'ocf',
-      primitive_type  => 'ceilometer-agent-central',
-      provided_by     => 'heartbeat',
-      operations      => {
-        'monitor' => {
-          interval => '10s',
-          timeout  => '30s'
-        },
-        'start'   => {
-          interval => '0',
-          timeout  => '30s',
-          on-fail  => 'restart'
-        }
+  Package['corosync'] ->
+  cs_property {
+    'no-quorum-policy':         value => 'ignore';
+    'stonith-enabled':          value => 'false';
+    'pe-warn-series-max':       value => 1000;
+    'pe-input-series-max':      value => 1000;
+    'cluster-recheck-interval': value => '5min';
+  } ->
+  file { '/usr/lib/ocf/resource.d/heartbeat/ceilometer-agent-central':
+    source => 'puppet:///modules/cloud/heartbeat/ceilometer-agent-central',
+    mode   => '0755',
+    owner  => 'root',
+    group  => 'root',
+  } ->
+  cs_primitive { 'ceilometer-agent-central':
+    primitive_class => 'ocf',
+    primitive_type  => 'ceilometer-agent-central',
+    provided_by     => 'heartbeat',
+    operations      => {
+      'monitor' => {
+        interval => '10s',
+        timeout  => '30s'
+      },
+      'start'   => {
+        interval => '0',
+        timeout  => '30s',
+        on-fail  => 'restart'
       }
-    } ->
-    exec { 'cleanup_ceilometer_agent_central':
-      command => 'crm resource cleanup ceilometer-agent-central',
-      unless  => 'crm resource show ceilometer-agent-central | grep Started',
-      user    => 'root',
-      path    => ['/usr/sbin', '/bin'],
     }
+  } ->
+  exec { 'cleanup_ceilometer_agent_central':
+    command => 'crm resource cleanup ceilometer-agent-central',
+    unless  => 'crm resource show ceilometer-agent-central | grep Started',
+    user    => 'root',
+    path    => ['/usr/sbin', '/bin'],
   }
 
   # Run OpenStack SPOF service and disable them since they will be managed by Corosync.

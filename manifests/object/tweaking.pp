@@ -37,12 +37,6 @@ class cloud::object::tweaking {
       $swift_tuning_real = merge($swift_tuning, $debian_swift_tuning)
     }
     default : {
-      $redhat_swift_tuning = {
-        'net.netfilter.nf_conntrack_max'                    => { value => 524288 },
-        'net.netfilter.nf_conntrack_tcp_timeout_time_wait'  => { value => 2 },
-        'net.netfilter.nf_conntrack_tcp_timeout_close_wait' => { value => 2 },
-      }
-      $swift_tuning_real = merge($swift_tuning, $redhat_swift_tuning)
     }
   }
 
