@@ -7,9 +7,8 @@ class cloud::role::storage inherits ::cloud::role::base {
     class { '::cloud::auth_file': }                     ->
 
     class { '::cloud::storage::rbd': }                  ->
-#    class { '::cloud::storage::rbd::pools': }           ->
+    class { '::cloud::volume::storage': }               ->
 
-    class { '::cloud::volume::storage': }
-
-
+    class { '::cloud::image::registry': }               ->
+    class { '::cloud::image::api': }
 }

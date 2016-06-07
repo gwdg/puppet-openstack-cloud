@@ -6,8 +6,8 @@ class cloud::role::controller inherits ::cloud::role::base {
     class { '::cloud::database::nosql::memcached': }    ->
     class { '::cloud::messaging': }                     ->
     class { '::cloud::identity': }                      ->
-    class { '::cloud::image::registry': }               ->
-    class { '::cloud::image::api': }                    ->
+#    class { '::cloud::image::registry': }               ->
+#    class { '::cloud::image::api': }                    ->
 
     class { '::cloud::volume': }                        ->
     class { '::cloud::volume::scheduler': }             ->
