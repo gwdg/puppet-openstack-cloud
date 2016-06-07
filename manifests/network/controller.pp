@@ -264,6 +264,8 @@ class cloud::network::controller(
     l3_ha                               => $l3_ha,
     router_distributed                  => $router_distributed,
     allow_automatic_l3agent_failover    => $allow_automatic_l3agent_failover,
+
+    sync_db                             => true,
   }
 
 #  neutron_config {
