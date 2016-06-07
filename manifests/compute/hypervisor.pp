@@ -118,8 +118,8 @@
 class cloud::compute::hypervisor(
   $server_proxyclient_address = '127.0.0.1',
   $libvirt_virt_type          = 'kvm',
-  $nova_ssh_private_key       = undef,
-  $nova_ssh_public_key        = undef,
+#  $nova_ssh_private_key       = undef,
+#  $nova_ssh_public_key        = undef,
   $console                    = 'novnc',
   $novnc_port                 = '6080',
   $spice_port                 = '6082',
@@ -197,36 +197,45 @@ class cloud::compute::hypervisor(
     }
   }
 
-  file{ '/var/lib/nova/.ssh':
-    ensure  => directory,
-    mode    => '0700',
-    owner   => 'nova',
-    group   => 'nova',
-    require => Class['nova']
-  } ->
-  file{ '/var/lib/nova/.ssh/id_rsa':
-    ensure  => present,
-    mode    => '0600',
-    owner   => 'nova',
-    group   => 'nova',
-    content => $nova_ssh_private_key
-  } ->
-  file{ '/var/lib/nova/.ssh/authorized_keys':
-    ensure  => present,
-    mode    => '0600',
-    owner   => 'nova',
-    group   => 'nova',
-    content => $nova_ssh_public_key
-  } ->
-  file{ '/var/lib/nova/.ssh/config':
-    ensure  => present,
-    mode    => '0600',
-    owner   => 'nova',
-    group   => 'nova',
-    content => "
-Host *
-    StrictHostKeyChecking no
-"
+#  file{ '/var/lib/nova/.ssh':
+#    ensure  => directory,
+#    mode    => '0700',
+#    owner   => 'nova',
+#    group   => 'nova',
+#    require => Class['nova']
+#  } ->
+#  file{ '/var/lib/nova/.ssh/id_rsa':
+#    ensure  => present,
+#    mode    => '0600',
+#    owner   => 'nova',
+#    group   => 'nova',
+#    content => $nova_ssh_private_key
+#  } ->
+#  file{ '/var/lib/nova/.ssh/authorized_keys':
+#    ensure  => present,
+#    mode    => '0600',
+#    owner   => 'nova',
+#    group   => 'nova',
+#    content => $nova_ssh_public_key
+#  } ->
+#  file{ '/var/lib/nova/.ssh/config':
+#    ensure  => present,
+#    mode    => '0600',
+#    owner   => 'nova',
+#    group   => 'nova',
+#    content => "
+#Host *
+#    StrictHostKeyChecking no
+#"
+#  }
+
+  cloud::util::ssh_access { 'nova':
+    home_dir          => '/var/lib/nova',
+    user              => 'nova',
+    group             => 'nova',
+    public_key_file   => 'puppet:///modules/cloud/secrets/nova_ssh_key.pub',
+    private_key_file  => 'puppet:///modules/cloud/secrets/nova_ssh_key',
+    require           => Class['nova'],
   }
 
   if $nova_shell {
