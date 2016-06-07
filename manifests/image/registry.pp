@@ -115,6 +115,8 @@ class cloud::image::registry(
 
     bind_host             => $api_eth,
     bind_port             => $ks_glance_registry_internal_port,
+
+    sync_db               => true,
   }
 
 #  glance_registry_config {
