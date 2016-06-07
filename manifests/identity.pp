@@ -280,6 +280,8 @@ class cloud::identity (
     token_expiration      => $ks_token_expiration,
 
     using_domain_config   => true,
+
+    sync_db               => true,
   }
 
   keystone_config {
