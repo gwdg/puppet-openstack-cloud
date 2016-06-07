@@ -338,19 +338,6 @@ class cloud::network::controller(
     })
   }
 
-  # Note(EmilienM):
-  # We check if DB tables are created, if not we populate Neutron DB.
-  # It's a hack to fit with our setup where we run MySQL/Galera
-#  Neutron_config<| |> ->
-#  exec {'neutron_db_sync':
-#    command => 'neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugin.ini upgrade head',
-#    path    => '/usr/bin',
-#    user    => 'neutron',
-#    unless  => "/usr/bin/mysql neutron -h ${neutron_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
-#    require => ['Neutron_config[DEFAULT/service_plugins]', Package['mysql_client'], Package['cinder-common']],
-#    notify  => Service['neutron-server']
-#  }
-
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow neutron-server access':
       port   => $ks_neutron_public_port,

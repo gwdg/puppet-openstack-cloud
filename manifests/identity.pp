@@ -357,15 +357,6 @@ class cloud::identity (
   # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)  
   if $::fqdn == $keystone_master_name {
 
-    # Install ssh key for access from secondary keystone nodes
-#    ssh_authorized_key { 'keystone@controller':
-#      user      => 'keystone',
-#      type      => 'ssh-rsa',
-#      key       => template('cloud/ssh/id_rsa.pub'),
-#      key       => 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC9JY0WdPrv9pF7mVZZ7mHPN9HnG+Cm/og0TcddFe1uV6/5wRsUPPb6fYpKNX4+sAuhGJ/hg70X08nLWbdlv6WKyYWQoIwOgP1K4VxFUOuu1aJsyL0iRcPXGaO/xXPcXLcqmhI5ORHPlohJAAp5veM3UsJbeBf14rFYXCATH9YGAhjTr1oP5GkPaeB7cEhjQKGyoGS7lorpbNjdmZ17vZX6Geklm0BtqZQgOvQquvS4L10B90PyhXzCVx/wvzd7PtWj7HTd1s5zF5+vzt1fhbOX5fIwCp2TtSeJ0Ht/gzLx+ninQxxPjVWnFhiZEfi7h7jdisQto5Mt8wxXmwY4Ie3r',
-#      require   => Package['keystone'],
-#    }
-
     # Restrict keystone account to just scp
     package { 'rssh': }
 
@@ -381,30 +372,11 @@ class cloud::identity (
 
   } else {
 
-#    file { '/var/lib/keystone/.ssh':
-#      ensure  => directory,
-#      mode    => '0700',
-#      owner   => 'keystone',
-#      group   => 'keystone',
-#      require => Package['keystone'],
-#    }
-
-    # Deploy private ssh key
-#    file { '/var/lib/keystone/.ssh/id_rsa':
-#      ensure  => present,
-#      mode    => '0600',
-#      owner   => 'keystone',
-#      group   => 'keystone',
-#      content => template('cloud/ssh/id_rsa'),
-#      require => File['/var/lib/keystone/.ssh'],
-#    }
-
     # Copy files
     exec { 'keystone-copy-ssl-certs':
       command   => "/usr/bin/scp -P $ssh_port -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
       creates   => '/etc/keystone/ssl/synced_from_master',
       user      => 'keystone',
-#      require   => File['/var/lib/keystone/.ssh/id_rsa'],
       require   => Cloud::Util::Ssh_access['keystone'],
       notify    => Service['keystone']
     }
@@ -522,20 +494,6 @@ class cloud::identity (
 
   # Purge expored tokens every days at midnight
   class { '::keystone::cron::token_flush': }
-
-  # Note(EmilienM):
-  # We check if DB tables are created, if not we populate Keystone DB.
-  # It's a hack to fit with our setup where we run MySQL/Galera
-  # TODO(Goneri)
-  # We have to do this only on the primary node of the galera cluster to avoid race condition
-  # https://github.com/enovance/puppet-openstack-cloud/issues/156
-#  exec {'keystone_db_sync':
-#    command => 'keystone-manage db_sync',
-#    path    => '/usr/bin',
-#    user    => 'keystone',
-#    unless  => "/usr/bin/mysql keystone -h ${keystone_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
-#    require => Package['mysql_client']
-#  }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow keystone access':

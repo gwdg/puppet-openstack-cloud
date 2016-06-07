@@ -84,12 +84,4 @@ class cloud::database::dbaas(
     nova_proxy_admin_tenant_name => $nova_admin_tenant_name
   }
 
-#  exec {'trove_db_sync':
-#    command => 'trove-manage db_sync',
-#    user    => 'trove',
-#    path    => '/usr/bin',
-#    unless  => "/usr/bin/mysql trove -h ${trove_db_host} -u ${encoded_user} -p${encoded_password} -e \"show tables\" | /bin/grep Tables",
-#    require => [Package['mysql_client'], Package['trove-common']]
-#  }
-
 }

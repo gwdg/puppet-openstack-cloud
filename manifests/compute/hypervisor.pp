@@ -28,18 +28,6 @@
 #   Replaces libvirt_type
 #   Defaults to 'kvm'
 #
-# [*nova_ssh_public_key*]
-#   (optional) Install public key in .ssh/authorized_keys for the 'nova' user.
-#   Note: this parameter use the 'content' provider of Puppet, in consequence
-#   you must provide the entire ssh public key in this parameter.
-#   Defaults to undef
-#
-# [*nova_ssh_private_key*]
-#   (optional) Install private key into .ssh/id_rsa.
-#   Note: this parameter use the 'content' provider of Puppet, in consequence
-#   you must provide the entire ssh privatekey in this parameter.
-#   Defaults to undef
-#
 # [*console*]
 #   (optional) Nova's console type (spice or novnc)
 #   Defaults to 'novnc'
@@ -118,8 +106,6 @@
 class cloud::compute::hypervisor(
   $server_proxyclient_address = '127.0.0.1',
   $libvirt_virt_type          = 'kvm',
-#  $nova_ssh_private_key       = undef,
-#  $nova_ssh_public_key        = undef,
   $console                    = 'novnc',
   $novnc_port                 = '6080',
   $spice_port                 = '6082',
@@ -196,38 +182,6 @@ class cloud::compute::hypervisor(
       fail('When running NFS backend, vm_rbd parameter cannot be set to true.')
     }
   }
-
-#  file{ '/var/lib/nova/.ssh':
-#    ensure  => directory,
-#    mode    => '0700',
-#    owner   => 'nova',
-#    group   => 'nova',
-#    require => Class['nova']
-#  } ->
-#  file{ '/var/lib/nova/.ssh/id_rsa':
-#    ensure  => present,
-#    mode    => '0600',
-#    owner   => 'nova',
-#    group   => 'nova',
-#    content => $nova_ssh_private_key
-#  } ->
-#  file{ '/var/lib/nova/.ssh/authorized_keys':
-#    ensure  => present,
-#    mode    => '0600',
-#    owner   => 'nova',
-#    group   => 'nova',
-#    content => $nova_ssh_public_key
-#  } ->
-#  file{ '/var/lib/nova/.ssh/config':
-#    ensure  => present,
-#    mode    => '0600',
-#    owner   => 'nova',
-#    group   => 'nova',
-#    content => "
-#Host *
-#    StrictHostKeyChecking no
-#"
-#  }
 
   cloud::util::ssh_access { 'nova':
     home_dir          => '/var/lib/nova',
@@ -379,41 +333,6 @@ class cloud::compute::hypervisor(
       refreshonly =>  true,
     } ~> Service['nova-compute']
 
-#    File <<| tag == 'ceph_compute_secret_file' |>>
-#    Exec <<| tag == 'get_or_set_virsh_secret' |>>
-
-    # After setting virsh key, we need to restart nova-compute
-    # otherwise nova will fail to connect to RADOS.
-#    Exec <<| tag == 'set_secret_value_virsh' |>> ~> Service['nova-compute']
-
-    # If Cinder & Nova reside on the same node, we need a group
-    # where nova & cinder users have read permissions.
-    #
-    # pete: not relevant for our deplyoment
-#    ensure_resource('group', 'cephkeyring', {
-#      ensure => 'present'
-#    })
-
-#    ensure_resource ('exec','add-nova-to-group', {
-#      'command' => 'usermod -a -G cephkeyring nova',
-#      'path'    => ['/usr/sbin', '/usr/bin', '/bin', '/sbin'],
-#      'unless'  => 'groups nova | grep cephkeyring'
-#    })
-
-    # Configure Ceph keyring
-#    Ceph::Key <<| title == $cinder_rbd_user |>>
-#    ensure_resource(
-#      'file',
-#      "/etc/ceph/ceph.client.${cinder_rbd_user}.keyring", {
-#        owner   => 'root',
-#        group   => 'cephkeyring',
-#        mode    => '0440',
-#        require => Ceph::Key[$cinder_rbd_user],
-#        notify  => Service['nova-compute'],
-#      }
-#    )
-
-#    Concat::Fragment <<| title == 'ceph-client-os' |>>
   } else {
     $libvirt_disk_cachemodes_real = []
   }
