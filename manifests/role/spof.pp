@@ -5,6 +5,7 @@ class cloud::role::spof inherits ::cloud::role::base {
 
     class { '::cloud::orchestration::engine': }         ->
 
+    class { '::cloud::telemetry::tsdb': }               ->
     class { '::cloud::telemetry::centralagent': }       ->
     class { '::cloud::telemetry::alarmevaluator': }     ->
     class { '::cloud::telemetry::alarmnotifier': }      ->
