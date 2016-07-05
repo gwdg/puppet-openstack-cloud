@@ -123,7 +123,7 @@ class cloud::messaging(
     provider => 'rabbitmqctl',
     require  => Class['rabbitmq'],
   }
-  rabbitmq_user { ['nova','glance','neutron','cinder','ceilometer','heat','trove','magnum','sensu']:
+  rabbitmq_user { ['nova','glance','neutron','cinder','ceilometer', 'aodh', 'heat','trove','magnum','sensu']:
     admin    => true,
     password => $rabbit_password,
     provider => 'rabbitmqctl',
@@ -135,6 +135,7 @@ class cloud::messaging(
     'neutron@/',
     'cinder@/',
     'ceilometer@/',
+    'aodh@/',
     'heat@/',
     'trove@/',
     'magnum@/',
