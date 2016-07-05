@@ -171,6 +171,12 @@ class cloud::identity (
 
   $ceilometer_password          = 'ceilometerpassword',
 
+  $aodh_public_url              = undef,
+  $aodh_internal_url            = undef,
+  $aodh_admin_url               = undef,
+
+  $aodh_password                = 'aodhpassword',
+
   $cinder_v1_public_url         = undef,
   $cinder_v1_internal_url       = undef,
   $cinder_v1_admin_url          = undef,
@@ -400,6 +406,17 @@ class cloud::identity (
 
     region              => $region,
     password            => $ceilometer_password
+  }
+
+
+  class { '::aodh::keystone::auth':
+    
+    public_url   => $aodh_public_url,
+    internal_url => $aodh_internal_url,
+    admin_url    => $aodh_admin_url,
+
+    region       => $region,
+    password     => $aodh_password
   }
 
   class { '::nova::keystone::auth':

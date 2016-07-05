@@ -232,6 +232,12 @@ class cloud::database::sql::mysql (
     $magnum_db_user                  = 'magnum',
     $magnum_db_password              = 'magnumpassword',
     $magnum_db_allowed_hosts         = ['127.0.0.1'],
+
+    $aodh_db_host                    = '127.0.0.1',
+    $aodh_db_user                    = 'aodh',
+    $aodh_db_password                = 'aodhpassword',
+    $aodh_db_allowed_hosts           = ['127.0.0.1'],
+
     $mysql_root_password             = 'rootpassword',
 
     $mysql_sys_maint_password        = 'sys_maint',
@@ -321,6 +327,14 @@ class cloud::database::sql::mysql (
       password      => $magnum_db_password,
       host          => $magnum_db_host,
       allowed_hosts => $magnum_db_allowed_hosts,
+    }
+
+    class { '::aodh::db::mysql':
+      dbname        => 'aodh',
+      user          => $aodh_db_user,
+      password      => $aodh_db_password,
+      host          => $aodh_db_host,
+      allowed_hosts => $aodh_db_allowed_hosts,
     }
 
     # Monitoring DB
