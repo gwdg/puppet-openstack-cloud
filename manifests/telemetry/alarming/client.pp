@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
+# Copyright (C) 2014 gwdg <gwdg@gwdg.de>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -13,14 +13,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# Telemetry Alarm Evaluator nodes
+# == Class: cloud::telemetry::alarming::client
 #
-class cloud::telemetry::alarmevaluator(
+class cloud::telemetry::alarming::client(
 ){
 
   include ::cloud::telemetry
 
-  class { '::ceilometer::alarm::evaluator': }
-
-  warning('Class is deprecated and will be removed. Use 'cloud::telemetry::alarming::evaluator' to deploy Alarm Evaluator service')
+  # TODO(mmalchuk): this workaround should be removed when
+  # https://review.openstack.org/#/c/311762/ is merged
+  package { 'python-aodhclient':
+    ensure => 'present',
+    tag    => 'openstack',
+  }
 }

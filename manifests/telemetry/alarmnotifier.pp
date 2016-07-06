@@ -22,4 +22,5 @@ class cloud::telemetry::alarmnotifier(
 
   class { '::ceilometer::alarm::notifier': }
 
+  warning('Class is deprecated and will be removed. Use 'cloud::telemetry::alarming::notifier' to deploy Alarm Notifier service')
 }

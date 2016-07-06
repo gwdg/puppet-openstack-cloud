@@ -15,12 +15,11 @@
 #
 # Telemetry Alarm Evaluator nodes
 #
-class cloud::telemetry::alarmevaluator(
+class cloud::telemetry::alarming::evaluator(
 ){
 
   include ::cloud::telemetry
 
-  class { '::ceilometer::alarm::evaluator': }
+  class { '::aodh::evaluator': }
 
-  warning('Class is deprecated and will be removed. Use 'cloud::telemetry::alarming::evaluator' to deploy Alarm Evaluator service')
 }

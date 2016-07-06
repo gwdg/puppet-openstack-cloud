@@ -13,14 +13,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# Telemetry Alarm Evaluator nodes
+# Telemetry Alarm Notifier nodes
 #
-class cloud::telemetry::alarmevaluator(
+class cloud::telemetry::alarming::notifier(
 ){
 
   include ::cloud::telemetry
 
-  class { '::ceilometer::alarm::evaluator': }
-
-  warning('Class is deprecated and will be removed. Use 'cloud::telemetry::alarming::evaluator' to deploy Alarm Evaluator service')
+  class { '::aodh::notifier': }
 }
