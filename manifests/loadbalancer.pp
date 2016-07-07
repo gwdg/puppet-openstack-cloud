@@ -512,6 +512,7 @@ class cloud::loadbalancer(
 
   $enable_swift_api                 = false,
   $enable_ceilometer_api            = false,
+  $enable_aodh_api                  = false,
   $enable_cinder_api                = false,
   $enable_glance_api                = false,
   $enable_glance_registry           = false,
@@ -555,6 +556,7 @@ class cloud::loadbalancer(
   $keepalived_auth_pass             = false,
 
   $ceilometer_options               = {},
+  $aodh_options                     = {},
   $cinder_options                   = {},
   $glance_api_options               = {},
   $glance_registry_options          = {},
@@ -584,6 +586,7 @@ class cloud::loadbalancer(
   $redis_options                    = {},
 
   $ks_ceilometer_public_port        = 8777,
+  $ks_aodh_public_port              = 8042,
   $ks_cinder_public_port            = 8776,
   $ks_glance_api_public_port        = 9292,
   $ks_glance_registry_internal_port = 9191,
@@ -928,6 +931,13 @@ class cloud::loadbalancer(
     public_access       => true,
     port                => $ks_ceilometer_public_port,
     options             => merge($common_http_options, $ceilometer_options),
+  }
+
+  cloud::loadbalancer::bind_api { 'aodh_api':
+    enable              => $enable_aodh_api,
+    public_access       => true,
+    port                => $ks_aodh_public_port,
+    options             => merge($common_http_options, $aodh_options),
   }
 
   cloud::loadbalancer::bind_api { 'magnum_api':
