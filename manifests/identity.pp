@@ -241,6 +241,12 @@ class cloud::identity (
 
   $trove_password               = 'trovepassword',
 
+  $sahara_public_url            = undef,
+  $sahara_internal_url          = undef,
+  $sahara_admin_url             = undef,
+
+  $sahara_password              = 'saharapassword',
+
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
   $verbose                      = true,
@@ -533,6 +539,16 @@ class cloud::identity (
       region            => $region,
       password          => $trove_password
     }
+  }
+
+  class { 'sahara::keystone::auth':
+
+    public_url          => $sahara_public_url,
+    internal_url        => $sahara_internal_url,
+    admin_url           => $sahara_admin_url,
+
+    region              => $region,
+    password            => $sahara_password
   }
 
   # Purge expored tokens every days at midnight

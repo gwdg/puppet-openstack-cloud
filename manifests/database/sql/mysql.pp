@@ -219,6 +219,10 @@ class cloud::database::sql::mysql (
     $trove_db_user                   = 'trove',
     $trove_db_password               = 'trovepassword',
     $trove_db_allowed_hosts          = ['127.0.0.1'],
+    $sahara_db_host                  = '127.0.0.1',
+    $sahara_db_user                  = 'sahara',
+    $sahara_db_password              = 'saharapassword',
+    $sahara_db_allowed_hosts         = ['127.0.0.1'],
     $mysql_root_password             = 'rootpassword',
     $mysql_sys_maint_password        = 'sys_maint',
     $galera_clustercheck_dbuser      = 'clustercheck',
@@ -298,6 +302,13 @@ class cloud::database::sql::mysql (
       password      => $trove_db_password,
       host          => $trove_db_host,
       allowed_hosts => $trove_db_allowed_hosts,
+    }
+    class { 'sahara::db::mysql':
+      dbname        => 'sahara',
+      user          => $sahara_db_user,
+      password      => $sahara_db_password,
+      host          => $sahara_db_host,
+      allowed_hosts => $sahara_db_allowed_hosts,
     }
 
     # Monitoring DB
