@@ -238,6 +238,11 @@ class cloud::database::sql::mysql (
     $aodh_db_password                = 'aodhpassword',
     $aodh_db_allowed_hosts           = ['127.0.0.1'],
 
+    $gnocchi_db_host                 = '127.0.0.1',
+    $gnocchi_db_user                 = 'gnocchi',
+    $gnocchi_db_password             = 'gnocchipassword',
+    $gnocchi_db_allowed_hosts        = ['127.0.0.1'],
+
     $mysql_root_password             = 'rootpassword',
 
     $mysql_sys_maint_password        = 'sys_maint',
@@ -335,6 +340,14 @@ class cloud::database::sql::mysql (
       password      => $aodh_db_password,
       host          => $aodh_db_host,
       allowed_hosts => $aodh_db_allowed_hosts,
+    }
+
+    class { '::gnocchi::db::mysql':
+      dbname        => 'gnocchi',
+      user          => $gnocchi_db_user,
+      password      => $gnocchi_db_password,
+      host          => $gnocchi_db_host,
+      allowed_hosts => $gnocchi_db_allowed_hosts,
     }
 
     # Monitoring DB
