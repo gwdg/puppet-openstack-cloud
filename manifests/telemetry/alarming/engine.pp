@@ -30,6 +30,8 @@ class cloud::telemetry::alarming::engine(
   $ks_keystone_internal_proto = 'http',
   $ks_aodh_password           = 'aodhpassword',
 
+  $gnocchi_url                = undef,
+
   $os_endpoint_type           = 'publicURL'
 ){
 
@@ -39,6 +41,7 @@ class cloud::telemetry::alarming::engine(
     rabbit_hosts            => $rabbit_hosts,
     rabbit_password         => $rabbit_password,
     rabbit_userid           => 'aodh',
+    gnocchi_url             => $gnocchi_url,
   }
 
   class { '::aodh::auth':
@@ -54,9 +57,5 @@ class cloud::telemetry::alarming::engine(
   class { '::aodh::db':
     database_connection   => "mysql://${encoded_user}:${encoded_password}@${db_host}:${db_port}/aodh?charset=utf8",
     database_idle_timeout => $db_idle_timeout,
-  }
-
-  class { '::aodh::db::sync':
-    user => $db_user,
   }
 }

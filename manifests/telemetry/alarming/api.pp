@@ -32,7 +32,9 @@ class cloud::telemetry::alarming::api(
     keystone_identity_uri => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     keystone_password     => $ks_aodh_password,
     host                  => $api_eth,
-    port                  => $ks_aodh_internal_port
+    port                  => $ks_aodh_internal_port,
+
+    sync_db               => true,
   }
 
   @@haproxy::balancermember{"${::fqdn}-aodh_api":
