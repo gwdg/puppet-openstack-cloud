@@ -54,7 +54,7 @@ class cloud::object::tweaking {
 
   logrotate::rule { 'swift':
     path          => '/var/log/swift/*.log',
-    rotate        => 7,
+    rotate        => '7',
     rotate_every  => 'day',
     missingok     => true,
     ifempty       => false,

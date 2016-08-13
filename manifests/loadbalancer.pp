@@ -783,7 +783,7 @@ class cloud::loadbalancer(
 
   logrotate::rule { 'haproxy':
     path          => '/var/log/haproxy.log',
-    rotate        => 7,
+    rotate        => '7',
     rotate_every  => 'day',
     missingok     => true,
     ifempty       => false,
