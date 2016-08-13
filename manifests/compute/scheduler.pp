@@ -24,7 +24,7 @@
 #   Defaults to false
 #
 class cloud::compute::scheduler(
-  $scheduler_default_filters = false
+  $scheduler_default_filters = []
 ){
 
   include ::cloud::compute
