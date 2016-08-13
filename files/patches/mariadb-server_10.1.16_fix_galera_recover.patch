@@ -1,0 +1,12 @@
+--- galera_recovery.orig    2016-07-19 11:00:44.937342699 +0200
++++ galera_recovery 2016-07-19 11:01:09.778022232 +0200
+@@ -68,7 +68,7 @@
+ 
+ wsrep_recover_position() {
+   # Redirect server's error log to the log file.
+-  eval /usr/sbin/mysqld $cmdline_args --user=$user --wsrep_recover 2> "$log_file"
++  eval /usr/sbin/mysqld $cmdline_args --user=$user --wsrep_recover --log-error="$log_file"
+   ret=$?
+   if [ $ret -ne 0 ]; then
+     # Something went wrong, let us also print the error log so that it
+
