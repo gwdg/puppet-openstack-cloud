@@ -76,6 +76,7 @@ class cloud::compute::api(
 ){
 
   include ::cloud::compute
+  include ::cloud::compute::db
   include ::cloud::params
   include ::nova::params
 
