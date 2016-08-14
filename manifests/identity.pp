@@ -139,10 +139,16 @@
 #
 class cloud::identity (
 
-  $swift_enabled                = true,
+  $token_driver                 = 'sql',
+  $token_provider               = 'uuid',
+
+  $identity_driver              = 'sql',
+  $assignment_driver            = 'sql',
+
   $cinder_enabled               = true,
   $trove_enabled                = false,
   $magnum_enabled               = false,
+  $swift_enabled                = false,
 
   $identity_roles_addons        = ['SwiftOperator', 'ResellerAdmin'],
 
@@ -237,7 +243,6 @@ class cloud::identity (
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
   $ks_token_expiration          = 3600,
-  $token_driver                 = 'keystone.token.persistence.backends.sql.Token',
   $firewall_settings            = {},
 
   # New stuff
@@ -268,16 +273,15 @@ class cloud::identity (
     admin_token           => $ks_admin_token,
     service_name          => 'httpd',
 
-    token_provider        => 'keystone.token.providers.uuid.Provider',
+    token_provider        => $token_provider,
+    token_driver          => $token_driver,
+    token_expiration      => $ks_token_expiration,
 
     public_bind_host      => $api_eth,
     admin_bind_host       => $api_eth,
 
     admin_endpoint        => $keystone_admin_url,
     public_endpoint       => $keystone_public_url,
-
-    token_driver          => $token_driver,
-    token_expiration      => $ks_token_expiration,
 
     using_domain_config   => true,
 
@@ -286,8 +290,8 @@ class cloud::identity (
 
   keystone_config {
     # Make sure identity / assignment is configured for sql in keystone.conf (ldap is done via domain specific configuration)
-    'identity/driver':              value => 'keystone.identity.backends.sql.Identity';
-    'assignment/driver':            value => 'keystone.assignment.backends.sql.Assignment';
+    'identity/driver':          value => $identity_driver;
+    'assignment/driver':        value => $assignment_driver;
   }
 
   # Keystone LDAP
