@@ -213,6 +213,11 @@ class cloud::database::sql::mysql (
     $nova_db_password                = 'novapassword',
     $nova_db_allowed_hosts           = ['127.0.0.1'],
 
+    $nova_api_db_host                = '127.0.0.1',
+    $nova_api_db_user                = 'nova_api',
+    $nova_api_db_password            = 'nova_apipassword',
+    $nova_api_db_allowed_hosts       = ['127.0.0.1'],
+
     $neutron_db_host                 = '127.0.0.1',
     $neutron_db_user                 = 'neutron',
     $neutron_db_password             = 'neutronpassword',
@@ -268,6 +273,14 @@ class cloud::database::sql::mysql (
       password      => $nova_db_password,
       host          => $nova_db_host,
       allowed_hosts => $nova_db_allowed_hosts,
+    }
+
+    class { '::nova::db::mysql_api':
+      dbname        => 'nova_api',
+      user          => $nova_api_db_user,
+      password      => $nova_api_db_password,
+      host          => $nova_api_db_host,
+      allowed_hosts => $nova_api_db_allowed_hosts,
     }
 
     class { '::cinder::db::mysql':
