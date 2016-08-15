@@ -13,10 +13,10 @@ EXTERNAL_GATEWAY='<%= @vip_public_gateway %>'
 INTERNAL_INTERFACE='<%= @keepalived_internal_interface %>'
 EXTERNAL_INTERFACE='<%= @keepalived_public_interface %>'
 
-INTERNAL_IP='<%= @vip_internal_ip[0] %>'
+INTERNAL_IP='<%= @vip_internal_ip %>'
 INTERNAL_NETWORK='<%= @vip_internal_network %>'
 
-EXTERNAL_IP='<%= @vip_public_ip[0] %>'
+EXTERNAL_IP='<%= @vip_public_ip %>'
 EXTERNAL_NETWORK='<%= @vip_public_network %>'
 
 TABLE_INTERNAL_NAME="internal"
