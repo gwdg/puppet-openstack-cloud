@@ -23,23 +23,13 @@
 #   (optional) Set log output to debug output
 #   Defaults to true
 #
-# [*manage_haproxy_pkg*]
-#   (optional) Manage or not HAproxy package
-#   Defaults to true
-#
 class cloud::network::lbaas(
-  $debug              = true,
-  $manage_haproxy_pkg = true
 ) {
 
   include ::cloud::network
   include ::cloud::network::vswitch
 
-  if $::cloud::network::lbaas_enabled {
-	  class { '::neutron::agents::lbaas':
-	    manage_haproxy_package => $manage_haproxy_pkg,
-	    debug                  => $debug,
-	  }
-  }
-
+  
+	class { '::neutron::agents::lbaas': }
+  
 }

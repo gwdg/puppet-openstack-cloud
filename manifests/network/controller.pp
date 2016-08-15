@@ -220,7 +220,6 @@ class cloud::network::controller(
   # only needed by ml2 plugin
   $tunnel_id_ranges                 = ['1:10000'],
   $vni_ranges                       = ['1:10000'],
-  $lbaas_package_ensure             = 'latest',
 ) {
 
   include ::cloud::network
@@ -329,14 +328,7 @@ class cloud::network::controller(
     }
   }
 
-  if $::cloud::network::lbaas_enabled {
-    Package['neutron'] -> Package['python-neutron-lbaas']
-    ensure_resource( 'package', 'python-neutron-lbaas', {
-      ensure => $lbaas_package_ensure,
-      name   => python-neutron-lbaas,
-      tag    => ['openstack', 'neutron-package'],
-    })
-  }
+  class { 'neutron::services::lbaas': }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow neutron-server access':
