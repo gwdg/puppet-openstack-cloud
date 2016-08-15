@@ -195,11 +195,11 @@ class cloud::network::controller(
   $api_eth                          = '127.0.0.1',
 
   $nova_url                         = 'http://127.0.0.1:8774/v2',
-  $nova_admin_auth_url              = 'http://127.0.0.1:5000/v2.0',
-  $nova_admin_username              = 'nova',
-  $nova_admin_tenant_name           = 'services',
-  $nova_admin_password              = 'novapassword',
-  $nova_region_name                 = 'RegionOne',
+  $auth_url                         = 'http://127.0.0.1:5000/v2.0',
+  $username                         = 'nova',
+  $tenant_name                      = 'services',
+  $password                         = 'novapassword',
+  $region_name                      = 'RegionOne',
   $manage_ext_network               = false,
 
   $firewall_settings                = {},
@@ -312,12 +312,12 @@ class cloud::network::controller(
   }
 
   class { '::neutron::server::notifications':
-    nova_url               => $nova_url,
-    nova_admin_auth_url    => $nova_admin_auth_url,
-    nova_admin_username    => $nova_admin_username,
-    nova_admin_tenant_name => $nova_admin_tenant_name,
-    nova_admin_password    => $nova_admin_password,
-    nova_region_name       => $nova_region_name
+    nova_url            => $nova_url,
+    auth_url            => $auth_url,
+    username            => $username,
+    tenant_name         => $tenant_name,
+    password            => $password,
+    region_name         => $region_name
   }
 
   if $manage_ext_network {
