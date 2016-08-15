@@ -19,10 +19,6 @@
 #
 # === Parameters:
 #
-# [*rhn_registration*]
-#  (optional) The RedHat network authentication token
-#  Defaults to undef
-#
 # [*root_password*]
 #  (optional) Unix root password
 #  Defaults to 'root'
@@ -113,7 +109,6 @@
 #   Default to {}
 #
 class cloud(
-  $rhn_registration     = undef,
   $root_password        = 'root',
   $dns_ips              = ['8.8.8.8', '8.8.4.4'],
   $site_domain          = 'mydomain',
