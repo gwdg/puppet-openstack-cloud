@@ -145,6 +145,10 @@ class cloud::volume::storage(
     # Manage Volume types.
     # It allows to the end-user to choose from which backend he would like to provision a volume.
     # Cinder::Type requires keystone credentials
+
+    # Make sure Cinder::Type is only run after cinder.conf is setup correctly (else resource prefetch will fail due to missing cinder.conf)
+    Cinder_config<||> -> Cinder::Type <| |>
+
     Cinder::Type <| |> {
       os_tenant_name => $ks_admin_tenant,
       os_username    => $ks_cinder_user,
