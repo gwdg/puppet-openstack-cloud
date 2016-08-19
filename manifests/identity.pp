@@ -177,6 +177,12 @@ class cloud::identity (
 
   $aodh_password                = 'aodhpassword',
 
+  $gnocchi_public_url           = undef,
+  $gnocchi_internal_url         = undef,
+  $gnocchi_admin_url            = undef,
+
+  $gnocchi_password             = 'gnocchipassword',
+
   $cinder_v1_public_url         = undef,
   $cinder_v1_internal_url       = undef,
   $cinder_v1_admin_url          = undef,
@@ -411,13 +417,23 @@ class cloud::identity (
 
   class { '::aodh::keystone::auth':
     
-    public_url   => $aodh_public_url,
-    internal_url => $aodh_internal_url,
-    admin_url    => $aodh_admin_url,
+    public_url          => $aodh_public_url,
+    internal_url        => $aodh_internal_url,
+    admin_url           => $aodh_admin_url,
 
-    region       => $region,
-    password     => $aodh_password
+    region              => $region,
+    password            => $aodh_password
   }
+
+  class { '::gnocchi::keystone::auth':
+
+    public_url          => $gnocchi_public_url,
+    internal_url        => $gnocchi_internal_url,
+    admin_url           => $gnocchi_admin_url,
+
+    region              => $region,
+    password            => $gnocchi_password,
+  }                                                                                                                                                                                                        
 
   class { '::nova::keystone::auth':
 
