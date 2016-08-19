@@ -540,6 +540,7 @@ class cloud::loadbalancer(
   $enable_redis                     = false,
   $enable_galera                    = false,
   $enable_galera_readonly           = false,
+  $enable_influxdb                  = false,
 
   $haproxy_auth                     = 'admin:changeme',
 
@@ -584,6 +585,7 @@ class cloud::loadbalancer(
   $sensu_dashboard_options          = {},
   $sensu_api_options                = {},
   $redis_options                    = {},
+  $influxdb_options                 = {},
 
   $ks_ceilometer_public_port        = 8777,
   $ks_aodh_public_port              = 8042,
@@ -604,6 +606,7 @@ class cloud::loadbalancer(
   $rabbitmq_port                    = 5672,
   $galera_port                      = 3306,
   $galera_readonly_port             = 3307,
+  $influxdb_public_port             = 8086,
 
   $horizon_port                     = 80,
   $horizon_ssl_port                 = 443,
@@ -1007,6 +1010,12 @@ class cloud::loadbalancer(
     enable              => $enable_logstash_syslog,
     port                => $logstash_syslog_port,
     options             => merge($common_tcp_options, $logstash_syslog_options),
+  }
+
+  cloud::loadbalancer::bind_api { 'influxdb':
+    enable              => $enable_influxdb,
+    port                => $influxdb_public_port,
+    options             => merge($common_tcp_options, $influxdb_options),
   }
 
   cloud::loadbalancer::bind_api { 'redis':
