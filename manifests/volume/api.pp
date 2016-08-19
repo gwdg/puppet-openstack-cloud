@@ -50,6 +50,8 @@ class cloud::volume::api(
 
   $default_volume_type,
 
+  $ks_cinder_port              = 8776,
+
   $ks_glance_internal_host     = '127.0.0.1',
   $ks_glance_internal_proto    = 'http',
   $ks_glance_api_internal_port = 9292,
@@ -66,8 +68,25 @@ class cloud::volume::api(
   }
 
   class { '::cinder::api':
+
     bind_host              => $api_eth,
+
+    service_name           => 'httpd',
+
     default_volume_type    => $default_volume_type,
+  }
+
+  class {'::cinder::wsgi::apache':
+ 
+    servername  => $::fqdn,
+
+    port        => $ks_cinder_port,
+
+    # Use multiprocessing defaults
+    workers     => 1,
+    threads     => $::processorcount,
+
+    ssl         => false
   }
 
   class { '::cinder::glance':
