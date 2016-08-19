@@ -271,7 +271,9 @@ class cloud::identity (
   class { '::keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
+
     service_name          => 'httpd',
+    manage_policyrcd      => 'true',
 
     token_provider        => $token_provider,
     token_driver          => $token_driver,
@@ -321,14 +323,18 @@ class cloud::identity (
   }
 
   # Configure keystone to use apache/wsgi
-  include cloud::util::apache_common
+#  include cloud::util::apache_common
   class {'::keystone::wsgi::apache':
+
     servername  => $::fqdn,
+
     admin_port  => $ks_keystone_admin_port,
     public_port => $ks_keystone_public_port,
 
-    # TODO(EmilienM) not sure workers is useful when using WSGI backend
-    workers     => $::processorcount,
+    # Use multiprocessing defaults
+    workers     => 1,
+    threads     => $::processorcount,
+
     ssl         => false
   }
 
@@ -382,7 +388,7 @@ class cloud::identity (
       creates   => '/etc/keystone/ssl/synced_from_master',
       user      => 'keystone',
       require   => Cloud::Util::Ssh_access['keystone'],
-      notify    => Service['keystone']
+      notify    => Service['httpd']
     }
   }
 
