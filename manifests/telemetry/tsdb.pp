@@ -16,16 +16,17 @@
 # Telemetry TSDB nodes
 #
 class cloud::telemetry::tsdb(
+
   $ks_keystone_internal_host      = '127.0.0.1',
   $ks_keystone_internal_proto     = 'http',
-  $ks_keystone_internal_port      = '5000',
-  $ks_keystone_admin_port         = '35357', 
+  $ks_keystone_internal_port      = 5000,
+  $ks_keystone_admin_port         = 35357, 
 
-  $ks_gnocchi_internal_port       = '8041',
+  $ks_gnocchi_internal_port       = 8041,
   $ks_gnocchi_password            = 'gnocchipassword',
 
-  $gnocchi_db_user                = 'magnum',
-  $gnocchi_db_password            = 'magnumpassword',
+  $gnocchi_db_user                = 'gnocchi',
+  $gnocchi_db_password            = 'gnocchipassword',
   $gnocchi_db_host                = '127.0.0.1',
   $gnocchi_db_port                = 3306,
 
@@ -34,15 +35,6 @@ class cloud::telemetry::tsdb(
 ){
 
   include ::cloud::telemetry
-
-  #service and enpoint
- # class { '::gnocchi::keystone::auth':
- #   admin_address    => '10.0.0.1',
- #   internal_address => '10.0.0.1',
- #   public_address   => '10.0.0.1',
- #   password         => $ks_gnocchi_password,
- #   region           => $region
- # }
 
   $encoded_user     = uriescape($gnocchi_db_user)
   $encoded_password = uriescape($gnocchi_db_password)
