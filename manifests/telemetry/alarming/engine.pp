@@ -16,8 +16,9 @@
 # Telemetry Alarming Engine - AODH
 #
 class cloud::telemetry::alarming::engine(
+
   $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword' ,
+  $rabbit_password            = 'rabbitpassword',
   
   $db_user                    = 'aodh',
   $db_password                = 'aodhpassword',
@@ -47,7 +48,7 @@ class cloud::telemetry::alarming::engine(
   class { '::aodh::auth':
     auth_url           => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
     auth_password      => $ks_aodh_password,
-    auth_region        => $region    
+    auth_region        => $region,
     auth_endpoint_type => $os_endpoint_type,
   }
 
