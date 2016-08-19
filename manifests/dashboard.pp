@@ -161,7 +161,7 @@ class cloud::dashboard(
     $cache_backend      = 'django.core.cache.backends.locmem.LocMemCache'
   }
 
-  include ::cloud::util::apache_common
+#  include ::cloud::util::apache_common
   class { '::horizon':
     secret_key              => $secret_key,
     servername              => $servername,
