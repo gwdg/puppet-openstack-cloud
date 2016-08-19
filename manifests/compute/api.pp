@@ -53,10 +53,6 @@
 #   Should be an hash.
 #   Default to {}
 #
-# [*pacemaker_enabled*]
-#   (optional) Manage Nova API with Pacemaker or not.
-#   Default to false
-#
 class cloud::compute::api(
 
   $ks_keystone_internal_host            = '127.0.0.1',
@@ -72,7 +68,6 @@ class cloud::compute::api(
   $ks_metadata_public_port              = '8775',
 
   $firewall_settings                    = {},
-  $pacemaker_enabled                    = false,
 ){
 
   include ::cloud::compute
@@ -84,6 +79,8 @@ class cloud::compute::api(
 
     enabled                              => true,
 
+    service_name                         => 'httpd',
+
     auth_uri                             => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
     identity_uri                         => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
 
@@ -91,17 +88,21 @@ class cloud::compute::api(
     api_bind_address                     => $api_eth,
     metadata_listen                      => $api_eth,
     neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_shared_secret,
-    osapi_v3                             => true,
   }
 
-  if $pacemaker_enabled {
-    cloud::clustering::pacemaker_service { $::nova::params::api_service_name:
-      service_name    => $::nova::params::api_service_name,
-      primitive_class => $::cloud::params::service_provider,
-      requires        => Package[$::nova::params::api_package_name],
-    }
-  }
+  class {'::nova::wsgi::apache':
+ 
+    servername  => $::fqdn,
 
+    api_port    => $ks_nova_public_port,
+
+    # Use multiprocessing defaults
+    workers     => 1,
+    threads     => $::processorcount,
+
+    ssl         => false
+  }
+  
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow nova-api access':
       port   => $ks_nova_public_port,
