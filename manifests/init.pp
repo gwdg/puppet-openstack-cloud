@@ -163,8 +163,13 @@ class cloud(
   }
 
   apt::conf { 'progressbar':
-    priority => 99,
+    priority => '99',
     content  => 'Dpkg::Progress-Fancy "1";',
+  }
+
+  apt::conf { 'norecommends':
+    priority => '00',
+    content  => "Apt::Install-Recommends 0;\nApt::AutoRemove::InstallRecommends 1;\n",
   }
 
   # Create users / groups whose uids / gids need to be in sync on different systems
