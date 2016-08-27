@@ -541,6 +541,7 @@ class cloud::loadbalancer(
   $enable_galera                    = false,
   $enable_galera_readonly           = false,
   $enable_influxdb                  = false,
+  $enable_influxdb_management       = false,
 
   $haproxy_auth                     = 'admin:changeme',
 
@@ -603,10 +604,12 @@ class cloud::loadbalancer(
   $ks_nova_public_port              = 8774,
   $ks_swift_public_port             = 8080,
   $ks_trove_public_port             = 8779,
+
   $rabbitmq_port                    = 5672,
+  $rabbitmq_management_port         = 15672,
   $galera_port                      = 3306,
   $galera_readonly_port             = 3307,
-  $influxdb_public_port             = 8086,
+  $influxdb_port                    = 8086,
 
   $horizon_port                     = 80,
   $horizon_ssl_port                 = 443,
@@ -634,13 +637,11 @@ class cloud::loadbalancer(
   $galera_ip                        = ['127.0.0.1'],
   $firewall_settings                = {},
 
-  # New settings
   $haproxy_ensure                   = 'present',
   $haproxy_global_options           = {},
   $haproxy_defaults_options         = {},
 
   $keepalived_preempt_delay         = undef,
-  $rabbitmq_management_port         = 15672,
 
   $haproxy_certs                    = 'api.dev.cloud.gwdg.de_20150716_all.pem',
 ){
@@ -1014,7 +1015,7 @@ class cloud::loadbalancer(
 
   cloud::loadbalancer::bind_api { 'influxdb':
     enable              => $enable_influxdb,
-    port                => $influxdb_public_port,
+    port                => $influxdb_port,
     options             => merge($common_tcp_options, $influxdb_options),
   }
 
