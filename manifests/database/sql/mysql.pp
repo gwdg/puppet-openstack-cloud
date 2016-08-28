@@ -243,6 +243,11 @@ class cloud::database::sql::mysql (
     $gnocchi_db_password             = 'gnocchipassword',
     $gnocchi_db_allowed_hosts        = ['127.0.0.1'],
 
+    $ceilometer_db_host              = '127.0.0.1',
+    $ceilometer_db_user              = 'ceilometer',
+    $ceilometer_db_password          = 'ceilometerpassword',
+    $ceilometer_db_allowed_hosts     = ['127.0.0.1'],
+
     $mysql_root_password             = 'rootpassword',
 
     $mysql_sys_maint_password        = 'sys_maint',
@@ -348,6 +353,14 @@ class cloud::database::sql::mysql (
       password      => $gnocchi_db_password,
       host          => $gnocchi_db_host,
       allowed_hosts => $gnocchi_db_allowed_hosts,
+    }
+
+    class { '::ceilometer::db::mysql':
+      dbname        => 'ceilometer',
+      user          => $ceilometer_db_user,
+      password      => $ceilometer_db_password,
+      host          => $ceilometer_db_host,
+      allowed_hosts => $ceilometer_db_allowed_hosts,
     }
 
     # Monitoring DB
