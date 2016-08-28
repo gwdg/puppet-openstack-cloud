@@ -17,24 +17,30 @@
 #
 class cloud::telemetry::tsdb(
 
-  $ks_keystone_internal_host      = '127.0.0.1',
-  $ks_keystone_internal_proto     = 'http',
-  $ks_keystone_internal_port      = 5000,
-  $ks_keystone_admin_port         = 35357, 
+  $ks_keystone_internal_host    = '127.0.0.1',
+  $ks_keystone_internal_proto   = 'http',
+  $ks_keystone_internal_port    = 5000,
+  $ks_keystone_admin_port       = 35357, 
 
-  $ks_gnocchi_internal_port       = 8041,
-  $ks_gnocchi_password            = 'gnocchipassword',
+  $ks_gnocchi_internal_port     = 8041,
+  $ks_gnocchi_password          = 'gnocchipassword',
 
-  $gnocchi_db_user                = 'gnocchi',
-  $gnocchi_db_password            = 'gnocchipassword',
-  $gnocchi_db_host                = '127.0.0.1',
-  $gnocchi_db_port                = 3306,
+  $gnocchi_db_user              = 'gnocchi',
+  $gnocchi_db_password          = 'gnocchipassword',
+  $gnocchi_db_host              = '127.0.0.1',
+  $gnocchi_db_port              = 3306,
 
-  $api_eth                        = '127.0.0.1',
-  $region                         = 'RegionOne',
+  $influxdb_host                = '127.0.0.1',
+  $influxdb_port                = 8086,
+  $influxdb_management_port     = 8083,
+
+  $api_eth                      = '127.0.0.1',
+  $region                       = 'RegionOne',
 ){
 
   include ::cloud::telemetry
+  include ::gnocchi::client
+  include ::gnocchi::storage::influxdb
 
   $encoded_user     = uriescape($gnocchi_db_user)
   $encoded_password = uriescape($gnocchi_db_password)
@@ -61,5 +67,20 @@ class cloud::telemetry::tsdb(
     options           => 'check inter 2000 rise 2 fall 5'
   }
 
-  include ::gnocchi::client
+  @@haproxy::balancermember{"${::fqdn}-influxdb":
+    listening_service => 'influxdb',
+    server_names      => 'influxdb',
+    ipaddresses       => $influxdb_host,
+    ports             => $influxdb_port,
+    options           => 'check inter 2000 rise 2 fall 5'
+  }
+
+  @@haproxy::balancermember{"${::fqdn}-influxdb-management":
+    listening_service => 'influxdb_management',
+    server_names      => 'influxdb',
+    ipaddresses       => $influxdb_host,
+    ports             => $influxdb_management_port,
+    options           => 'check inter 2000 rise 2 fall 5'
+  }
+
 }
