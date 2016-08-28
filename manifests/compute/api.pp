@@ -70,10 +70,10 @@ class cloud::compute::api(
   $firewall_settings                    = {},
 ){
 
-  include ::cloud::compute
-  include ::cloud::compute::db
-  include ::cloud::params
   include ::nova::params
+  include ::nova::db
+  include ::cloud::compute
+  include ::cloud::params
 
   class { '::nova::api':
 
