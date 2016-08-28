@@ -518,6 +518,7 @@ class cloud::loadbalancer(
   $enable_galera_readonly           = false,
   $enable_glance_api                = false,
   $enable_glance_registry           = false,
+  $enable_gnocchi_api               = false,
   $enable_heat_api                  = false,
   $enable_heat_cfn_api              = false,
   $enable_heat_cloudwatch_api       = false,
@@ -565,6 +566,7 @@ class cloud::loadbalancer(
   $galera_readonly_options          = {},
   $glance_api_options               = {},
   $glance_registry_options          = {},
+  $gnocchi_options                  = {},
   $heat_api_options                 = {},
   $heat_cfn_options                 = {},
   $heat_cloudwatch_options          = {},
@@ -594,6 +596,7 @@ class cloud::loadbalancer(
   $ks_cinder_public_port            = 8776,
   $ks_glance_api_public_port        = 9292,
   $ks_glance_registry_internal_port = 9191,
+  $ks_gnocchi_public_port           = 8041,
   $ks_heat_cfn_public_port          = 8000,
   $ks_heat_cloudwatch_public_port   = 8003,
   $ks_heat_public_port              = 8004,
@@ -944,6 +947,13 @@ class cloud::loadbalancer(
     public_access       => true,
     port                => $ks_aodh_public_port,
     options             => merge($common_http_options, $aodh_options),
+  }
+
+  cloud::loadbalancer::bind_api { 'gnocchi_api':
+    enable              => $enable_gnocchi_api,
+    public_access       => false,
+    port                => $ks_gnocchi_public_port,
+    options             => merge($common_http_options, $gnocchi_options),
   }
 
   cloud::loadbalancer::bind_api { 'magnum_api':
