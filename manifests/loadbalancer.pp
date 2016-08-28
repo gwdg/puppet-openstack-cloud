@@ -571,6 +571,7 @@ class cloud::loadbalancer(
   $horizon_options                  = {},
   $horizon_ssl_options              = {},
   $influxdb_options                 = {},
+  $influxdb_management_options      = {},
   $keystone_admin_options           = {},
   $keystone_options                 = {},
   $kibana_options                   = {},
@@ -611,6 +612,7 @@ class cloud::loadbalancer(
   $horizon_port                     = 80,
   $horizon_ssl_port                 = 443,
   $influxdb_port                    = 8086,
+  $influxdb_management_port         = 8083,
   $kibana_port                      = 8300,
   $logstash_syslog_port             = 514,
   $novnc_port                       = 6080,
@@ -1017,6 +1019,12 @@ class cloud::loadbalancer(
     enable              => $enable_influxdb,
     port                => $influxdb_port,
     options             => merge($common_tcp_options, $influxdb_options),
+  }
+
+  cloud::loadbalancer::bind_api { 'influxdb_management':
+    enable              => $enable_influxdb_management,
+    port                => $influxdb_management_port,
+    options             => merge($common_http_options, $influxdb_management_options),
   }
 
   cloud::loadbalancer::bind_api { 'redis':
