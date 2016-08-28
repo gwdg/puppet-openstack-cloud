@@ -29,23 +29,34 @@
 #   Defaults to true
 #
 class cloud::telemetry::collector(
-  $mongo_nodes              = ['127.0.0.1:27017'],
-  $replica_set_name         = 'ceilometer',
+#  $mongo_nodes              = ['127.0.0.1:27017'],
+#  $replica_set_name         = 'ceilometer',
+  $gnocchi_url          = 'http://localhost:8041',
 ){
-
+  include ::ceilometer::db
   include ::cloud::telemetry
 
-  $s_mongo_nodes = join($mongo_nodes, ',')
+#  $s_mongo_nodes = join($mongo_nodes, ',')
 
 #  mongodb_conn_validator { $mongo_nodes:
 #    before => Class['ceilometer::db']
 #  }
 
-  class { '::ceilometer::db':
-    database_connection => "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}",
-    sync_db             => true,
+#  class { '::ceilometer::db':
+#    database_connection => "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}",
+#    sync_db             => true,
+#  }
+
+  class { '::ceilometer::collector': 
+    meter_dispatcher => ['gnocchi'],
   }
 
-  class { '::ceilometer::collector': }
+  class { '::ceilometer::dispatcher::gnocchi':
+#    filter_service_activity   => false,
+    filter_project            => 'services',
+    url                       => $gnocchi_url,
+#    archive_policy            => 'high',
+    resources_definition_file => 'gnocchi_resources.yaml',
+  }
 
 }
