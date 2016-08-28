@@ -41,6 +41,7 @@ class cloud::telemetry::tsdb(
   include ::cloud::telemetry
   include ::gnocchi::client
   include ::gnocchi::storage::influxdb
+  include ::gnocchi::metricd
 
   $encoded_user     = uriescape($gnocchi_db_user)
   $encoded_password = uriescape($gnocchi_db_password)
@@ -52,6 +53,10 @@ class cloud::telemetry::tsdb(
   class { '::gnocchi::api':
     host                  => $api_eth,
     port                  => $ks_gnocchi_internal_port,
+
+    # Use WSGI
+    service_name          => 'httpd',
+
     keystone_auth_uri     => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
     keystone_identity_uri => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     keystone_password     => $ks_gnocchi_password,
@@ -59,8 +64,21 @@ class cloud::telemetry::tsdb(
     sync_db               => true
   }
 
+  class {'::gnocchi::wsgi::apache':
+
+    servername  => $::fqdn,
+
+    port        => $ks_gnocchi_internal_port,
+
+    # Use multiprocessing defaults
+    workers     => 1,
+    threads     => $::processorcount,
+
+    ssl         => false
+  }
+
   @@haproxy::balancermember{"${::fqdn}-gnocchi_api":
-    listening_service => 'gnocci_api',
+    listening_service => 'gnocchi_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
     ports             => $ks_gnocchi_internal_port,
