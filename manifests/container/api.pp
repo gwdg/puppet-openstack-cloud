@@ -1,22 +1,26 @@
 #
 class cloud::container::api(
-  $ks_magnum_internal_port    = 9511,
-  $ks_keystone_internal_host  = '127.0.0.1',
-  $ks_keystone_internal_port  = '5000',
-  $ks_keystone_internal_proto = 'http',
-  $ks_keystone_admin_port     = '35357',
-  $api_eth                    = '127.0.0.1',
-  $ks_magnum_password         = 'magnumpassword',
+
+  $ks_magnum_internal_port  = 9511,
+
+  $auth_uri                 = 'http://127.0.0.1:5000/',
+  $identity_uri             = 'http://127.0.0.1:35357/',
+
+  $api_eth                  = '127.0.0.1',
+  $ks_magnum_password       = 'magnumpassword',
 ){
 
   include ::cloud::container
 
   class { '::magnum::api':
-    admin_password => $ks_magnum_password,
+
     host           => $api_eth,
-    auth_uri       => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
-    identity_uri   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
     port           => $ks_magnum_internal_port,
+
+    auth_uri       => $auth_uri,
+    identity_uri   => $identity_uri,
+
+    admin_password => $ks_magnum_password,
 
     require        => Exec ['/tmp/setup_magnum.sh']
   }
