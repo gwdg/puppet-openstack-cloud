@@ -19,14 +19,6 @@
 #
 # === Parameters:
 #
-# [*ks_keystone_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_keystone_internal_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
 # [*ks_glance_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Glance
 #   Defaults to '127.0.0.1'
@@ -109,10 +101,8 @@
 #
 class cloud::image::api(
 
-  $ks_keystone_internal_host         = '127.0.0.1',
-  $ks_keystone_internal_proto        = 'http',
-  $ks_keystone_internal_port         = 5000,
-  $ks_keystone_admin_port            = 35357,
+  $auth_uri                          = 'http://127.0.0.1:5000/',
+  $identity_uri                      = 'http://127.0.0.1:35357/',
 
   $ks_glance_internal_host           = '127.0.0.1',
   $ks_glance_api_internal_port       = '9292',
@@ -148,8 +138,8 @@ class cloud::image::api(
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
 
-    auth_uri                 => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
-    identity_uri             => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+    auth_uri                 => $auth_uri,
+    identity_uri             => $identity_uri,
 
     registry_client_protocol => $ks_glance_registry_internal_proto,
     keystone_password        => $ks_glance_password,
