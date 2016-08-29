@@ -20,32 +20,12 @@
 #
 # === Parameters:
 #
-# [*mongo_nodes*]
-#   (optional) An array of mongo db nodes
-#   Defaults to ['127.0.0.1:27017']
-#
-# [*replicaset_enabled*]
-#   (optional) Enable or not mongo replicat (using ceilometer name)
-#   Defaults to true
 #
 class cloud::telemetry::collector(
-#  $mongo_nodes              = ['127.0.0.1:27017'],
-#  $replica_set_name         = 'ceilometer',
   $gnocchi_url          = 'http://localhost:8041',
 ){
   include ::ceilometer::db
   include ::cloud::telemetry
-
-#  $s_mongo_nodes = join($mongo_nodes, ',')
-
-#  mongodb_conn_validator { $mongo_nodes:
-#    before => Class['ceilometer::db']
-#  }
-
-#  class { '::ceilometer::db':
-#    database_connection => "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}",
-#    sync_db             => true,
-#  }
 
   class { '::ceilometer::collector': 
     meter_dispatcher => ['gnocchi'],
