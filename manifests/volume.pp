@@ -20,22 +20,6 @@
 #
 # === Parameters:
 #
-# [*cinder_db_host*]
-#   (optional) Cinder database host
-#   Defaults to '127.0.0.1'
-#
-# [*cinder_db_user*]
-#   (optional) Cinder database user
-#   Defaults to 'cinder'
-#
-# [*cinder_db_password*]
-#   (optional) Cinder database password
-#   Defaults to 'cinderpassword'
-#
-# [*cinder_db_idle_timeout*]
-#   (optional) Timeout before idle SQL connections are reaped.
-#   Defaults to 5000
-#
 # [*rabbit_hosts*]
 #   (optional) List of RabbitMQ servers. Should be an array.
 #   Defaults to ['127.0.0.1:5672']
@@ -49,14 +33,6 @@
 #   Defaults to 'nova'
 #
 class cloud::volume(
-
-  $cinder_db_host             = '127.0.0.1',
-  $cinder_db_user             = 'cinder',
-  $cinder_db_password         = 'cinderpassword',
-  $cinder_db_idle_timeout     = 5000,
-  $cinder_db_use_slave        = false,
-  $cinder_db_port             = 3306,
-  $cinder_db_slave_port       = 3307,
 
   $ks_cinder_internal_port    = 8776,
 
@@ -78,22 +54,8 @@ class cloud::volume(
 
 ) {
 
-  $encoded_user     = uriescape($cinder_db_user)
-  $encoded_password = uriescape($cinder_db_password)
-
+  include ::cinder::db
   include ::mysql::client
-
-  if $cinder_db_use_slave {
-    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_slave_port}/cinder?charset=utf8"
-  } else {
-    $slave_connection_url = undef
-  }
-
-  class { '::cinder::db':
-    database_connection       => "mysql://${encoded_user}:${encoded_password}@${cinder_db_host}:${cinder_db_port}/cinder?charset=utf8",
-    database_slave_connection => $slave_connection_url,
-    database_idle_timeout     => $cinder_db_idle_timeout,
-  }
 
   class { '::cinder':
     rabbit_userid             => 'cinder',
