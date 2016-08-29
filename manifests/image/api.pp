@@ -39,14 +39,6 @@
 #   (optional) Password used by Glance to connect to Keystone API
 #   Defaults to 'glancepassword'
 #
-# [*rabbit_host*]
-#   (optional) IP or Hostname of one RabbitMQ server.
-#   Defaults to '127.0.0.1'
-#
-# [*rabbit_password*]
-#   (optional) Password to connect to glance queue.
-#   Defaults to 'rabbitpassword'
-#
 # [*api_eth*]
 #   (optional) Which interface we bind the Glance API server.
 #   Defaults to '127.0.0.1'
@@ -109,9 +101,6 @@ class cloud::image::api(
   $ks_glance_registry_internal_port  = '9191',
   $ks_glance_registry_internal_proto = 'http',
   $ks_glance_password                = 'glancepassword',
-
-  $rabbit_password                   = 'rabbit_password',
-  $rabbit_host                       = '127.0.0.1',
 
   $api_eth                           = '127.0.0.1',
   $openstack_vip                     = '127.0.0.1',
