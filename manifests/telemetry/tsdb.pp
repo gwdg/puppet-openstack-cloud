@@ -17,10 +17,8 @@
 #
 class cloud::telemetry::tsdb(
 
-  $ks_keystone_internal_host    = '127.0.0.1',
-  $ks_keystone_internal_proto   = 'http',
-  $ks_keystone_internal_port    = 5000,
-  $ks_keystone_admin_port       = 35357, 
+  $auth_uri                     = false,
+  $identity_uri                 = false,
 
   $ks_gnocchi_internal_port     = 8041,
   $ks_gnocchi_password          = 'gnocchipassword',
@@ -49,8 +47,8 @@ class cloud::telemetry::tsdb(
     # Use WSGI
     service_name          => 'httpd',
 
-    keystone_auth_uri     => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
-    keystone_identity_uri => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+    keystone_auth_uri     => $auth_uri,
+    keystone_identity_uri => $identity_uri,
     keystone_password     => $ks_gnocchi_password,
 
     sync_db               => true
