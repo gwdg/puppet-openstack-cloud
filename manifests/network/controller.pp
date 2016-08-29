@@ -17,22 +17,6 @@
 #
 # === Parameters:
 #
-# [*neutron_db_host*]
-#   (optional) Host where user should be allowed all privileges for database.
-#   Defaults to 127.0.0.1
-#
-# [*neutron_db_user*]
-#   (optional) Name of neutron DB user.
-#   Defaults to trove
-#
-# [*neutron_db_password*]
-#   (optional) Password that will be used for the neutron db user.
-#   Defaults to 'neutronpassword'
-#
-# [*neutron_db_idle_timeout*]
-#   (optional) Timeout before idle SQL connections are reaped.
-#   Defaults to 5000
-#
 # [*ks_neutron_password*]
 #   (optional) Password used by Neutron to connect to Keystone API
 #   Defaults to 'neutronpassword'
@@ -173,14 +157,6 @@
 #
 class cloud::network::controller(
 
-  $neutron_db_host                  = '127.0.0.1',
-  $neutron_db_user                  = 'neutron',
-  $neutron_db_password              = 'neutronpassword',
-  $neutron_db_idle_timeout          = 5000,
-  $neutron_db_use_slave             = false,
-  $neutron_db_port                  = 3306,
-  $neutron_db_slave_port            = 3307,
-
   $ks_neutron_password              = 'neutronpassword',
   $ks_keystone_admin_host           = '127.0.0.1',
   $ks_keystone_admin_proto          = 'http',
@@ -222,12 +198,10 @@ class cloud::network::controller(
   $vni_ranges                       = ['1:10000'],
 ) {
 
-  include ::cloud::network
   include ::mysql::client
   include ::neutron::quota
-
-  $encoded_user = uriescape($neutron_db_user)
-  $encoded_password = uriescape($neutron_db_password)
+  include ::neutron::db
+  include ::cloud::network
 
   if $l3_ha and $router_distributed {
     fail 'l3_ha and router_distributed are mutually exclusive, only one of them can be set to true'
@@ -236,18 +210,6 @@ class cloud::network::controller(
   validate_array($mechanism_drivers)
   if $l3_ha and member($mechanism_drivers, 'l2population') {
     fail 'l3_ha does not work with l2population mechanism driver in Juno.'
-  }
-
-  if $neutron_db_use_slave {
-    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_slave_port}/neutron?charset=utf8"
-  } else {
-    $slave_connection_url = undef
-  }
-
-  class { '::neutron::db':
-    database_connection         => "mysql://${encoded_user}:${encoded_password}@${neutron_db_host}:${neutron_db_port}/neutron?charset=utf8",
-    database_slave_connection   => $slave_connection_url,
-    database_idle_timeout       => $neutron_db_idle_timeout,
   }
 
   class { '::neutron::server':
