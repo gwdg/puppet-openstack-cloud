@@ -46,16 +46,14 @@
 #
 class cloud::telemetry::api(
 
-  $ks_keystone_internal_host      = '127.0.0.1',
-  $ks_keystone_internal_proto     = 'http',
-  $ks_keystone_internal_port      = 5000,
-  $ks_keystone_admin_port         = 35357, 
+  $auth_uri                     = 'http://127.0.0.1:5000/',
+  $identity_uri                 = 'http://127.0.0.1:35357/',
 
-  $ks_ceilometer_internal_port    = '8777',
-  $ks_ceilometer_password         = 'ceilometerpassword',
+  $ks_ceilometer_internal_port  = '8777',
+  $ks_ceilometer_password       = 'ceilometerpassword',
 
-  $api_eth                        = '127.0.0.1',
-  $firewall_settings              = {},
+  $api_eth                      = '127.0.0.1',
+  $firewall_settings            = {},
 
 ){
   include ::ceilometer::db
@@ -66,8 +64,8 @@ class cloud::telemetry::api(
     # Use WSGI
     service_name            => 'httpd',
 
-    keystone_auth_uri       => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
-    keystone_identity_uri   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+    auth_uri                => $auth_uri,
+    identity_uri            => $identity_uri,
     keystone_password       => $ks_ceilometer_password,
 
     host                    => $api_eth
