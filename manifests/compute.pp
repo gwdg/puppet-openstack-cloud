@@ -19,27 +19,6 @@
 #
 # === Parameters:
 #
-# [*nova_db_host*]
-#   (optional) Hostname or IP address to connect to nova database
-#   Defaults to '127.0.0.1'
-#
-# [*nova_db_use_slave*]
-#   (optional) Enable slave connection for nova, this assume
-#   the haproxy is used and mysql loadbalanced port for read operation is 3307
-#   Defaults to false
-#
-# [*nova_db_user*]
-#   (optional) Username to connect to nova database
-#   Defaults to 'nova'
-#
-# [*nova_db_password*]
-#   (optional) Password to connect to nova database
-#   Defaults to 'novapassword'
-#
-# [*nova_db_idle_timeout*]
-#   (optional) Timeout before idle SQL connections are reaped.
-#   Defaults to 5000
-#
 # [*rabbit_hosts*]
 #   (optional) List of RabbitMQ servers. Should be an array.
 #   Defaults to ['127.0.0.1:5672']
