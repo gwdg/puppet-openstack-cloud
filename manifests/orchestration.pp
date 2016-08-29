@@ -19,30 +19,6 @@
 #
 # === Parameters:
 #
-# [*ks_keystone_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_keystone_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_keystone_internal_port*]
-#   (optional) TCP port to connect to Keystone API from internal network
-#   Defaults to '5000'
-#
-# [*ks_keystone_admin_port*]
-#   (optional) TCP port to connect to Keystone API from admin network
-#   Defaults to '35357'
-#
-# [*ks_keystone_internal_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_keystone_admin_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
 # [*ks_heat_public_host*]
 #   (optional) Public Hostname or IP to connect to Heat API
 #   Defaults to '127.0.0.1'
@@ -69,16 +45,14 @@
 #
 class cloud::orchestration(
 
-  $ks_keystone_internal_host  = '127.0.0.1',
-  $ks_keystone_internal_port  = '5000',
-  $ks_keystone_internal_proto = 'http',
-  $ks_keystone_admin_host     = '127.0.0.1',
-  $ks_keystone_admin_port     = '35357',
-  $ks_keystone_admin_proto    = 'http',
+  $auth_uri                   = 'http://127.0.0.1:5000/',
+  $identity_uri               = 'http://127.0.0.1:35357/',
 
   $ks_heat_public_host        = '127.0.0.1',
   $ks_heat_public_proto       = 'http',
   $ks_heat_password           = 'heatpassword',
+
+  $memcache_servers           = [],
 
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
@@ -91,9 +65,12 @@ class cloud::orchestration(
 
   class { '::heat':
 
+    auth_plugin           => 'password',
+    identity_uri          => $identity_uri,
+    auth_uri              => $auth_uri,
+    keystone_user         => 'heat',
     keystone_password     => $ks_heat_password,
-    identity_uri          => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
-    auth_uri              => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
+    memcached_servers     => $memcache_servers,
 
     rabbit_hosts          => $rabbit_hosts,
     rabbit_password       => $rabbit_password,
