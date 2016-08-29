@@ -77,6 +77,16 @@ class cloud::telemetry::tsdb(
     ssl         => false
   }
 
+  # Fix: create default archive policies (this is done automatically in newer versions of Gnocch [v2.0+])
+  exec { 'create-gnocchi-default-policies':
+    command     =>  'gnocchi archive-policy create -d granularity:5m,points:12 -d granularity:1h,points:24 -d granularity:1d,points:30 low && gnocchi archive-policy create -d granularity:60s,points:60 -d granularity:1h,points:168 -d granularity:1d,points:365 medium && gnocchi archive-policy create -d granularity:1s,points:86400 -d granularity:1m,points:43200 -d granularity:1h,points:8760 high && gnocchi archive-policy-rule create -a low -m "*" default',
+    unless      => 'gnocchi archive-policy show low',
+    require     => [ Package['python-gnocchiclient'], Service['apache2'] ],
+    path        => ['/usr/bin', '/bin'],
+    tries       => '3',
+    try_sleep   => '5',
+  }
+
   @@haproxy::balancermember{"${::fqdn}-gnocchi_api":
     listening_service => 'gnocchi_api',
     server_names      => $::hostname,
