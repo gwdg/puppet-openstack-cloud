@@ -16,11 +16,14 @@
 # == Class: cloud::telemetry::alarming::api
 #
 class cloud::telemetry::alarming::api(
+
+  $auth_uri                   = false,
+  $auth_url                   = $::os_service_default,
+
+  $memcache_servers           = [],
+
   $ks_aodh_internal_port      = 8042,
-  $ks_keystone_internal_host  = '127.0.0.1',
-  $ks_keystone_internal_port  = '5000',
-  $ks_keystone_internal_proto = 'http',
-  $ks_keystone_admin_port     = '35357',
+
   $api_eth                    = '127.0.0.1',
   $ks_aodh_password           = 'aodhpassword',
 ){
@@ -28,9 +31,12 @@ class cloud::telemetry::alarming::api(
   include ::cloud::telemetry
 
   class { '::aodh::api':
-    keystone_auth_uri     => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
-    keystone_identity_uri => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+
+    keystone_auth_uri     => $auth_uri,
+    keystone_auth_url     => $auth_url,
     keystone_password     => $ks_aodh_password,
+    memcached_servers     => $memcache_servers,
+
     host                  => $api_eth,
     port                  => $ks_aodh_internal_port,
 
