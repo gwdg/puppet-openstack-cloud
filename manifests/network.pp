@@ -37,7 +37,7 @@
 #
 # [*plugin*]
 #   (optional) Neutron plugin name
-#   Supported values: 'ml2', 'n1kv'
+#   Supported values: 'ml2'
 #   Defaults to 'ml2'
 #
 # [*service_plugins*]
@@ -57,9 +57,6 @@ class cloud::network(
   case $plugin {
     'ml2': {
       $core_plugin = 'neutron.plugins.ml2.plugin.Ml2Plugin'
-    }
-    'n1kv': {
-      $core_plugin = 'neutron.plugins.cisco.network_plugin.PluginV2'
     }
     default: {
       fail("${plugin} plugin is not supported.")

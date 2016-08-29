@@ -92,7 +92,7 @@
 #
 # [*plugin*]
 #   (optional) Neutron plugin name
-#   Supported values: 'ml2', 'n1kv'
+#   Supported values: 'ml2'
 #   Defaults to 'ml2'
 #
 # [*l3_ha*]
@@ -131,14 +131,6 @@
 #   Should be an array.
 #   Default to ['public'].
 #
-# [*n1kv_vsm_ip*]
-#   (required) N1KV VSM (Virtual Supervisor Module) VM's IP.
-#   Defaults to 127.0.0.1
-#
-# [*n1kv_vsm_password*]
-#   (required) N1KV VSM (Virtual Supervisor Module) password.
-#   Defaults to secrete
-#
 # [*tunnel_id_ranges*]
 #   (optional) GRE tunnel id ranges. used by he ml2 plugin
 #   List of colon-separated id ranges
@@ -162,6 +154,7 @@ class cloud::network::controller(
   $ks_keystone_admin_proto          = 'http',
   $ks_keystone_admin_port           = 35357,
   $ks_keystone_admin_user           = 'admin',
+
   $ks_admin_tenant                  = 'admin',
   $ks_keystone_admin_password       = 'password',
   $ks_keystone_admin_token          = undef,
@@ -188,10 +181,6 @@ class cloud::network::controller(
   $l3_ha                            = false,
   $router_distributed               = false,
   $allow_automatic_l3agent_failover = false,
-
-  # only needed by cisco n1kv plugin
-  $n1kv_vsm_ip                      = '127.0.0.1',
-  $n1kv_vsm_password                = 'secrete',
 
   # only needed by ml2 plugin
   $tunnel_id_ranges                 = ['1:10000'],
@@ -245,25 +234,6 @@ class cloud::network::controller(
         flat_networks         => $flat_networks,
         mechanism_drivers     => $mechanism_drivers,
         enable_security_group => true
-      }
-    }
-
-    'n1kv': {
-      $core_plugin = 'neutron.plugins.cisco.network_plugin.PluginV2'
-      class { '::neuton::plugins::cisco':
-        database_user     => $neutron_db_user,
-        database_password => $neutron_db_password,
-        database_host     => $neutron_db_host,
-        keystone_auth_url => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}/v2.0/",
-        keystone_password => $ks_neutron_password,
-        vswitch_plugin    => 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2',
-      }
-      neutron_plugin_cisco {
-        'securitygroup/firewall_driver': value => 'neutron.agent.firewall.NoopFirewallDriver';
-        "N1KV:${n1kv_vsm_ip}/username":  value  => 'admin';
-        "N1KV:${n1kv_vsm_ip}/password":  value  => $n1kv_vsm_password;
-        # TODO (EmilienM) not sure about this one:
-        'database/connection':           value => "mysql://${neutron_db_user}:${neutron_db_password}@${neutron_db_host}/neutron";
       }
     }
 
