@@ -20,12 +20,6 @@ class cloud::telemetry::alarming::engine(
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
   
-  $db_user                    = 'aodh',
-  $db_password                = 'aodhpassword',
-  $db_host                    = '127.0.0.1',
-  $db_port                    = 3306,
-  $db_idle_timeout            = 5000,
-
   $ks_keystone_internal_host  = '127.0.0.1',
   $ks_keystone_internal_port  = '5000',
   $ks_keystone_internal_proto = 'http',
@@ -36,6 +30,7 @@ class cloud::telemetry::alarming::engine(
   $os_endpoint_type           = 'publicURL'
 ){
 
+  include ::aodh::db
   include ::cloud::telemetry
 
   class { '::aodh': 
@@ -50,13 +45,5 @@ class cloud::telemetry::alarming::engine(
     auth_password      => $ks_aodh_password,
     auth_region        => $region,
     auth_endpoint_type => $os_endpoint_type,
-  }
-
-  $encoded_user     = uriescape($db_user)
-  $encoded_password = uriescape($db_password)
-
-  class { '::aodh::db':
-    database_connection   => "mysql://${encoded_user}:${encoded_password}@${db_host}:${db_port}/aodh?charset=utf8",
-    database_idle_timeout => $db_idle_timeout,
   }
 }
