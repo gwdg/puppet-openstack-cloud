@@ -73,11 +73,30 @@ class cloud::telemetry::api(
 #  }
 
   class { '::ceilometer::api':
-    keystone_auth_uri     => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
-    keystone_identity_uri => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
-    keystone_password     => $ks_ceilometer_password,
-    host                  => $api_eth
+
+    # Use WSGI
+    service_name            => 'httpd',
+
+    keystone_auth_uri       => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}",
+    keystone_identity_uri   => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_admin_port}",
+    keystone_password       => $ks_ceilometer_password,
+
+    host                    => $api_eth
   }
+
+  # Use WSGI for Ceilometer API
+  class {'::ceilometer::wsgi::apache':
+
+    servername  => $::fqdn,
+    port        => $ks_ceilometer_internal_port,
+
+    # Use multiprocessing defaults
+    workers     => 1,
+    threads     => $::processorcount,
+
+    ssl         => false
+  }
+
 
 # Configure TTL for samples
 # Purge datas older than one month
