@@ -55,22 +55,6 @@
 #   (optional) Password used by Heat to connect to Keystone API
 #   Defaults to 'heatpassword'
 #
-# [*heat_db_host*]
-#   (optional) Hostname or IP address to connect to heat database
-#   Defaults to '127.0.0.1'
-#
-# [*heat_db_user*]
-#   (optional) Username to connect to heat database
-#   Defaults to 'heat'
-#
-# [*heat_db_password*]
-#   (optional) Password to connect to heat database
-#   Defaults to 'heatpassword'
-#
-# [*heat_db_idle_timeout*]
-#   (optional) Timeout before idle SQL connections are reaped.
-#   Defaults to 5000
-#
 # [*rabbit_hosts*]
 #   (optional) List of RabbitMQ servers. Should be an array.
 #   Defaults to ['127.0.0.1:5672']
@@ -96,14 +80,6 @@ class cloud::orchestration(
   $ks_heat_public_proto       = 'http',
   $ks_heat_password           = 'heatpassword',
 
-  $heat_db_host               = '127.0.0.1',
-  $heat_db_user               = 'heat',
-  $heat_db_password           = 'heatpassword',
-  $heat_db_idle_timeout       = 5000,
-  $heat_db_use_slave          = false,
-  $heat_db_port               = 3306,
-  $heat_db_slave_port         = 3307,
-
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
 
@@ -111,21 +87,7 @@ class cloud::orchestration(
 ) {
 
   include ::mysql::client
-
-  $encoded_user     = uriescape($heat_db_user)
-  $encoded_password = uriescape($heat_db_password)
-
-  if $heat_db_use_slave {
-    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_slave_port}/heat?charset=utf8"
-  } else {
-    $slave_connection_url = undef
-  }
-
-  class { '::heat::db':
-    database_connection         => "mysql://${encoded_user}:${encoded_password}@${heat_db_host}:${heat_db_port}/heat?charset=utf8",
-    database_slave_connection   => $slave_connection_url,
-    database_idle_timeout       => $heat_db_idle_timeout,
-  }
+  include ::heat::db
 
   class { '::heat':
 
