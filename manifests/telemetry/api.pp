@@ -57,20 +57,9 @@ class cloud::telemetry::api(
   $api_eth                        = '127.0.0.1',
   $firewall_settings              = {},
 
-#  $mongo_nodes                    = ['127.0.0.1:27017'],
-#  $replica_set_name               = 'ceilometer',
 ){
   include ::ceilometer::db
   include ::cloud::telemetry
-
-#  unless defined(Class['::ceilometer::db']) {
-#    $s_mongo_nodes = join($mongo_nodes, ',')
-#
-#    class { '::ceilometer::db':
-#      database_connection => "mongodb://${s_mongo_nodes}/ceilometer?replicaSet=${replica_set_name}",
-#      sync_db             => true,
-#    }
-#  }
 
   class { '::ceilometer::api':
 
