@@ -21,18 +21,6 @@
 #   (optional) Password used by Neutron to connect to Keystone API
 #   Defaults to 'neutronpassword'
 #
-# [*ks_keystone_admin_host*]
-#   (optional) Admin Hostname or IP to connect to Keystone API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_keystone_admin_proto*]
-#   (optional) Protocol for admin endpoint. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_keystone_public_port*]
-#   (optional) TCP port to connect to Keystone API from public network
-#   Defaults to '5000'
-#
 # [*ks_neutron_public_port*]
 #   (optional) TCP port to connect to Neutron API from public network
 #   Defaults to '9696'
@@ -40,10 +28,6 @@
 # [*api_eth*]
 #   (optional) Which interface we bind the Neutron server.
 #   Defaults to '127.0.0.1'
-#
-# [*ks_admin_tenant*]
-#   (optional) Admin tenant name in Keystone
-#   Defaults to 'admin'
 #
 # [*nova_url*]
 #   (optional) URL for connection to nova (Only supports one nova region
@@ -104,22 +88,6 @@
 #   Right now, DVR is not compatible with l3_ha
 #   Defaults to false
 #
-# [*ks_keystone_admin_port*]
-#   (optional) TCP port to connect to Keystone API from admin network
-#   Defaults to '35357'
-#
-# [*ks_keystone_admin_user*]
-#   (optional) Admin user to connect to Keystone API
-#   Defaults to 'admin'
-#
-# [*ks_keystone_admin_password*]
-#   (optional) Password for admin user to connect to Keystone API
-#   Defaults to 'password'
-#
-# [*ks_keystone_admin_token*]
-#   (optional) Token to connect to Keystone API as admin user
-#   Defaults to undef
-#
 # [*provider_vlan_ranges*]
 #   (optionnal) VLAN range for provider networks
 #   Defaults to ['physnet1:1000:2999']
@@ -150,24 +118,18 @@
 class cloud::network::controller(
 
   $ks_neutron_password              = 'neutronpassword',
-  $ks_keystone_admin_host           = '127.0.0.1',
-  $ks_keystone_admin_proto          = 'http',
-  $ks_keystone_admin_port           = 35357,
-  $ks_keystone_admin_user           = 'admin',
 
-  $ks_admin_tenant                  = 'admin',
-  $ks_keystone_admin_password       = 'password',
-  $ks_keystone_admin_token          = undef,
-  $ks_keystone_public_port          = 5000,
   $ks_neutron_public_port           = 9696,
-
   $api_eth                          = '127.0.0.1',
 
   $nova_url                         = 'http://127.0.0.1:8774/v2',
-  $auth_url                         = 'http://127.0.0.1:5000/v2.0',
+
+  $auth_uri                         = 'http://localhost:5000/',
+  $auth_url                         = 'http://localhost:35357/',
   $username                         = 'nova',
-  $tenant_name                      = 'services',
   $password                         = 'novapassword',
+
+  $tenant_name                      = 'services',
   $region_name                      = 'RegionOne',
   $manage_ext_network               = false,
 
@@ -178,6 +140,7 @@ class cloud::network::controller(
   $provider_vlan_ranges             = ['physnet1:1000:2999'],
   $plugin                           = 'ml2',
   $mechanism_drivers                = ['linuxbridge', 'openvswitch','l2population'],
+
   $l3_ha                            = false,
   $router_distributed               = false,
   $allow_automatic_l3agent_failover = false,
@@ -203,24 +166,20 @@ class cloud::network::controller(
 
   class { '::neutron::server':
 
-    auth_password                       => $ks_neutron_password,
-    auth_uri                            => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_public_port}",
-    identity_uri                        => "${ks_keystone_admin_proto}://${ks_keystone_admin_host}:${ks_keystone_admin_port}",
+    auth_uri                            => $auth_uri,
+    auth_url                            => $auth_url,
+    username                            => 'neutron',
+    password                            => $ks_neutron_password,
 
     api_workers                         => $::neutron::server::api_workers,
     rpc_workers                         => $::neutron::server::rpc_workers,
 
-    agent_down_time                     => '60',
     l3_ha                               => $l3_ha,
     router_distributed                  => $router_distributed,
     allow_automatic_l3agent_failover    => $allow_automatic_l3agent_failover,
 
     sync_db                             => true,
   }
-
-#  neutron_config {
-#    'database/slave_connection':    value => $slave_connection_url;
-#  }
 
   case $plugin {
     'ml2': {
