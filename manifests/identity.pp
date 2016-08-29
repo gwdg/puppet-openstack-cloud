@@ -23,22 +23,6 @@
 #   (optional) Extra keystone roles to create
 #   Defaults to ['SwiftOperator', 'ResellerAdmin']
 #
-# [*keystone_db_host*]
-#   (optional) Hostname or IP address to connect to keystone database
-#   Defaults to '127.0.0.1'
-#
-# [*keystone_db_user*]
-#   (optional) Username to connect to keystone database
-#   Defaults to 'keystone'
-#
-# [*keystone_db_password*]
-#   (optional) Password to connect to keystone database
-#   Defaults to 'keystonepassword'
-#
-# [*keystone_db_idle_timeout*]
-#   (optional) Timeout before idle SQL connections are reaped.
-#   Defaults to 5000
-#
 # [*ks_admin_email*]
 #   (optional) Email address of admin user in Keystone
 #   Defaults to 'no-reply@keystone.openstack'
@@ -152,14 +136,6 @@ class cloud::identity (
 
   $identity_roles_addons        = ['SwiftOperator', 'ResellerAdmin'],
 
-  $keystone_db_host             = '127.0.0.1',
-  $keystone_db_user             = 'keystone',
-  $keystone_db_password         = 'keystonepassword',
-  $keystone_db_idle_timeout     = 5000,
-  $keystone_db_use_slave        = false,
-  $keystone_db_port             = 3306,
-  $keystone_db_slave_port       = 3307,
-
   $ks_admin_email               = 'no-reply@keystone.openstack',
   $ks_admin_password            = 'adminpassword',
   $ks_admin_tenant              = 'admin',
@@ -263,22 +239,8 @@ class cloud::identity (
   $ldap_backends                = {},
 ){
 
-  $encoded_user     = uriescape($keystone_db_user)
-  $encoded_password = uriescape($keystone_db_password)
-
+  include ::keystone::db
   include ::mysql::client
-
-  if $keystone_db_use_slave {
-    $slave_connection_url = "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_slave_port}/keystone?charset=utf8"
-  } else {
-    $slave_connection_url = undef
-  }
-
-  class { '::keystone::db':
-    database_idle_timeout       => $keystone_db_idle_timeout,
-    database_connection         => "mysql://${encoded_user}:${encoded_password}@${keystone_db_host}:${keystone_db_port}/keystone?charset=utf8",
-    database_slave_connection   => $slave_connection_url,
-  }
 
   class { '::keystone':
     enabled               => true,
