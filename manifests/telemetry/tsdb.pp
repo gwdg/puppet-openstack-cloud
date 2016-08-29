@@ -25,11 +25,6 @@ class cloud::telemetry::tsdb(
   $ks_gnocchi_internal_port     = 8041,
   $ks_gnocchi_password          = 'gnocchipassword',
 
-  $gnocchi_db_user              = 'gnocchi',
-  $gnocchi_db_password          = 'gnocchipassword',
-  $gnocchi_db_host              = '127.0.0.1',
-  $gnocchi_db_port              = 3306,
-
   $influxdb_host                = '127.0.0.1',
   $influxdb_port                = 8086,
   $influxdb_management_port     = 8083,
@@ -40,14 +35,11 @@ class cloud::telemetry::tsdb(
 
   include ::cloud::telemetry
   include ::gnocchi::client
+  include ::gnocchi::db
   include ::gnocchi::storage::influxdb
   include ::gnocchi::metricd
 
-  $encoded_user     = uriescape($gnocchi_db_user)
-  $encoded_password = uriescape($gnocchi_db_password)
-
   class { '::gnocchi':
-    database_connection => "mysql://${encoded_user}:${encoded_password}@${gnocchi_db_host}:${gnocchi_db_port}/gnocchi?charset=utf8",
   }
 
   class { '::gnocchi::api':
@@ -67,7 +59,6 @@ class cloud::telemetry::tsdb(
   class {'::gnocchi::wsgi::apache':
 
     servername  => $::fqdn,
-
     port        => $ks_gnocchi_internal_port,
 
     # Use multiprocessing defaults
