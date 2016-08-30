@@ -37,10 +37,26 @@ class cloud::telemetry::alarming::api(
     keystone_password     => $ks_aodh_password,
     memcached_servers     => $memcache_servers,
 
+    # Use WSGI
+    service_name          => 'httpd',
+
     host                  => $api_eth,
     port                  => $ks_aodh_internal_port,
 
     sync_db               => true,
+  }
+
+  # WSGI setup
+  class {'::aodh::wsgi::apache':
+
+    servername  => $::fqdn,
+    port        => $ks_aodh_internal_port,
+
+    # Use multiprocessing defaults
+    workers     => 1,
+    threads     => $::processorcount,
+
+    ssl         => false
   }
 
   @@haproxy::balancermember{"${::fqdn}-aodh_api":
