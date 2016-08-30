@@ -70,9 +70,8 @@ class cloud::telemetry(
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword' ,
 
-  $ks_keystone_internal_host  = '127.0.0.1',
-  $ks_keystone_internal_port  = '5000',
-  $ks_keystone_internal_proto = 'http',
+  $auth_uri                   = false,
+  $memcache_servers           = [],
 
   $ks_ceilometer_password     = 'ceilometerpassword',
 
@@ -82,7 +81,10 @@ class cloud::telemetry(
 ){
 
   class { '::ceilometer':
+
     metering_secret         => $ceilometer_secret,
+
+    memcached_servers       => $memcache_servers,
 
     rabbit_hosts            => $rabbit_hosts,
     rabbit_password         => $rabbit_password,
@@ -96,7 +98,7 @@ class cloud::telemetry(
   }
 
   class { '::ceilometer::agent::auth':
-    auth_url      => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
+    auth_url      => $auth_uri,
     auth_password => $ks_ceilometer_password,
     auth_region   => $region
   }
