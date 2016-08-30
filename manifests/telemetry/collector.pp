@@ -22,8 +22,13 @@
 #
 #
 class cloud::telemetry::collector(
+
   $gnocchi_url          = 'http://localhost:8041',
   $workers              = 1,
+
+  $batch_size           = 100,
+  $batch_timeout        = 5,
+
 ){
   include ::ceilometer::db
   include ::cloud::telemetry
@@ -39,6 +44,12 @@ class cloud::telemetry::collector(
     url                       => $gnocchi_url,
 #    archive_policy            => 'high',
     resources_definition_file => 'gnocchi_resources.yaml',
+  }
+
+  # Add some missing options for collector
+  ceilometer_config {
+    'collector/batch_size':     value => $batch_size;
+    'collector/batch_timeout':  value => $batch_timeout;
   }
 
 }
