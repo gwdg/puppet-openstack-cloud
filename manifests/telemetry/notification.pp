@@ -18,7 +18,5 @@
 class cloud::telemetry::notification {
 
   include ::cloud::telemetry
-
-  class { '::ceilometer::agent::notification': }
-
+  include ::ceilometer::agent::notification
 }
