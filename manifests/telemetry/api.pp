@@ -49,6 +49,8 @@ class cloud::telemetry::api(
   $auth_uri                     = 'http://127.0.0.1:5000/',
   $identity_uri                 = 'http://127.0.0.1:35357/',
 
+  $memcache_servers             = [],
+
   $ks_ceilometer_internal_port  = '8777',
   $ks_ceilometer_password       = 'ceilometerpassword',
 
@@ -67,6 +69,8 @@ class cloud::telemetry::api(
     auth_uri                => $auth_uri,
     identity_uri            => $identity_uri,
     keystone_password       => $ks_ceilometer_password,
+
+    memcached_servers       => $memcache_servers,
 
     host                    => $api_eth
   }
