@@ -19,10 +19,8 @@ class cloud::telemetry::alarming::engine(
 
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
-  
-  $ks_keystone_internal_host  = '127.0.0.1',
-  $ks_keystone_internal_port  = '5000',
-  $ks_keystone_internal_proto = 'http',
+
+  $auth_url                   = 'http://localhost:5000/v2.0',
   $ks_aodh_password           = 'aodhpassword',
 
   $gnocchi_url                = undef,
@@ -41,7 +39,7 @@ class cloud::telemetry::alarming::engine(
   }
 
   class { '::aodh::auth':
-    auth_url           => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0",
+    auth_url           => $auth_url,
     auth_password      => $ks_aodh_password,
     auth_region        => $region,
     auth_endpoint_type => $os_endpoint_type,
