@@ -45,6 +45,8 @@ class cloud::image::registry(
   $auth_uri                         = 'http://127.0.0.1:5000/',
   $identity_uri                     = 'http://127.0.0.1:35357/',
 
+  $memcache_servers                 = [],
+
   $ks_glance_internal_host          = '127.0.0.1',
   $ks_glance_registry_internal_port = '9191',
   $ks_glance_password               = 'glancepassword',
@@ -60,6 +62,8 @@ class cloud::image::registry(
 
     auth_uri              => $auth_uri, 
     identity_uri          => $identity_uri,
+
+    memcached_servers     => $memcache_servers,
 
     keystone_password     => $ks_glance_password,
     keystone_tenant       => 'services',
