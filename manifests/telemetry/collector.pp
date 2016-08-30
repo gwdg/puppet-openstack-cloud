@@ -23,12 +23,14 @@
 #
 class cloud::telemetry::collector(
   $gnocchi_url          = 'http://localhost:8041',
+  $workers              = 1,
 ){
   include ::ceilometer::db
   include ::cloud::telemetry
 
   class { '::ceilometer::collector': 
-    meter_dispatcher => ['gnocchi'],
+    meter_dispatcher    => ['gnocchi'],
+    collector_workers   => $workers,
   }
 
   class { '::ceilometer::dispatcher::gnocchi':
