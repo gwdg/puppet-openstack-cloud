@@ -167,6 +167,10 @@ class cloud::identity (
   $cinder_v2_internal_url       = undef,
   $cinder_v2_admin_url          = undef,
 
+  $cinder_v3_public_url         = undef,
+  $cinder_v3_internal_url       = undef,
+  $cinder_v3_admin_url          = undef,
+
   $cinder_password              = 'cinderpassword',
 
   $glance_public_url            = undef,
@@ -431,6 +435,10 @@ class cloud::identity (
       public_url_v2     => $cinder_v2_public_url,
       internal_url_v2   => $cinder_v2_internal_url,
       admin_url_v2      => $cinder_v2_admin_url,
+
+      public_url_v3     => $cinder_v3_public_url,
+      internal_url_v3   => $cinder_v3_internal_url,
+      admin_url_v3      => $cinder_v3_admin_url,
 
       region            => $region,
       password          => $cinder_password
