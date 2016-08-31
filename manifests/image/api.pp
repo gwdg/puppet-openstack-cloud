@@ -145,6 +145,14 @@ class cloud::image::api(
     known_stores             => $known_stores,
   }
 
+  # Make sure Memcache Python module is available (will be made obsolete with use of oslo.cache puppet module)
+  include ::oslo::params
+  ensure_packages('python-memcache', {
+    ensure => present,
+    name   => $::oslo::params::python_memcache_package_name,
+    tag    => ['openstack'],
+  })
+  
   glance_api_config {
     'DEFAULT/notifier_driver':      value => 'noop';
     'DEFAULT/container_formats':    value => $container_formats;

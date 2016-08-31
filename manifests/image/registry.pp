@@ -75,9 +75,13 @@ class cloud::image::registry(
     sync_db               => true,
   }
 
-#  glance_registry_config {
-#    'database/slave_connection':    value => $slave_connection_url;
-#  }
+  # Make sure Memcache Python module is available (will be made obsolete with use of oslo.cache puppet module)
+  include ::oslo::params
+  ensure_packages('python-memcache', {
+    ensure => present,
+    name   => $::oslo::params::python_memcache_package_name,
+    tag    => ['openstack'],
+  })
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow glance-registry access':
