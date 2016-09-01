@@ -19,6 +19,8 @@ class cloud::role::controller inherits ::cloud::role::base {
 
     class { '::cloud::network::controller': }           ->
     class { '::cloud::dashboard': }                     ->
+
+    class { '::cloud::orchestration::engine': }         ->
     class { '::cloud::orchestration::api': }            ->
 
     class { '::cloud::telemetry::tsdb': }               ->

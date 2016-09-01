@@ -3,8 +3,6 @@ class cloud::role::spof inherits ::cloud::role::base {
 
     class { '::cloud::auth_file': }                      ->
 
-    class { '::cloud::orchestration::engine': }          ->
-
     class { '::cloud::telemetry::centralagent': }        ->
 
     class { '::cloud::telemetry::alarming::engine': }    ->
