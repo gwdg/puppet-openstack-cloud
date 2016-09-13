@@ -276,7 +276,13 @@ class cloud::identity (
 
   # Keystone LDAP
   if $use_ldap {
-#    include 'keystone::ldap'
+
+    # Create domain for LDAP users ('GWDG')
+    ensure_resource('keystone_domain', 'GWDG', {
+      'ensure'  => 'present',
+      'enabled' => true,
+    })
+
     create_resources('::keystone::ldap_backend', $ldap_backends)
   }
 
