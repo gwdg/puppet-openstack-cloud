@@ -47,9 +47,11 @@ class cloud::telemetry::collector(
   }
 
   # Add some missing options for collector
-  ceilometer_config {
-    'collector/batch_size':     value => $batch_size;
-    'collector/batch_timeout':  value => $batch_timeout;
+  class { '::ceilometer::config':
+    ceilometer_config => {
+      'collector/batch_size'    => { value => $batch_size},
+      'collector/batch_timeout' => { value => $batch_timeout}
+    }
   }
 
 }
