@@ -1,5 +1,5 @@
 #
-class cloud::role::volume-api inherits ::cloud::role::base {
+class cloud::role::volume_api inherits ::cloud::role::base {
 
     class { '::cloud::auth_file': }                     ->
 

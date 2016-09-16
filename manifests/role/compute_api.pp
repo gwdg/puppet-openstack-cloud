@@ -1,5 +1,5 @@
 #
-class cloud::role::compute-api inherits ::cloud::role::base {
+class cloud::role::compute_api inherits ::cloud::role::base {
 
     class { '::cloud::auth_file': }                     ->
 

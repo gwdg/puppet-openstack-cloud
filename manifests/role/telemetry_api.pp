@@ -1,5 +1,5 @@
 #
-class cloud::role::telemetry-api inherits ::cloud::role::base {
+class cloud::role::telemetry_api inherits ::cloud::role::base {
 
     class { '::cloud::auth_file': }                     ->
 
