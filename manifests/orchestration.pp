@@ -77,6 +77,12 @@ class cloud::orchestration(
     rabbit_userid         => 'heat',
   }
 
+  class { '::heat::keystone::domain': 
+    manage_domain => false,
+    manage_user   => false,
+    manage_role   => false,
+  }
+
   heat_config {
     'clients/endpoint_type': value => $os_endpoint_type;
   }
