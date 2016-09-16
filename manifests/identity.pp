@@ -472,8 +472,8 @@ class cloud::identity (
 
     configure_delegated_roles => true
   }
-  
-  class { '::heat::keystone::domain': }
+
+  class { '::cloud::orchestration::domain': }
 
   class { '::heat::keystone::auth_cfn':
 
