@@ -3,6 +3,8 @@ class cloud::role::telemetry_api inherits ::cloud::role::base {
 
     class { '::cloud::auth_file': }                     ->
 
+    class { '::cloud::profile::memcache': }             ->
+
     class { '::cloud::telemetry::tsdb': }                ->
     class { '::cloud::telemetry::api': }                 ->
     class { '::cloud::telemetry::centralagent': }        ->
