@@ -134,24 +134,6 @@ class cloud::dashboard(
   # We build the param needed for horizon class
   $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}/v3"
 
-  # Apache2 specific configuration
-  # FIXME(piotr): we add the headers for ssl termination via haproxy, so don't do it here
-#  if $ssl_forward {
-#    $setenvif = ['X-Forwarded-Proto https HTTPS=1']
-#  } else {
-    $setenvif = []
-#  }
-  $extra_params = {
-    'add_listen' => true,
-    'setenvif'   => $setenvif
-  }
-  $vhost_extra_params_real = merge ($extra_params, $vhost_extra_params)
-
-  $neutron_options = {
-    'enable_lb' => true
-  }
-  $neutron_options_real = merge ($neutron_options, $neutron_extra_options)
-
   # Use memcache servers for caching if set, else in memory caching
   if $memcache_servers {
     $cache_server_ip    = $memcache_servers
@@ -170,12 +152,12 @@ class cloud::dashboard(
     cache_server_ip         => $cache_server_ip,
     cache_backend           => $cache_backend,
     django_debug            => $debug,
-    neutron_options         => $neutron_options_real,
+    neutron_options         => $neutron_extra_options,
     listen_ssl              => $listen_ssl,
     horizon_cert            => $horizon_cert,
     horizon_key             => $horizon_key,
     horizon_ca              => $horizon_ca,
-    vhost_extra_params      => $vhost_extra_params_real,
+    vhost_extra_params      => $vhost_extra_params,
     openstack_endpoint_type => $os_endpoint_type,
     allowed_hosts           => $allowed_hosts,
     ssl_forward             => $ssl_forward,
