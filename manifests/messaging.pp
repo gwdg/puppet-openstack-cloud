@@ -85,8 +85,8 @@ class cloud::messaging(
   $rabbitmq_port            = '5672',
   $firewall_settings        = {},
 
-  # New stuff
-  $rabbitmq_master_name     = 'controller1.dev.cloud.gwdg.de',
+  $rabbitmq_master_name     = 'messaging1',
+  $rabbitmq_cluster_name    = 'rabbit@messaging1.dev.cloud.gwdg.de',
   $rabbitmq_management_port = '15672',
 ){
 
@@ -98,12 +98,11 @@ class cloud::messaging(
   Class['::rabbitmq'] -> Rabbitmq_user_permissions <<| |>>
 
   # Differentiate between master and slave nodes to allow automatic cluster join
-  if $::fqdn != $rabbitmq_master_name {
-    $clustername                = "rabbit@${rabbitmq_master_name}"
+  if $::hostname != $rabbitmq_master_name {
     $sleep_after_state_change   = "5"
     exec { 'join-rabbitmq-cluster':
       command   => "/usr/sbin/rabbitmqctl stop_app; /bin/sleep ${sleep_after_state_change}; /usr/sbin/rabbitmqctl join_cluster rabbit@${rabbitmq_master_name}; /usr/sbin/rabbitmqctl start_app; /bin/sleep ${sleep_after_state_change}",
-      unless    => "/usr/sbin/rabbitmqctl -q cluster_status | grep '{cluster_name,<<\"${clustername}\">>}'",
+      unless    => "/usr/sbin/rabbitmqctl -q cluster_status | grep '{cluster_name,<<\"${rabbitmq_cluster_name}\">>}'",
       require   => Class['rabbitmq'],
     }
   }
