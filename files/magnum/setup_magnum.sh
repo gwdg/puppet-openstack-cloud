@@ -1,105 +1,64 @@
 #!/bin/bash
+apt-get -y install python-dev libssl-dev libxml2-dev python-setuptools \
+                   libmysqlclient-dev libxslt-dev libpq-dev git \
+                   libffi-dev gettext build-essential gcc
 
-# Install Git
-apt-get -y install git
+groupadd --system magnum
 
-# Install Pip
+useradd --home-dir "/var/lib/magnum" \
+        --create-home \
+        --system \
+        --shell /bin/false \
+        -g magnum \
+        magnum
+
+mkdir -p /var/log/magnum
+mkdir -p /etc/magnum
+
+chown magnum:magnum /var/log/magnum
+chown magnum:magnum /var/lib/magnum
+chown magnum:magnum /etc/magnum
+
+easy_install -U virtualenv
+
+su -s /bin/sh -c "virtualenv /var/lib/magnum/env" magnum
+su -s /bin/sh -c "/var/lib/magnum/env/bin/pip install tox pymysql python-memcached" magnum
+
+# Magnum API/Conductor
+cd /var/lib/magnum
+git clone https://git.openstack.org/openstack/magnum.git 
+cd magnum
+git checkout stable/newton
+cd ..
+chown -R magnum:magnum magnum
+cd magnum
+su -s /bin/sh -c "/var/lib/magnum/env/bin/pip install -r requirements.txt" magnum
+su -s /bin/sh -c "/var/lib/magnum/env/bin/python setup.py install" magnum
+
+su -s /bin/sh -c "cp etc/magnum/policy.json /etc/magnum" magnum
+su -s /bin/sh -c "cp etc/magnum/api-paste.ini /etc/magnum" magnum
+
+su -s /bin/sh -c "/var/lib/magnum/env/bin/tox -e genconfig" magnum
+su -s /bin/sh -c "cp etc/magnum/magnum.conf.sample /etc/magnum/magnum.conf" magnum
+
+cd /var/lib/magnum/magnum
+cp doc/examples/etc/systemd/system/magnum-api.service /etc/systemd/system/magnum-api.service
+cp doc/examples/etc/systemd/system/magnum-conductor.service /etc/systemd/system/magnum-conductor.service
+cp doc/examples/etc/logrotate.d/magnum.logrotate /etc/logrotate.d/magnum
+
+systemctl enable magnum-api
+systemctl enable magnum-conductor
+
+# Magnum Client
 curl "https://bootstrap.pypa.io/get-pip.py" -o "/tmp/get-pip.py"
 python /tmp/get-pip.py
 
-# Install Magnum Api/Conductor
-git clone https://github.com/openstack/magnum.git /opt/magnum
-cd /opt/magnum
-git checkout stable/mitaka
-apt-get -y install build-essential libssl-dev libffi-dev python-dev
-pip install -e .
+cd /opt/
+git clone https://git.openstack.org/openstack/python-magnumclient.git magnumclient
+cd magnumclient
+git checkout stable/newton
+pip install -r requirements.txt
+python setup.py install
 
-# Install Magnum Client
-git clone https://git.openstack.org/openstack/python-magnumclient /opt/magnumclient
-cd /opt/magnumclient
-git checkout stable/mitaka
-sudo pip install -e .
-
-# Generate Base Config
-pip install tox
-cd /opt/magnum/etc/magnum
-tox -egenconfig
-
-mkdir /etc/magnum
-cp /opt/magnum/etc/magnum/magnum.conf.sample /etc/magnum/magnum.conf
-cp /opt/magnum/etc/magnum/policy.json /etc/magnum/policy.json
-cp /opt/magnum/etc/magnum/api-paste.ini /etc/magnum/api-paste.ini
-
-# Create Zertification Directory
+## Create Zertification Directory
 mkdir -p /var/lib/magnum/certificates/
-
-#Create Magnum Services
-mkdir /var/run/magnum/
-
-cat > /etc/init/magnum-api.conf << EOF
-description "Magnum API"
-author "Maik Srba <maik.srba@gwdg.de>"
-
-start on runlevel [2345]
-stop on runlevel [!2345]
-
-chdir /var/run
-
-respawn
-respawn limit 20 5
-limit nofile 65535 65535
-
-pre-start script
-    for i in lock run log lib ; do
-        mkdir -p /var/\$i/magnum
-        #chown magnum /var/$i/magnum
-    done
-end script
-
-script
-    [ -x "/usr/local/bin/magnum-api" ] || exit 0
-    DAEMON_ARGS=""
-    [ -r /etc/default/openstack ] && . /etc/default/openstack
-    [ -r /etc/default/\$UPSTART_JOB ] && . /etc/default/\$UPSTART_JOB
-    [ "x\$USE_SYSLOG" = "xyes" ] && DAEMON_ARGS="\$DAEMON_ARGS --use-syslog"
-    [ "x\$USE_LOGFILE" != "xno" ] && DAEMON_ARGS="\$DAEMON_ARGS --log-file=/var/log/magnum/magnum-api.log"
-
-    exec start-stop-daemon --start --chdir /var/lib/magnum \
-        --chuid root:root --make-pidfile --pidfile /var/run/magnum/magnum-api.pid \
-        --exec /usr/local/bin/magnum-api -- --config-file=/etc/magnum/magnum.conf \${DAEMON_ARGS}
-end script
-EOF
-
-cat > /etc/init/magnum-conductor.conf << EOF
-description "Magnum Conductor"
-author "Maik Srba <maik.srba@gwdg.de>"
-
-start on runlevel [2345]
-stop on runlevel [!2345]
-
-chdir /var/run
-
-respawn
-respawn limit 20 5
-limit nofile 65535 65535
-
-pre-start script
-    for i in lock run log lib ; do
-        mkdir -p /var/\$i/magnum
-        #chown magnum /var/$i/magnum
-    done
-end script
-
-script
-    [ -x "/usr/local/bin/magnum-conductor" ] || exit 0
-    DAEMON_ARGS=""
-    [ -r /etc/default/openstack ] && . /etc/default/openstack
-    [ -r /etc/default/\$UPSTART_JOB ] && . /etc/default/\$UPSTART_JOB
-    [ "x\$USE_SYSLOG" = "xyes" ] && DAEMON_ARGS="\$DAEMON_ARGS --use-syslog"
-    [ "x\$USE_LOGFILE" != "xno" ] && DAEMON_ARGS="\$DAEMON_ARGS --log-file=/var/log/magnum/magnum-conductor.log"
-
-    exec start-stop-daemon --start --chdir /var/lib/magnum \
-        --chuid root:root --make-pidfile --pidfile /var/run/magnum/magnum-conductor.pid \
-        --exec /usr/local/bin/magnum-conductor -- --config-file=/etc/magnum/magnum.conf \${DAEMON_ARGS}
-end script
-EOF
