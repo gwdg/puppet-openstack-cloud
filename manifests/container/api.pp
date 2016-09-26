@@ -22,7 +22,7 @@ class cloud::container::api(
 
     admin_password => $ks_magnum_password,
 
-    require        => Exec ['/tmp/setup_magnum.sh']
+    require        => Exec['/tmp/setup_magnum.sh']
   }
 
   @@haproxy::balancermember{"${::fqdn}-magnum_api":

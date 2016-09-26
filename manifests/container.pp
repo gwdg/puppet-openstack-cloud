@@ -30,37 +30,43 @@ class cloud::container(
   include ::magnum::db
 
   file { '/tmp/setup_magnum.sh':
-    ensure => file,
-    source => 'puppet:///modules/cloud/magnum/setup_magnum.sh',
-    owner  => root,
-    group  => root,
-    mode   => 'u+x',
-    audit  => content,
+    ensure  => file,
+    source  => 'puppet:///modules/cloud/magnum/setup_magnum.sh',
+    owner   => root,
+    group   => root,
+    mode    => 'u+x',
+    audit   => content,
+
+    require => Exec['apt_update'],
   } 
 
   exec { '/tmp/setup_magnum.sh':
-    subscribe => File['/tmp/setup_magnum.sh'],
+    subscribe   => File['/tmp/setup_magnum.sh'],
     refreshonly => true,
+    logoutput   => true,
+
+    tag    => ['magnum-package'],
   }
 
+  Exec['/tmp/setup_magnum.sh'] -> Magnum_config <| |>
+  
   class { '::magnum':
-	rabbit_hosts          => $rabbit_hosts,
-	rabbit_password       => $rabbit_password,
-	rabbit_userid         => 'magnum',
+	  rabbit_hosts          => $rabbit_hosts,
+	  rabbit_password       => $rabbit_password,
+	  rabbit_userid         => 'magnum',
 
-    require               => Exec ['/tmp/setup_magnum.sh']
+    require               => Exec['/tmp/setup_magnum.sh']
   }->
   magnum_config {
 	'certificates/cert_manager_type' :   value => 'local';
 	'certificates/storage_path' :        value => '/var/lib/magnum/certificates/';
   }
 
-  exec { 'magnum-db-sync':
-    command     => "magnum-db-manage upgrade",
-    path        => '/usr/bin:/usr/local/bin/',
-    refreshonly => true,
-    subscribe   => [Exec['/tmp/setup_magnum.sh'], Magnum_config['database/connection']],
+  class { '::magnum::keystone::domain':
+    manage_domain => false,
+    manage_user   => false,
+    manage_role   => false,
   }
 
-  Exec['magnum-manage db_sync'] ~> Service<| title == 'magnum' |>
+  Exec['/tmp/setup_magnum.sh'] ~> Exec['magnum-db-sync']
 }
