@@ -246,6 +246,14 @@ class cloud::identity (
   include ::keystone::db
   include ::mysql::client
 
+  if $token_provider == 'fernet' and $::fqdn == $keystone_master_name {
+
+    $enable_fernet_setup = true
+  } else {
+
+    $enable_fernet_setup = false
+  }
+
   class { '::keystone':
     enabled               => true,
     admin_token           => $ks_admin_token,
@@ -266,6 +274,8 @@ class cloud::identity (
     using_domain_config   => true,
 
     sync_db               => true,
+
+    enable_fernet_setup   => $enable_fernet_setup,
   }
 
   keystone_config {
@@ -285,6 +295,7 @@ class cloud::identity (
 
     create_resources('::keystone::ldap_backend', $ldap_backends)
   }
+
 
   # Keystone Endpoints + Users
 
@@ -374,6 +385,27 @@ class cloud::identity (
       require   => Cloud::Util::Ssh_access['keystone'],
       notify    => Service['httpd']
     }
+
+    # Copy fernet keys from master node to slave node(s)
+    # Ensure /etc/keystone/fernet-keys/ directory is present and empty
+    file { '/etc/keystone/fernet-keys/':
+      ensure => directory,
+      recurse => true,
+      purge => true,
+      force => true,
+      owner  => 'keystone',
+      group  => 'keystone',
+      mode   => '0600',
+    }
+    # Copy Fernet Keys from master node
+    exec { 'keystone-copy-fernet-keys':
+      command   => "/usr/bin/scp -P $ssh_port -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/fernet-keys /etc/keystone/",
+      creates   => '/etc/keystone/fernet-keys/0',
+      user      => 'keystone',
+      require   => [Cloud::Util::Ssh_access['keystone'], File['/etc/keystone/fernet-keys/']],
+      notify    => Service['httpd']
+    }
+
   }
 
   class {'::ceilometer::keystone::auth':
