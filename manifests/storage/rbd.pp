@@ -49,13 +49,12 @@ class cloud::storage::rbd (
   if $enable {
 
     # Install ceph client packages
-    $packages = ['python-rbd']
+    $packages = ['python-rbd', 'ceph-common']
 
-    # This is now handled in nova::compute::rbd
-#    package { 'ceph':
-#      ensure  => $package_ensure,
-#      name    => 'ceph-common',
-#    } 
+    package { 'ceph':
+      ensure  => $package_ensure,
+      name    => 'ceph-common',
+    } 
 
     package { 'python-rbd':
       ensure  => $package_ensure,
@@ -64,7 +63,7 @@ class cloud::storage::rbd (
     # Setup ceph.conf
     file { '/etc/ceph/ceph.conf':
       content => template('cloud/storage/ceph/ceph.conf.erb'),
-      require => Package['python-rbd']
+      require => Package['ceph']
     }
 
     Exec {
