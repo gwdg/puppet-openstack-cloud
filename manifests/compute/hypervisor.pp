@@ -256,7 +256,7 @@ class cloud::compute::hypervisor(
 
   Service<| title == 'dbus' |> { enable => true }
 
-  Service<| title == 'libvirt-bin' |> { enable => true }
+  Service<| title == 'libvirt' |> { enable => true }
 
   class { '::nova::compute::neutron': }
 
@@ -275,7 +275,7 @@ class cloud::compute::hypervisor(
         mode    => '0770',
         owner   => 'libvirt-qemu',
         group   => 'libvirtd',
-        require => Package['libvirt-bin'],
+        require => Package['libvirt'],
         before  => Class['::nova::compute::rbd'],
       }
 
@@ -313,7 +313,7 @@ class cloud::compute::hypervisor(
       tag     => 'ceph_compute_secret_file',
     }
 
-    $libvirt_package_name = 'libvirt-bin'
+    $libvirt_package_name = 'libvirt'
 
     Exec {
       path => '/bin:/sbin:/usr/bin:/usr/sbin'
@@ -362,7 +362,7 @@ class cloud::compute::hypervisor(
   }
 
 	# Make sure group libvirtd exists before trying to set it as additional group for ceilometer user
-	Package['libvirt-bin'] -> User['ceilometer']
+	Package['libvirt'] -> User['ceilometer']
 
   class { '::ceilometer::agent::compute': }
 
