@@ -132,6 +132,8 @@ class cloud(
   $groups               = {},
   $users                = {},
 
+  $syslog_server        = undef,
+  $syslog_port          = undef,
 ) {
 
   include ::stdlib
@@ -298,16 +300,16 @@ class cloud(
     refreshonly => true,
   } 
 
-  $logstash_syslog_bind_ip = hiera('cloud::logging::server::logstash_syslog_bind_ip') 
-  $logstash_syslog_port = hiera('cloud::logging::server::logstash_syslog_port') 
+  if $syslog_server {
 
-  #*.* @@$IP_PREFIX.1.3:514 > /etc/rsyslog.d/10-logstash.conf
-  file { '/etc/rsyslog.d/10-logstash.conf':
-    ensure => file,
-    content => "*.* @@${logstash_syslog_bind_ip}:${logstash_syslog_port}",
-    owner => root,
-    group => root,
-    mode => '0644',
-    notify => Exec['restart_rsyslogd']
+    #*.* @@$IP_PREFIX.1.3:514 > /etc/rsyslog.d/10-logstash.conf
+    file { '/etc/rsyslog.d/10-logstash.conf':
+      ensure => file,
+      content => "*.* @@${syslog_server}:${syslog_port}",
+      owner => root,
+      group => root,
+      mode => '0644',
+      notify => Exec['restart_rsyslogd']
+    }
   }
 }
