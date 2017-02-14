@@ -61,6 +61,9 @@ class cloud::telemetry::api(
   include ::ceilometer::db
   include ::cloud::telemetry
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   class { '::ceilometer::api':
 
     # Use WSGI
@@ -86,11 +89,6 @@ class cloud::telemetry::api(
     threads     => $::processorcount,
 
     ssl         => false
-  }
-
-  # Active mod status for monitoring of Apache
-  class { 'apache::mod::status':
-    allow_from => ['127.0.0.1'],
   }
 
 # Configure TTL for samples

@@ -63,6 +63,9 @@ class cloud::volume::api(
 
   include ::cloud::volume
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   if ! $default_volume_type {
     fail('default_volume_type should be defined when running Cinder Multi-Backend.')
   }
@@ -87,11 +90,6 @@ class cloud::volume::api(
     threads     => $::processorcount,
 
     ssl         => false
-  }
-
-  # Active mod status for monitoring of Apache
-  class { 'apache::mod::status':
-    allow_from => ['127.0.0.1'],
   }
 
   class { '::cinder::glance':

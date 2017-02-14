@@ -131,6 +131,9 @@ class cloud::dashboard(
   $memcache_servers          = false,
 ) {
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   # We build the param needed for horizon class
   $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}/v3"
 

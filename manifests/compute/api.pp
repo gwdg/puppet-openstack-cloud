@@ -64,6 +64,9 @@ class cloud::compute::api(
   include ::cloud::compute
   include ::cloud::params
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   class { '::nova::api':
 
     enabled                              => true,
@@ -93,11 +96,6 @@ class cloud::compute::api(
     ssl         => false
   }
   
-  # Active mod status for monitoring of Apache
-  class { 'apache::mod::status':
-    allow_from => ['127.0.0.1'],
-  }
-
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow nova-api access':
       port   => $ks_nova_public_port,

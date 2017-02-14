@@ -246,6 +246,9 @@ class cloud::identity (
   include ::keystone::db
   include ::mysql::client
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   if $token_provider == 'fernet' and $::fqdn == $keystone_master_name {
 
     $enable_fernet_setup = true
@@ -331,11 +334,6 @@ class cloud::identity (
     threads     => $::processorcount,
 
     ssl         => false
-  }
-
-  # Active mod status for monitoring of Apache
-  class { 'apache::mod::status':
-    allow_from => ['127.0.0.1'],
   }
 
   if $swift_enabled {

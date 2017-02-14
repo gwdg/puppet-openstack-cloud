@@ -30,6 +30,9 @@ class cloud::telemetry::alarming::api(
 
   include ::cloud::telemetry
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   class { '::aodh::api':
 
     keystone_auth_uri     => $auth_uri,
@@ -57,11 +60,6 @@ class cloud::telemetry::alarming::api(
     threads     => $::processorcount,
 
     ssl         => false
-  }
-
-  # Active mod status for monitoring of Apache
-  class { 'apache::mod::status':
-    allow_from => ['127.0.0.1'],
   }
 
   @@haproxy::balancermember{"${::fqdn}-aodh_api":

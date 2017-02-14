@@ -37,6 +37,9 @@ class cloud::telemetry::tsdb(
   include ::gnocchi::storage::influxdb
   include ::gnocchi::metricd
 
+  # Active mod status for monitoring of Apache
+  include ::apache::mod::status
+
   class { '::gnocchi':
   }
 
@@ -64,11 +67,6 @@ class cloud::telemetry::tsdb(
     threads     => $::processorcount,
 
     ssl         => false
-  }
-
-  # Active mod status for monitoring of Apache
-  class { 'apache::mod::status':
-    allow_from => ['127.0.0.1'],
   }
 
   # Fix: create default archive policies (this is done automatically in newer versions of Gnocch [v2.0+])
