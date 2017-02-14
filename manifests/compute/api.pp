@@ -79,6 +79,7 @@ class cloud::compute::api(
     neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_shared_secret,
   }
 
+  # Use WSGI
   class {'::nova::wsgi::apache':
  
     servername  => $::fqdn,
@@ -92,6 +93,11 @@ class cloud::compute::api(
     ssl         => false
   }
   
+  # Active mod status for monitoring of Apache
+  class { 'apache::mod::status':
+    allow_from => ['127.0.0.1'],
+  }
+
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow nova-api access':
       port   => $ks_nova_public_port,

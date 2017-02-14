@@ -59,6 +59,11 @@ class cloud::telemetry::alarming::api(
     ssl         => false
   }
 
+  # Active mod status for monitoring of Apache
+  class { 'apache::mod::status':
+    allow_from => ['127.0.0.1'],
+  }
+
   @@haproxy::balancermember{"${::fqdn}-aodh_api":
     listening_service => 'aodh_api',
     server_names      => $::hostname,

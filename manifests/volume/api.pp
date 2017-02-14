@@ -89,6 +89,11 @@ class cloud::volume::api(
     ssl         => false
   }
 
+  # Active mod status for monitoring of Apache
+  class { 'apache::mod::status':
+    allow_from => ['127.0.0.1'],
+  }
+
   class { '::cinder::glance':
     glance_api_servers     => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}",
     glance_request_timeout => '10',

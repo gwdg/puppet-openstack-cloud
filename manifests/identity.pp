@@ -333,6 +333,11 @@ class cloud::identity (
     ssl         => false
   }
 
+  # Active mod status for monitoring of Apache
+  class { 'apache::mod::status':
+    allow_from => ['127.0.0.1'],
+  }
+
   if $swift_enabled {
     class {'::swift::keystone::auth':
 

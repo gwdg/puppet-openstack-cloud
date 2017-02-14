@@ -88,6 +88,10 @@ class cloud::telemetry::api(
     ssl         => false
   }
 
+  # Active mod status for monitoring of Apache
+  class { 'apache::mod::status':
+    allow_from => ['127.0.0.1'],
+  }
 
 # Configure TTL for samples
 # Purge datas older than one month
