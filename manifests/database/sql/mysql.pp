@@ -183,7 +183,9 @@
 #
 class cloud::database::sql::mysql (
 
-    $api_eth                         = '127.0.0.1',
+    $local_ip                        = '127.0.0.1',
+    $bind_address                    = '127.0.0.1',
+
     $galera_master_name              = 'mgmt001',
     $galera_internal_ips             = ['127.0.0.1'],
     $galera_gcache                   = '1G',
@@ -396,8 +398,8 @@ class cloud::database::sql::mysql (
     # This is used for the firewall + for status checks when deciding whether to bootstrap
     wsrep_group_comm_port           => 4567,
 
-    local_ip                        => $api_eth,
-    bind_address                    => $api_eth,
+    local_ip                        => $local_ip,
+    bind_address                    => $bind_address,
 
     root_password                   => $mysql_root_password,
     create_root_my_cnf              => true,
@@ -407,7 +409,7 @@ class cloud::database::sql::mysql (
 
 #    override_options   => {
 #      'mysqld' => {
-#        'bind-address' => $api_eth
+#        'bind-address' => $bind_address
 #      }
 #    },
   }
@@ -435,7 +437,7 @@ class cloud::database::sql::mysql (
   @@haproxy::balancermember{$::fqdn:
     listening_service => 'galera',
     server_names      => $::hostname,
-    ipaddresses       => $api_eth,
+    ipaddresses       => $local_ip,
     ports             => '3306',
     options           =>
       inline_template('check inter 2000 rise 2 fall 5 port 9200 <% if @fqdn != @galera_master_name -%>backup<% end %> on-marked-down shutdown-sessions')
@@ -444,7 +446,7 @@ class cloud::database::sql::mysql (
   @@haproxy::balancermember{"${::fqdn}-readonly":
     listening_service => 'galera_readonly',
     server_names      => $::hostname,
-    ipaddresses       => $api_eth,
+    ipaddresses       => $local_ip,
     ports             => '3306',
     options           =>
       inline_template('check inter 2000 rise 2 fall 5 port 9200 <% if @fqdn == @galera_master_name -%>backup<% end %> on-marked-down shutdown-sessions')
