@@ -106,6 +106,8 @@ class cloud::compute(
     upgrade_level_scheduler     => $upgrade_level,
   }
 
+  class { '::nova::cache': }
+
   class { '::nova::network::neutron':
     neutron_admin_password => $neutron_password,
     neutron_admin_auth_url => "${neutron_protocol}://${neutron_endpoint}:35357",
