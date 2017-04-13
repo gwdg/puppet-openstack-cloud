@@ -80,7 +80,7 @@ define cloud::network::qos::create(
 
   exec {"neutron qos-bandwidth-limit-rule-create ${policy_name}":
     command     => "neutron qos-bandwidth-limit-rule-create --max-kbps ${max_kbps} --max-burst-kbps ${max_burst_kbps} ${policy_name}",
-    unless      => "neutron qos-bandwidth-limit-rule-list gwdg-private-limiter -c id -f value | grep -qE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'",
+    unless      => "neutron qos-bandwidth-limit-rule-list ${policy_name} -c id -f value | grep -qE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'",
     environment => $env,
     require     => Anchor['neutron::service::end'],
     path        => ['/usr/bin', '/bin'],
