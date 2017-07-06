@@ -356,7 +356,10 @@ class cloud::compute::hypervisor(
   nova_config {
     'libvirt/live_migration_flag':  value => 'VIR_MIGRATE_UNDEFINE_SOURCE,VIR_MIGRATE_PEER2PEER,VIR_MIGRATE_LIVE,VIR_MIGRATE_PERSIST_DEST';
     'libvirt/block_migration_flag': value => 'VIR_MIGRATE_UNDEFINE_SOURCE,VIR_MIGRATE_PEER2PEER,VIR_MIGRATE_LIVE,VIR_MIGRATE_NON_SHARED_INC';
-
+    # When using libvirt 1.2.2 live snapshots fail intermittently under load 
+    # disable when use libvirt 1.2.2 and not ceph
+    # in production we use ceph cow so libvirt does not snapshot (ceph does the work)
+    'workarounds/disable_libvirt_livesnapshot': value => 'False';
     # Use interal API when communicating with cinder
 #    'cinder/catalog_info':          value => 'volume:cinder:internalURL';
   }
