@@ -73,6 +73,9 @@ define cloud::volume::backend::rbd (
     rbd_flatten_volume_from_snapshot => $rbd_flatten_volume_from_snapshot,
     rbd_max_clone_depth              => $rbd_max_clone_depth,
     volume_tmp_dir                   => '/tmp'
+    
+    extra_options                    => { 
+        "${volume_backend_name}/glance_api_version" => { 'value' => 2 },}
   }
 
   # Configure Ceph keyring
