@@ -74,8 +74,9 @@ define cloud::network::qos::create(
     environment => $env,
     require     => Anchor['neutron::service::end'],
     path        => ['/usr/bin', '/bin'],
-    tries       => '2',
-    try_sleep   => '5',
+    try_sleep   => 5,
+    tries       => 10,
+    timeout     => 300,
   }
 
   exec {"neutron qos-bandwidth-limit-rule-create ${policy_name}":
@@ -84,7 +85,8 @@ define cloud::network::qos::create(
     environment => $env,
     require     => Anchor['neutron::service::end'],
     path        => ['/usr/bin', '/bin'],
-    tries       => '2',
-    try_sleep   => '5',
+    try_sleep   => 5,
+    tries       => 10,
+    timeout     => 300,
   }
 }
