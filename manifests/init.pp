@@ -129,6 +129,8 @@ class cloud(
   $manage_root_password = false,
   $production           = false,
   $ntp_servers          = [],
+  $ntp_interfaces_ignore =[],
+  $ntp_interfaces        =[],
   $groups               = {},
   $users                = {},
 
@@ -208,7 +210,9 @@ class cloud(
     class { '::ntp':
       servers     => $ntp_servers,
       restrict    => ['127.0.0.1'],
-#     interfaces  => ['127.0.0.1', ip_for_network(hiera('openstack::network::management'))],
+      interfaces_ignore  => $ntp_interfaces_ignore,
+      interfaces => $ntp_interfaces,   
+#  interfaces  => ['127.0.0.1', ip_for_network(hiera('openstack::network::management'))],
     }
   }
 
