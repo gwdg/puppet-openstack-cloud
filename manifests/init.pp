@@ -109,33 +109,34 @@
 #   Default to {}
 #
 class cloud(
-  $root_password        = 'root',
-  $dns_ips              = ['8.8.8.8', '8.8.4.4'],
-  $site_domain          = 'mydomain',
-  $motd_title           = 'eNovance IT Operations',
-  $selinux_mode         = 'permissive',
-  $selinux_directory    = '/usr/share/selinux',
-  $selinux_booleans     = [],
-  $selinux_modules      = [],
-  $limits               = {},
-  $sysctl               = {},
-  $manage_firewall      = false,
-  $firewall_rules       = {},
-  $purge_firewall_rules = false,
-  $firewall_pre_extras  = {},
-  $firewall_post_extras = {},
+  $root_password            = 'root',
+  $dns_ips                  = ['8.8.8.8', '8.8.4.4'],
+  $site_domain              = 'mydomain',
+  $motd_title               = 'eNovance IT Operations',
+  $selinux_mode             = 'permissive',
+  $selinux_directory        = '/usr/share/selinux',
+  $selinux_booleans         = [],
+  $selinux_modules          = [],
+  $limits                   = {},
+  $sysctl                   = {},
+  $manage_firewall          = false,
+  $firewall_rules           = {},
+  $purge_firewall_rules     = false,
+  $firewall_pre_extras      = {},
+  $firewall_post_extras     = {},
 
   # Additional stuff
-  $manage_root_password = false,
-  $production           = false,
-  $ntp_servers          = [],
-  $ntp_interfaces_ignore =[],
-  $ntp_interfaces        =[],
-  $groups               = {},
-  $users                = {},
+  $manage_root_password     = false,
+  $production               = false,
+  $ntp_servers              = [],
+  $ntp_interfaces_ignore    = [],
+  $ntp_interfaces           = [],
+  $lldpd_interfaces         = [],
+  $groups                   = {},
+  $users                    = {},
 
-  $syslog_server        = undef,
-  $syslog_port          = undef,
+  $syslog_server            = undef,
+  $syslog_port              = undef,
 ) {
 
   include ::stdlib
@@ -212,7 +213,12 @@ class cloud(
       restrict    => ['127.0.0.1'],
       interfaces_ignore  => $ntp_interfaces_ignore,
       interfaces => $ntp_interfaces,   
-#  interfaces  => ['127.0.0.1', ip_for_network(hiera('openstack::network::management'))],
+    }
+  }
+
+  if ! ($::virtual == 'lxc')  {
+    class { '::lldpd':
+      interfaces => $lldpd_interfaces,    
     }
   }
 
