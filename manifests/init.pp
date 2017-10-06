@@ -205,6 +205,8 @@ class cloud(
   # SUDO (don't use for now, kills vagrant)
 #  include ::sudo
 #  include ::sudo::configs
+  
+  include ::telegraf
 
   # NTP (do not install for containers)
   if ! ($::virtual == 'lxc')  {
@@ -217,10 +219,10 @@ class cloud(
   }
 
   if ! ($::virtual == 'lxc')  {
-    class { '::lldpd':
-      interfaces => $lldpd_interfaces,    
-    }
-  }
+   class { '::lldpd':
+     interfaces => $lldpd_interfaces,    
+   }
+ }
 
   # Security Limits
   include ::limits
