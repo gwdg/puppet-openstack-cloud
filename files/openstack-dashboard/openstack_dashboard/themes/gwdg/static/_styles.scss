@@ -1,0 +1,157 @@
+@import "bootstrap/styles";
+@import "horizon/styles";
+
+/* Ubuntu styles */
+body,
+.page-header {
+  font-family: $font-gwdg;
+  font-weight: 300;
+}
+
+p {
+  margin: 10px 0;
+}
+
+a,
+a:link,
+a:visited {
+  color: $brand-color;
+}
+
+.row {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+table {
+  background-color: $table-bg;
+  border: 1px solid #ddd;
+}
+
+.table_actions {
+  margin-bottom: 10px;
+}
+
+.topbar,
+.topbar .switcher_bar .btn.btn-topnav,
+.navbar-default {
+  background: $brand-color;
+}
+
+.navbar-default .navbar-nav > li > a {
+    border-color: $brand-color;
+    color: $white ;
+    font-family: $font-gwdg;
+    font-weight: 300;
+    font-size: $font-navbar;
+    height: 40px;
+
+    &:hover,
+    &:focus {
+      border-color: $topbar-link-hover;
+      background: $brand-color;
+      color: $gwdg-light-blue1;
+    }
+}
+
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+ background-color: $brand-color;
+ color: $gwdg-light-blue1;
+}
+
+.navbar-brand {
+  background-position: 20px 4px;
+  background-repeat: no-repeat;
+  background-size: 110px;
+
+  img {
+    opacity: 0.5;
+  }
+}
+
+.nav_accordion dt li a.active,
+.nav_accordion dd li a.active {
+  border-left: 4px solid $brand-color;
+  background-color: $brand-color;
+  color: $gwdg-light-blue1;
+}
+
+.nav-tabs {
+  margin-bottom: 10px;
+}
+
+.navbar .dropdown-menu:before {
+  display: none;
+}
+
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover {
+  background-color: $brand-color;
+  color: $gwdg-light-blue1;
+
+  &:hover {
+    background-color: $brand-color;
+    color: $gwdg-light-blue1;
+  }
+}
+
+.d3_pie_chart_usage .arc.inner {
+  fill: $brand-color;
+}
+
+.container-fluid {
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+
+.btn-primary {
+  background-color: $gwdg-light-blue2;
+  border-color: darken($gwdg-light-blue2, 5%);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary.active,
+.open > .btn-primary.dropdown-toggle {
+  background-color: darken($gwdg-light-blue2, 15%);
+  border-color: darken($gwdg-light-blue2, 15%);
+}
+
+.btn-primary.disabled {
+  background-color: #efefef;
+  border: 1px solid #efefef;
+}
+
+.fa.hz-icon-required {
+  color: $brand-color;
+}
+
+.context-selection > li > ul > li > a > .fa.fa-check {
+  left: 0.5em;
+  padding: 0;
+}
+
+.form-group label {
+  margin-right: 5px;
+}
+
+#splash {
+  background: $gwdg-light-gray2;
+
+    .login {
+      background-color: $gwdg-light-gray2; //Color of the box (splash) behind the login box
+      max-width: 500px;
+      position: center;
+
+      .splash-logo {
+        opacity: 1 ;
+      }
+
+      .horizontal-center {
+        margin: 0;
+        width: auto;
+      }
+    }
+}
