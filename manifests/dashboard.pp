@@ -168,7 +168,11 @@ class cloud::dashboard(
 
   class { '::cloud::dashboard::gwdg_theme':
     require => Class['::horizon'],
- }
+  }
+
+  class { '::cloud::dashboard::policy_overrides':
+    require => Class['::horizon'],
+  }
 
   if ($::osfamily == 'Debian') {
     # TODO(Goneri): HACK to ensure Horizon can cache its files
