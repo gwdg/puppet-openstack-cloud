@@ -241,6 +241,7 @@ class cloud::identity (
   $keystone_master_name         = undef,
   $use_ldap                     = false,
   $ldap_backends                = {},
+  $custom_policies              = {},
 ){
 
   include ::keystone::db
@@ -576,4 +577,7 @@ class cloud::identity (
     options           => 'check inter 2000 rise 2 fall 5'
   }
 
+  class { '::keystone::policy':
+    policies => $custom_policies
+  }
 }

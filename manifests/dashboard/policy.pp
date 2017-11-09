@@ -1,10 +1,13 @@
 #
-class cloud::dashboard::policy_overrides (
+class cloud::dashboard::policy (
 
-  $py_dir     = '/usr/lib/python2.7/dist-packages/',
-  $py_mod     = 'dashboard_policies',
-  $py_name    = 'override',
-  $local_dir  = '/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.d/'
+  $py_dir      = '/usr/lib/python2.7/dist-packages/',
+  $py_mod      = 'dashboard_policies',
+  $py_name     = 'override',
+  $home        = '/usr/share/openstack-dashboard/openstack_dashboard/',
+  $local_dir   = "${home}local/local_settings.d/",
+  $policies    = {},
+  $policy_path = "${home}conf/keystone_policy.json",
 
 ) {
 
@@ -42,5 +45,13 @@ class cloud::dashboard::policy_overrides (
     group   => root,
     mode    => 'u+w',
   }
+
+  validate_hash($policies)
+
+  Openstacklib::Policy::Base {
+      file_path => $policy_path,
+  }
+
+  create_resources('openstacklib::policy::base', $policies)
 }
 

@@ -170,7 +170,7 @@ class cloud::dashboard(
     require => Class['::horizon'],
   }
 
-  class { '::cloud::dashboard::policy_overrides':
+  class { '::cloud::dashboard::policy':
     require => Class['::horizon'],
   }
 
