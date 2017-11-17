@@ -33,6 +33,12 @@ class cloud::compute::scheduler(
     enabled => true,
   }
 
+  file { '/usr/lib/python2.7/dist-packages/nova/scheduler/filters/aggregate_domain_isolation.py':
+    source => 'puppet:///modules/cloud/filters/aggregate_domain_isolation.py',
+    mode => '0644',
+    owner => 'root'
+  }
+
   class { '::nova::scheduler::filter':
     scheduler_default_filters => $scheduler_default_filters,
   }
