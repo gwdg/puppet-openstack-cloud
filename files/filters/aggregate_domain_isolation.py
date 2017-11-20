@@ -26,31 +26,34 @@ import ConfigParser
 
 LOG = logging.getLogger(__name__)
 
-novaconfig = ConfigParser.ConfigParser()
-novaconfig.read("/etc/nova/nova.conf")
-
-admin_auth_password     = novaconfig.get("keystone_authtoken","admin_password")
-auth_url                = novaconfig.get("keystone_authtoken","auth_uri") + "/v3/"
-
-admin_auth_username     = "admin"
-admin_project_name      = "admin"
-admin_project_domain_id = "default"
-admin_user_domain_id    = "default"
-
-auth_v3 = keystoneauth1.identity.v3.Password(
-        auth_url          = auth_url,
-        username          = admin_auth_username,
-        password          = admin_auth_password,
-        project_name      = admin_project_name,
-        project_domain_id = admin_project_domain_id,
-        user_domain_id    = admin_user_domain_id )
-
-sess = session.Session(auth = auth_v3)
-
-keystone =  keystoneclient_v3.Client(session=sess)
 
 class AggregateDomainIsolation(filters.BaseHostFilter):
     """Isolate tenants in specific aggregates based on the domain id."""
+
+    def __init__(self):
+        novaconfig = ConfigParser.ConfigParser()
+        novaconfig.read("/etc/nova/nova.conf")
+
+        admin_auth_password     = novaconfig.get("keystone_authtoken","admin_password")
+        auth_url                = novaconfig.get("keystone_authtoken","auth_uri") + "/v3/"
+
+        admin_auth_username     = "admin"
+        admin_project_name      = "admin"
+        admin_project_domain_id = "default"
+        admin_user_domain_id    = "default"
+
+        auth_v3 = keystoneauth1.identity.v3.Password(
+                auth_url          = auth_url,
+                username          = admin_auth_username,
+                password          = admin_auth_password,
+                project_name      = admin_project_name,
+                project_domain_id = admin_project_domain_id,
+                user_domain_id    = admin_user_domain_id )
+
+        sess = session.Session(auth = auth_v3)
+
+        self.keystone =  keystoneclient_v3.Client(session=sess)
+
 
     # Aggregate data and tenant do not change within a request
     run_filter_once_per_request = True
@@ -70,7 +73,7 @@ class AggregateDomainIsolation(filters.BaseHostFilter):
         tenant_id = spec_obj.project_id
         #LOG.debug("lgx: The tenant_id is: " + tenant_id)
 
-        project_obj       = keystone.projects.get(tenant_id)
+        project_obj       = self.keystone.projects.get(tenant_id)
         domain_id = project_obj.domain_id
         #LOG.debug("lgx: The domain_id is: " + domain_id)
 
