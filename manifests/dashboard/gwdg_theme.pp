@@ -19,16 +19,6 @@ class cloud::dashboard::gwdg_theme (
     audit   => content,
   } 
 
-  file { '_quota.scss':
-    ensure  => file,
-    path    => "${home_dir}${quota_scss}",
-    source  => 'puppet:///modules/cloud/dashboard/_quota.scss',
-    owner   => root,
-    group   => root,
-    mode    => 'u+w',
-    audit   => content,
-  } 
-
   file { 'gwdg_logo.svg':
     ensure  => file,
     path    => "${home_dir}${gwdg_logo}",
@@ -61,7 +51,7 @@ class cloud::dashboard::gwdg_theme (
   exec { 'manage.py compress':
     path => '/bin:/usr/bin:/sbin:/usr/sbin:',
     command => '/usr/share/openstack-dashboard/manage.py compress',
-    subscribe  => [ File['_quota.scss'], File['gwdg_logo.svg'], File['_set_custom_theme_gwdg.py'], Exec['tar -xf gwdg_theme.tar']],
+    subscribe  => [ File['gwdg_logo.svg'], File['_set_custom_theme_gwdg.py'], Exec['tar -xf gwdg_theme.tar']],
     notify => Class['Apache::Service'],
   }
 
