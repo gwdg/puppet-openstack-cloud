@@ -24,7 +24,9 @@
 #   Defaults to false
 #
 class cloud::compute::scheduler(
-  $scheduler_default_filters = []
+  $scheduler_default_filters   = [],
+  $scheduler_available_filters = [],
+  $python_path                 = '/usr/lib/python2.7/dist-packages/'
 ){
 
   include ::cloud::compute
@@ -33,8 +35,34 @@ class cloud::compute::scheduler(
     enabled => true,
   }
 
+  file { ["$python_path/gwdg/", "$python_path/gwdg/nova/",
+          "$python_path/gwdg/nova/scheduler", "$python_path/gwdg/nova/scheduler/filters/"]:
+    ensure => 'directory',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755'
+  } ->
+
+  file { ["$python_path/gwdg/__init__.py", "$python_path/gwdg/nova/__init__.py",
+          "$python_path/gwdg/nova/scheduler/__init__.py",
+          "$python_path/gwdg/nova/scheduler/filters/__init__.py"]:
+    ensure => 'file',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644'
+  }
+    
+
+  file { "$python_path/gwdg/nova/scheduler/filters/aggregate_domain_isolation.py":
+    source   => 'puppet:///modules/cloud/filters/aggregate_domain_isolation.py',
+    mode     => '0644',
+    owner    => 'root',
+    require  => File["$python_path/gwdg/nova/scheduler/filters/"]
+  }
+
   class { '::nova::scheduler::filter':
-    scheduler_default_filters => $scheduler_default_filters,
+    scheduler_default_filters   => $scheduler_default_filters,
+    scheduler_available_filters => $scheduler_available_filters,
   }
 
 }
