@@ -13,7 +13,7 @@ all_rule = (('identity', "identity:show_all"),)
 volumes_panel.Volumes.policy_rules = volumes_rule
 
 project = horizon.get_dashboard("project")
-project.get_panel("images").policy_rules = volumes_rule
+#project.get_panel("images").policy_rules = volumes_rule
 project.get_panel('network_topology').policy_rules = network_rule
 project.get_panel('networks').policy_rules = network_rule
 project.get_panel('routers').policy_rules = network_rule
