@@ -145,6 +145,16 @@ class cloud::messaging(
     read_permission      => '.*',
     provider             => 'rabbitmqctl',
   }
+  rabbitmq_user { 'telegraf':
+    password => $rabbit_password,
+    provider => 'rabbitmqctl',
+    tags     => ['monitoring'],
+    require  => Class['rabbitmq']
+  }
+  rabbitmq_user_permissions {'telegraf@/':
+    read_permission      => '.*',
+    provider             => 'rabbitmqctl',
+  }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow rabbitmq access':
