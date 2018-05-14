@@ -34,10 +34,11 @@ class cloud::auth_file(
 
   include ::openstacklib::openstackclient
 
-  file { "/root/auth_${user}.sh":
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0700',
-    content => template("${module_name}/openrc.erb")
+  class { '::openstack_extras::auth_file':
+    path           => "/root/auth_${user}.sh",
+    password       => $password,
+    project_domain => $domain_id,
+    user_domain    => $domain_id,
+    auth_url       => "${keystone_host}:5000/v3/",
   }
 }
