@@ -272,9 +272,6 @@ class cloud::identity (
     public_bind_host      => $api_eth,
     admin_bind_host       => $api_eth,
 
-    admin_endpoint        => $keystone_admin_url,
-    public_endpoint       => $keystone_public_url,
-
     using_domain_config   => true,
 
     sync_db               => true,
