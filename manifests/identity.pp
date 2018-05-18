@@ -349,7 +349,7 @@ class cloud::identity (
     group             => 'keystone',
     public_key_file   => 'puppet:///modules/cloud/secrets/keystone_ssh_key.pub',
     private_key_file  => 'puppet:///modules/cloud/secrets/keystone_ssh_key',
-    require           => Package['keystone'],
+    require           => Anchor['keystone::install::end'],
   }                                                                                                                                                                                                       
 
   # For keystone HA deployment all certs in /etc/keystone/ssl need to be copied from master node to slave node(s)  
@@ -371,13 +371,13 @@ class cloud::identity (
   } else {
 
     # Copy files
-    exec { 'keystone-copy-ssl-certs':
-      command   => "/usr/bin/scp -P $ssh_port -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
-      creates   => '/etc/keystone/ssl/synced_from_master',
-      user      => 'keystone',
-      require   => Cloud::Util::Ssh_access['keystone'],
-      notify    => Service['httpd']
-    }
+    #exec { 'keystone-copy-ssl-certs':
+    #  command   => "/usr/bin/scp -P $ssh_port -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/ssl /etc/keystone/",
+    #  creates   => '/etc/keystone/ssl/synced_from_master',
+    #  user      => 'keystone',
+    #  require   => [ Cloud::Util::Ssh_access['keystone'], Class['keystone'] ],
+    #  notify    => Service['httpd']
+    #}
 
     # Copy fernet keys from master node to slave node(s)
     # Ensure /etc/keystone/fernet-keys/ directory is present and empty
@@ -389,12 +389,14 @@ class cloud::identity (
       owner  => 'keystone',
       group  => 'keystone',
       mode   => '0600',
+      require => Anchor['keystone::install::end'],
     }
     # Copy Fernet Keys from master node
     exec { 'keystone-copy-fernet-keys':
       command   => "/usr/bin/scp -P $ssh_port -r -o StrictHostKeyChecking=no keystone@${keystone_master_name}:/etc/keystone/fernet-keys /etc/keystone/",
       creates   => '/etc/keystone/fernet-keys/0',
       user      => 'keystone',
+      before    => Anchor['keystone::config::begin'],
       require   => [Cloud::Util::Ssh_access['keystone'], File['/etc/keystone/fernet-keys/']],
       notify    => Service['httpd']
     }
