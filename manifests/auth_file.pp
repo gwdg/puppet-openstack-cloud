@@ -23,7 +23,7 @@
 #   (optional) Defaults to 'internal'.
 
 class cloud::auth_file(
-  $keystone_host    = '127.0.0.1',
+  $auth_url         = 'http://127.0.0.1:5000/v3/',
   $admin_token      = undef,
   $user             = 'admin',
   $password         = undef,
@@ -35,10 +35,17 @@ class cloud::auth_file(
   include ::openstacklib::openstackclient
 
   class { '::openstack_extras::auth_file':
-    path           => "/root/auth_${user}.sh",
-    password       => $password,
-    project_domain => $domain_id,
-    user_domain    => $domain_id,
-    auth_url       => "${keystone_host}:5000/v3/",
+    path                   => "/root/auth_${user}.sh",
+    password               => $password,
+    project_name           => $project,
+    project_domain         => $domain_id,
+    username               => $user,
+    user_domain            => $domain_id,
+    auth_url               => $auth_url,
+    cinder_endpoint_type   => 'internalURL',
+    glance_endpoint_type   => 'internalURL',
+    keystone_endpoint_type => 'internalURL',
+    nova_endpoint_type     => 'internalURL',
+    neutron_endpoint_type  => 'internalURL',
   }
 }
