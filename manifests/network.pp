@@ -71,7 +71,6 @@ class cloud::network(
     rabbit_password         => $rabbit_password,
     rabbit_virtual_host     => '/',
     bind_host               => $api_eth,
-    log_facility            => $log_facility,
     use_syslog              => $use_syslog,
     dhcp_agents_per_network => '2',
     core_plugin             => $core_plugin,
