@@ -49,7 +49,6 @@ class cloud::compute::api(
   $auth_uri                             = 'http://127.0.0.1:5000/',
   $identity_uri                         = 'http://127.0.0.1:35357/',
 
-  $ks_nova_password                     = 'novapassword',
   $neutron_metadata_proxy_shared_secret = 'metadatapassword',
   $api_eth                              = '127.0.0.1',
 
@@ -76,7 +75,6 @@ class cloud::compute::api(
     auth_uri                             => $auth_uri,
     identity_uri                         => $identity_uri,
 
-    admin_password                       => $ks_nova_password,
     api_bind_address                     => $api_eth,
     metadata_listen                      => $api_eth,
     neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_shared_secret,
