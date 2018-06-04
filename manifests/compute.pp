@@ -19,14 +19,6 @@
 #
 # === Parameters:
 #
-# [*rabbit_hosts*]
-#   (optional) List of RabbitMQ servers. Should be an array.
-#   Defaults to ['127.0.0.1:5672']
-#
-# [*rabbit_password*]
-#   (optional) Password to connect to nova queues.
-#   Defaults to 'rabbitpassword'
-#
 # [*ks_glance_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Glance API
 #   Defaults to '127.0.0.1'
@@ -65,9 +57,6 @@
 #
 class cloud::compute(
 
-  $rabbit_hosts             = ['127.0.0.1:5672'],
-  $rabbit_password          = 'rabbitpassword',
-
   $ks_glance_internal_host  = '127.0.0.1',
   $ks_glance_internal_proto = 'http',
   $glance_api_port          = 9292,
@@ -84,10 +73,6 @@ class cloud::compute(
 ) {
 
   class { '::nova':
-    rabbit_userid               => 'nova',
-    rabbit_hosts                => $rabbit_hosts,
-    rabbit_password             => $rabbit_password,
-
     glance_api_servers          => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
     memcached_servers           => $memcache_servers,
 
