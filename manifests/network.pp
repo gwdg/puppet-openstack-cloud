@@ -46,8 +46,6 @@
 #   Defaults to ['neutron.services.loadbalancer.plugin.LoadBalancerPlugin','neutron.services.metering.metering_plugin.MeteringPlugin','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin']
 #
 class cloud::network(
-  $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword',
   $api_eth                    = '127.0.0.1',
   $dhcp_lease_duration        = '120',
   $plugin                     = 'ml2',
@@ -66,10 +64,6 @@ class cloud::network(
   class { '::neutron':
     allow_overlapping_ips   => true,
     debug                   => $debug,
-    rabbit_user             => 'neutron',
-    rabbit_hosts            => $rabbit_hosts,
-    rabbit_password         => $rabbit_password,
-    rabbit_virtual_host     => '/',
     bind_host               => $api_eth,
     use_syslog              => $use_syslog,
     dhcp_agents_per_network => '2',
