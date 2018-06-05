@@ -71,11 +71,10 @@ class cloud::compute(
 
   $upgrade_level            = undef,
 ) {
-
+  
   class { '::nova':
     glance_api_servers          => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${glance_api_port}",
-    memcached_servers           => $memcache_servers,
-
+    
     cinder_catalog_info         => 'volumev2:cinderv2:internalURL',
 #    nova_shell                  => '/bin/bash',
 
