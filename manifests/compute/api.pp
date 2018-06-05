@@ -46,11 +46,10 @@
 #
 class cloud::compute::api(
 
-  $auth_uri                             = 'http://127.0.0.1:5000/',
-  $identity_uri                         = 'http://127.0.0.1:35357/',
-
   $neutron_metadata_proxy_shared_secret = 'metadatapassword',
-  $api_eth                              = '127.0.0.1',
+
+  $api_bind_address                     = hiera('nova::api::api_eth'),
+  $metadata_listen                      = hiera('nova::api::api_eth'),
 
   $ks_nova_public_port                  = '8774',
   $ks_metadata_public_port              = '8775',
@@ -60,25 +59,12 @@ class cloud::compute::api(
 
   include ::nova::params
   include ::nova::db
+  include ::nova::cron::archive_deleted_rows
   include ::cloud::compute
   include ::cloud::params
-
-  # Active mod status for monitoring of Apache
   include ::apache::mod::status
 
-  class { '::nova::api':
-
-    enabled                              => true,
-
-    service_name                         => 'httpd',
-
-    auth_uri                             => $auth_uri,
-    identity_uri                         => $identity_uri,
-
-    api_bind_address                     => $api_eth,
-    metadata_listen                      => $api_eth,
-    neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_shared_secret,
-  }
+  class { '::nova::api': }
 
   # Use WSGI
   class {'::nova::wsgi::apache':
@@ -105,12 +91,10 @@ class cloud::compute::api(
     }
   }
 
-  include ::nova::cron::archive_deleted_rows
-
   @@haproxy::balancermember{"${::fqdn}-compute_api_nova":
     listening_service => 'nova_api',
     server_names      => $::hostname,
-    ipaddresses       => $api_eth,
+    ipaddresses       => $api_bind_address,
     ports             => $ks_nova_public_port,
     options           => 'check inter 2000 rise 2 fall 5'
   }
@@ -118,7 +102,7 @@ class cloud::compute::api(
   @@haproxy::balancermember{"${::fqdn}-compute_api_metadata":
     listening_service => 'metadata_api',
     server_names      => $::hostname,
-    ipaddresses       => $api_eth,
+    ipaddresses       => $metadata_listen,
     ports             => $ks_metadata_public_port,
     options           => 'check inter 2000 rise 2 fall 5'
   }
