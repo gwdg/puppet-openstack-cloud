@@ -422,6 +422,7 @@ class cloud::identity (
   }                                                             
 
   class { '::nova::keystone::auth': }
+  class { '::nova::keystone::auth_placement': }
 
   class { '::neutron::keystone::auth':
 
