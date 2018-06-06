@@ -50,9 +50,6 @@
 #   (optional) Password used by Swift to connect to Keystone API
 #   Defaults to 'swiftpassword'
 #
-# [*nova_password*]
-#   (optional) Password used by Nova to connect to Keystone API
-#   Defaults to 'novapassword'
 #
 # [*neutron_password*]
 #   (optional) Password used by Neutron to connect to Keystone API
@@ -202,12 +199,6 @@ class cloud::identity (
   $neutron_admin_url            = undef,
 
   $neutron_password             = 'neutronpassword',
-
-  $nova_v2_public_url           = undef,
-  $nova_v2_internal_url         = undef,
-  $nova_v2_admin_url            = undef,
-
-  $nova_password                = 'novapassword',
 
   $swift_public_url             = undef,
   $swift_internal_url           = undef,
@@ -428,17 +419,9 @@ class cloud::identity (
 
     region              => $region,
     password            => $gnocchi_password,
-  }                                                                                                                                                                                                        
+  }                                                             
 
-  class { '::nova::keystone::auth':
-
-    public_url          => $nova_v2_public_url,
-    internal_url        => $nova_v2_internal_url,
-    admin_url           => $nova_v2_admin_url,
-
-    region              => $region,
-    password            => $nova_password
-  }                                                                                                                                                                                                         
+  class { '::nova::keystone::auth': }
 
   class { '::neutron::keystone::auth':
 
