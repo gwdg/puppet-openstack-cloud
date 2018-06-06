@@ -20,7 +20,7 @@ class cloud::compute::cert {
   include ::cloud::compute
 
   class { '::nova::cert':
-    enabled => true,
+    enabled => false, # remove deprecated nova-cert service - class should fully removed in ocata
   }
 
 }
