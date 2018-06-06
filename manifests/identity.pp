@@ -207,10 +207,6 @@ class cloud::identity (
   $nova_v2_internal_url         = undef,
   $nova_v2_admin_url            = undef,
 
-  $nova_v3_public_url           = undef,
-  $nova_v3_internal_url         = undef,
-  $nova_v3_admin_url            = undef,
-
   $nova_password                = 'novapassword',
 
   $swift_public_url             = undef,
@@ -439,10 +435,6 @@ class cloud::identity (
     public_url          => $nova_v2_public_url,
     internal_url        => $nova_v2_internal_url,
     admin_url           => $nova_v2_admin_url,
-
-    public_url_v3       => $nova_v3_public_url,
-    internal_url_v3     => $nova_v3_internal_url,
-    admin_url_v3        => $nova_v3_admin_url,
 
     region              => $region,
     password            => $nova_password
