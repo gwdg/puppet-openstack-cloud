@@ -218,6 +218,8 @@ class cloud::identity (
   $use_ldap                     = false,
   $ldap_backends                = {},
   $custom_policies              = {},
+
+  $endpoints                    = undef,
 ){
 
   include ::keystone::db
@@ -266,7 +268,12 @@ class cloud::identity (
     create_resources('::keystone::ldap_backend', $ldap_backends)
   }
 
+
   # Keystone Endpoints + Users
+
+  if $endpoints {
+    create_resources('::cloud::identity::endpoint', $endpoints)
+  }
 
   class { '::keystone::roles::admin':
 
