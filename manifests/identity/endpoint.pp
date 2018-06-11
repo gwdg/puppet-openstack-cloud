@@ -14,9 +14,11 @@ define cloud::identity::endpoint (
 ){
 
   if !$auth_class {
-    $auth_class = "::${name}::keystone::auth"
+    $real_auth_class = "::${name}::keystone::auth"
+  } else {
+    $real_auth_class = $auth_class
   }
 
-  class { $auth_class: }
+  class { $real_auth_class: }
 
 }
