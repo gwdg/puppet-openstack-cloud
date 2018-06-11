@@ -50,11 +50,6 @@
 #   (optional) Password used by Swift to connect to Keystone API
 #   Defaults to 'swiftpassword'
 #
-#
-# [*neutron_password*]
-#   (optional) Password used by Neutron to connect to Keystone API
-#   Defaults to 'neutronpassword'
-#
 # [*heat_password*]
 #   (optional) Password used by Heat to connect to Keystone API
 #   Defaults to 'heatpassword'
@@ -194,12 +189,6 @@ class cloud::identity (
   $ks_keystone_admin_port       = undef,
   $ssh_port                     = hiera('cloud::global::ssh_port'),
 
-  $neutron_public_url           = undef,
-  $neutron_internal_url         = undef,
-  $neutron_admin_url            = undef,
-
-  $neutron_password             = 'neutronpassword',
-
   $swift_public_url             = undef,
   $swift_internal_url           = undef,
   $swift_admin_url              = undef,
@@ -286,19 +275,9 @@ class cloud::identity (
     admin_tenant => $ks_admin_tenant,
   }
 
-#  keystone_role { $identity_roles_addons: ensure => present }
-
-  class {'::keystone::endpoint':
-
-    public_url   => $keystone_public_url,
-    internal_url => $keystone_internal_url,
-    admin_url    => $keystone_admin_url,
-
-    region       => $region,
-  }
+  class {'::keystone::endpoint': }
 
   # Configure keystone to use apache/wsgi
-#  include cloud::util::apache_common
   class {'::keystone::wsgi::apache':
 
     servername  => $::fqdn,
@@ -311,22 +290,6 @@ class cloud::identity (
     threads     => $::processorcount,
 
     ssl         => false
-  }
-
-  if $swift_enabled {
-    class {'::swift::keystone::auth':
-
-      public_url        => $swift_public_url,
-      internal_url      => $swift_internal_url,
-      admin_url         => $swift_admin_url,
-
-      password          => $swift_password,
-      region            => $region
-    }
-
-    class {'::swift::keystone::dispersion':
-      auth_pass         => $ks_swift_dispersion_password
-    }
   }
 
   # Deploy ssh keys for keystone account to allow remote access via scp
@@ -390,16 +353,12 @@ class cloud::identity (
 
   }
 
-  class {'::ceilometer::keystone::auth':
-
-    public_url          => $ceilometer_public_url,
-    internal_url        => $ceilometer_internal_url,
-    admin_url           => $ceilometer_admin_url,
-
-    region              => $region,
-    password            => $ceilometer_password
+  if $swift_enabled {
+    class {'::swift::keystone::auth': }
+    class {'::swift::keystone::dispersion': }
   }
 
+  class { '::ceilometer::keystone::auth': }
 
   class { '::aodh::keystone::auth':
     
@@ -424,15 +383,7 @@ class cloud::identity (
   class { '::nova::keystone::auth': }
   class { '::nova::keystone::auth_placement': }
 
-  class { '::neutron::keystone::auth':
-
-    public_url          => $neutron_public_url,
-    internal_url        => $neutron_internal_url,
-    admin_url           => $neutron_admin_url,
-
-    region              => $region,
-    password            => $neutron_password
-  }
+  class { '::neutron::keystone::auth': }
 
   if $cinder_enabled {
     class { '::cinder::keystone::auth':
