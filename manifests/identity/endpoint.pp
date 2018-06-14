@@ -11,6 +11,11 @@
 #
 define cloud::identity::endpoint (
   $auth_class = undef,
+  $public_url,
+  $internal_url,
+  $admin_url,
+  $region,
+  $password,
 ){
 
   if !$auth_class {
@@ -19,6 +24,12 @@ define cloud::identity::endpoint (
     $real_auth_class = $auth_class
   }
 
-  class { $real_auth_class: }
+  class { $real_auth_class: 
+    public_url          => $public_url,
+    internal_url        => $internal_url,
+    admin_url           => $admin_url,
+    region              => $region,
+    password            => $password
+  }
 
 }

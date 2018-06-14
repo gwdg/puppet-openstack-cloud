@@ -19,10 +19,6 @@
 #
 # === Parameters:
 #
-# [*identity_roles_addons*]
-#   (optional) Extra keystone roles to create
-#   Defaults to ['SwiftOperator', 'ResellerAdmin']
-#
 # [*ks_admin_email*]
 #   (optional) Email address of admin user in Keystone
 #   Defaults to 'no-reply@keystone.openstack'
@@ -38,30 +34,6 @@
 # [*ks_admin_token*]
 #   (required) Admin token used by Keystone.
 #
-# [*trove_password*]
-#   (optional) Password used by Trove to connect to Keystone API
-#   Defaults to 'trovepassword'
-#
-# [*ceilometer_password*]
-#   (optional) Password used by Ceilometer to connect to Keystone API
-#   Defaults to 'ceilometerpassword'
-#
-# [*swift_password*]
-#   (optional) Password used by Swift to connect to Keystone API
-#   Defaults to 'swiftpassword'
-#
-# [*heat_password*]
-#   (optional) Password used by Heat to connect to Keystone API
-#   Defaults to 'heatpassword'
-#
-# [*magnum_password*]
-#   (optional) Password used by Magnum to connect to Keystone API
-#   Defaults to 'magnumpassword'
-#
-# [*glance_password*]
-#   (optional) Password used by Glance to connect to Keystone API
-#   Defaults to 'glancepassword'
-#
 # [*cinder_password*]
 #   (optional) Password used by Cinder to connect to Keystone API
 #   Defaults to 'cinderpassword'
@@ -75,10 +47,6 @@
 #   (optional) Which interface we bind the Keystone server.
 #   Defaults to '127.0.0.1'
 #
-# [*region*]
-#   (optional) OpenStack Region Name
-#   Defaults to 'RegionOne'
-#
 # [*token_driver*]
 #   (optional) Driver to store tokens
 #   Defaults to 'keystone.token.persistence.backends.sql.Token'
@@ -90,11 +58,6 @@
 # [*cinder_enabled*]
 #   (optional) Enable or not Cinder (Block Storage Service)
 #   Defaults to true
-#
-# [*trove_enabled*]
-#   (optional) Enable or not Trove (Database as a Service)
-#   Experimental feature.
-#   Defaults to false
 #
 # [*swift_enabled*]
 #   (optional) Enable or not OpenStack Swift (Stockage as a Service)
@@ -122,94 +85,19 @@ class cloud::identity (
   $assignment_driver            = 'sql',
 
   $cinder_enabled               = true,
-  $trove_enabled                = false,
   $magnum_enabled               = false,
   $swift_enabled                = false,
-
-  $identity_roles_addons        = ['SwiftOperator', 'ResellerAdmin'],
 
   $ks_admin_email               = 'no-reply@keystone.openstack',
   $ks_admin_password            = 'adminpassword',
   $ks_admin_tenant              = 'admin',
   $ks_admin_token               = undef,
 
-  $ceilometer_public_url        = undef,
-  $ceilometer_internal_url      = undef,
-  $ceilometer_admin_url         = undef,
-
-  $ceilometer_password          = 'ceilometerpassword',
-
-  $aodh_public_url              = undef,
-  $aodh_internal_url            = undef,
-  $aodh_admin_url               = undef,
-
-  $aodh_password                = 'aodhpassword',
-
-  $gnocchi_public_url           = undef,
-  $gnocchi_internal_url         = undef,
-  $gnocchi_admin_url            = undef,
-
-  $gnocchi_password             = 'gnocchipassword',
-
-  $cinder_v1_public_url         = undef,
-  $cinder_v1_internal_url       = undef,
-  $cinder_v1_admin_url          = undef,
-
-  $cinder_v2_public_url         = undef,
-  $cinder_v2_internal_url       = undef,
-  $cinder_v2_admin_url          = undef,
-
-  $cinder_v3_public_url         = undef,
-  $cinder_v3_internal_url       = undef,
-  $cinder_v3_admin_url          = undef,
-
-  $cinder_password              = 'cinderpassword',
-
-  $glance_public_url            = undef,
-  $glance_internal_url          = undef,
-  $glance_admin_url             = undef,
-
-  $glance_password              = 'glancepassword',
-
-  $heat_public_url              = undef,
-  $heat_internal_url            = undef,
-  $heat_admin_url               = undef,
-
-  $heat_cfn_public_url          = undef,
-  $heat_cfn_internal_url        = undef,
-  $heat_cfn_admin_url           = undef,
-
-  $heat_password                = 'heatpassword',
-
-  $keystone_public_url          = undef,
-  $keystone_internal_url        = undef,
-  $keystone_admin_url           = undef,
-
   $ks_keystone_public_port      = undef,
   $ks_keystone_admin_port       = undef,
   $ssh_port                     = hiera('cloud::global::ssh_port'),
 
-  $swift_public_url             = undef,
-  $swift_internal_url           = undef,
-  $swift_admin_url              = undef,
-
-  $ks_swift_dispersion_password = 'dispersion',
-  $swift_password               = 'swiftpassword',
-
-  $trove_public_url             = undef,
-  $trove_internal_url           = undef,
-  $trove_admin_url              = undef,
-
-  $trove_password               = 'trovepassword',
-
-  $magnum_public_url            = undef,
-  $magnum_internal_url          = undef,
-  $magnum_admin_url             = undef,
-
-  $magnum_password              = 'magnumpassword',
-
   $api_eth                      = '127.0.0.1',
-  $region                       = 'RegionOne',
   $ks_token_expiration          = 3600,
   $firewall_settings            = {},
 
@@ -361,114 +249,16 @@ class cloud::identity (
   }
 
   if $swift_enabled {
-    class {'::swift::keystone::auth': }
     class {'::swift::keystone::dispersion': }
-  }
-
-  class { '::ceilometer::keystone::auth': }
-
-  class { '::aodh::keystone::auth':
-    
-    public_url          => $aodh_public_url,
-    internal_url        => $aodh_internal_url,
-    admin_url           => $aodh_admin_url,
-
-    region              => $region,
-    password            => $aodh_password
-  }
-
-  class { '::gnocchi::keystone::auth':
-
-    public_url          => $gnocchi_public_url,
-    internal_url        => $gnocchi_internal_url,
-    admin_url           => $gnocchi_admin_url,
-
-    region              => $region,
-    password            => $gnocchi_password,
-  }                                                             
-
-  class { '::nova::keystone::auth': }
-  class { '::nova::keystone::auth_placement': }
-
-  class { '::neutron::keystone::auth': }
+  }                                                            
 
   if $cinder_enabled {
-    class { '::cinder::keystone::auth':
-
-      public_url        => $cinder_v1_public_url,
-      internal_url      => $cinder_v1_internal_url,
-      admin_url         => $cinder_v1_admin_url,
-
-      public_url_v2     => $cinder_v2_public_url,
-      internal_url_v2   => $cinder_v2_internal_url,
-      admin_url_v2      => $cinder_v2_admin_url,
-
-      public_url_v3     => $cinder_v3_public_url,
-      internal_url_v3   => $cinder_v3_internal_url,
-      admin_url_v3      => $cinder_v3_admin_url,
-
-      region            => $region,
-      password          => $cinder_password
-    }
-  }
-
-  class { '::glance::keystone::auth':
-
-    public_url          => $glance_public_url,
-    internal_url        => $glance_internal_url,
-    admin_url           => $glance_admin_url,
-
-    region              => $region,
-    password            => $glance_password
-  }
-
-  class { '::heat::keystone::auth':
-
-    public_url          => $heat_public_url,                                                                                                                                                                
-    internal_url        => $heat_internal_url,
-    admin_url           => $heat_admin_url,                                                                                                                                                                 
-
-    region              => $region,
-    password            => $heat_password,    
-
-    configure_delegated_roles => true
+    class { '::cinder::keystone::auth': }
   }
 
   class { '::cloud::orchestration::domain': }
 
-  class { '::heat::keystone::auth_cfn':
-
-    public_url          => $heat_cfn_public_url,
-    internal_url        => $heat_cfn_internal_url,
-    admin_url           => $heat_cfn_admin_url,
-
-    region              => $region,
-    password            => $heat_password
-  }
-
-  if $trove_enabled {
-    class {'::trove::keystone::auth':
-
-      public_url        => $trove_public_url,
-      internal_url      => $trove_internal_url,
-      admin_url         => $trove_admin_url,
-
-      region            => $region,
-      password          => $trove_password
-    }
-  }
-
   if $magnum_enabled {
-    class { '::magnum::keystone::auth':
-
-      public_url          => $magnum_public_url,
-      internal_url        => $magnum_internal_url,
-      admin_url           => $magnum_admin_url,
-
-      region              => $region,
-      password            => $magnum_password
-    }
-
     class { '::cloud::container::domain': }
   }
 
