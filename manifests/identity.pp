@@ -31,9 +31,6 @@
 #   (optional) Admin tenant name in Keystone
 #   Defaults to 'admin'
 #
-# [*ks_admin_token*]
-#   (required) Admin token used by Keystone.
-#
 # [*cinder_password*]
 #   (optional) Password used by Cinder to connect to Keystone API
 #   Defaults to 'cinderpassword'
@@ -47,10 +44,6 @@
 #   (optional) Which interface we bind the Keystone server.
 #   Defaults to '127.0.0.1'
 #
-# [*token_driver*]
-#   (optional) Driver to store tokens
-#   Defaults to 'keystone.token.persistence.backends.sql.Token'
-#
 # [*token_expiration*]
 #   (optional) Amount of time a token should remain valid (in seconds)
 #   Defaults to '3600' (1 hour)
@@ -63,10 +56,6 @@
 #   (optional) Enable or not OpenStack Swift (Stockage as a Service)
 #   Defaults to true
 #
-# [*ks_token_expiration*]
-#   (optional) Amount of time a token should remain valid (seconds).
-#   Defaults to 3600 (1 hour).
-#
 # [*firewall_settings*]
 #   (optional) Allow to add custom parameters to firewall rules
 #   Should be an hash.
@@ -78,9 +67,6 @@
 #
 class cloud::identity (
 
-  $token_driver                 = 'sql',
-  $token_provider               = 'uuid',
-
   $identity_driver              = 'sql',
   $assignment_driver            = 'sql',
 
@@ -91,14 +77,12 @@ class cloud::identity (
   $ks_admin_email               = 'no-reply@keystone.openstack',
   $ks_admin_password            = 'adminpassword',
   $ks_admin_tenant              = 'admin',
-  $ks_admin_token               = undef,
 
   $ks_keystone_public_port      = undef,
   $ks_keystone_admin_port       = undef,
   $ssh_port                     = hiera('cloud::global::ssh_port'),
 
   $api_eth                      = '127.0.0.1',
-  $ks_token_expiration          = 3600,
   $firewall_settings            = {},
 
   # New stuff
@@ -116,34 +100,7 @@ class cloud::identity (
   # Active mod status for monitoring of Apache
   include ::apache::mod::status
 
-  if $token_provider == 'fernet' and $::fqdn == $keystone_master_name {
-
-    $enable_fernet_setup = true
-  } else {
-
-    $enable_fernet_setup = false
-  }
-
-  class { '::keystone':
-    enabled               => true,
-    admin_token           => $ks_admin_token,
-
-    service_name          => 'httpd',
-    manage_policyrcd      => 'true',
-
-    token_provider        => $token_provider,
-    token_driver          => $token_driver,
-    token_expiration      => $ks_token_expiration,
-
-    public_bind_host      => $api_eth,
-    admin_bind_host       => $api_eth,
-
-    using_domain_config   => true,
-
-    sync_db               => true,
-
-    enable_fernet_setup   => $enable_fernet_setup,
-  }
+  class { '::keystone': }
 
   keystone_config {
     # Make sure identity / assignment is configured for sql in keystone.conf (ldap is done via domain specific configuration)
