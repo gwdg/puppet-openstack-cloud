@@ -119,7 +119,6 @@ class cloud::dashboard(
   $horizon_cert              = undef,
   $horizon_key               = undef,
   $horizon_ca                = undef,
-  $ssl_forward               = false,
   $os_endpoint_type          = undef,
   $allowed_hosts             = $::fqdn,
   $vhost_extra_params        = {},
@@ -135,7 +134,7 @@ class cloud::dashboard(
   include ::apache::mod::status
 
   # We build the param needed for horizon class
-  $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}/v3"
+  $keystone_url = "${keystone_proto}://${keystone_host}:${keystone_port}"
 
   # Use memcache servers for caching if set, else in memory caching
   if $memcache_servers {
@@ -163,7 +162,6 @@ class cloud::dashboard(
     vhost_extra_params      => $vhost_extra_params,
     openstack_endpoint_type => $os_endpoint_type,
     allowed_hosts           => $allowed_hosts,
-    ssl_forward             => $ssl_forward,
   }
 
   class { '::cloud::dashboard::gwdg_theme':
