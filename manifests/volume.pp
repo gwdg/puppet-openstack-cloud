@@ -34,11 +34,6 @@
 #
 class cloud::volume(
 
-  $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword',
-
-  $memcache_servers           = [],
-
   $storage_availability_zone  = 'nova',
 
 ) {
@@ -47,12 +42,12 @@ class cloud::volume(
   include ::mysql::client
 
   class { '::cinder':
-    rabbit_userid             => 'cinder',
-    rabbit_hosts              => $rabbit_hosts,
-    rabbit_password           => $rabbit_password,
-    rabbit_virtual_host       => '/',
     storage_availability_zone => $storage_availability_zone
   }
 
   class { '::cinder::ceilometer': }
 }
+
+
+
+
