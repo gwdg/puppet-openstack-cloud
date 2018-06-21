@@ -100,7 +100,7 @@ class cloud::volume::api(
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow cinder-api access':
-      port   => ks_cinder_port,
+      port   => $ks_cinder_port,
       extras => $firewall_settings,
     }
   }
@@ -109,7 +109,7 @@ class cloud::volume::api(
     listening_service => 'cinder_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
-    ports             => ks_cinder_port,
+    ports             => $ks_cinder_port,
     options           => 'check inter 2000 rise 2 fall 5'
   }
 
