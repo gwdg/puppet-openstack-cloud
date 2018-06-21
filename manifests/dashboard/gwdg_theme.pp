@@ -1,11 +1,12 @@
 #
 class cloud::dashboard::gwdg_theme (
 
-  $home_dir   = '/usr/share/openstack-dashboard/openstack_dashboard/',
-  $add_theme  = 'local/local_settings.d/_set_custom_theme_gwdg.py',
-  $quota_scss = 'static/dashboard/scss/components/_quota.scss',
-  $gwdg_logo  = 'static/dashboard/img/gwdg_logo.svg',
-  $theme_tar  = 'themes/gwdg_theme.tar',
+  $home_dir         = '/usr/share/openstack-dashboard/openstack_dashboard/',
+  $add_theme        = 'local/local_settings.d/_set_custom_theme_gwdg.py',
+  $quota_scss       = 'static/dashboard/scss/components/_quota.scss',
+  $gwdg_logo        = 'static/dashboard/img/gwdg_logo.svg',
+  $theme_tar        = 'themes/gwdg_theme.tar',
+  $compress_offline = true,
 
 ) {
 
@@ -48,12 +49,10 @@ class cloud::dashboard::gwdg_theme (
     creates  => '/usr/share/openstack-dashboard/openstack_dashboard/themes/gwdg/',
   }
 
-  exec { 'manage.py compress':
-    path => '/bin:/usr/bin:/sbin:/usr/sbin:',
-    command => '/usr/share/openstack-dashboard/manage.py compress',
-    subscribe  => [ File['gwdg_logo.svg'], File['_set_custom_theme_gwdg.py'], Exec['tar -xf gwdg_theme.tar']],
-    notify => Class['Apache::Service'],
+  if $compress_offline {
+    Exec[tar -xf gwdg_theme.tar] ~> Exec['refresh_horizon_django_compress']
+    File['gwdg_logo.svg'] ~> Exec['refresh_horizon_django_compress']
+    File['_set_custom_theme_gwdg.py'] ~> Exec['refresh_horizon_django_compress']
   }
-
 }
 
