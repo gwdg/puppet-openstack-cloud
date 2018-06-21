@@ -50,7 +50,7 @@ class cloud::dashboard::gwdg_theme (
   }
 
   if $compress_offline {
-    Exec[tar -xf gwdg_theme.tar] ~> Exec['refresh_horizon_django_compress']
+    Exec['tar -xf gwdg_theme.tar'] ~> Exec['refresh_horizon_django_compress']
     File['gwdg_logo.svg'] ~> Exec['refresh_horizon_django_compress']
     File['_set_custom_theme_gwdg.py'] ~> Exec['refresh_horizon_django_compress']
   }
