@@ -128,6 +128,7 @@ class cloud::dashboard(
   # New parameters
   $lb_eth                    = '127.0.0.1',
   $memcache_servers          = false,
+  $compress_offline          = true,
 ) {
 
   # Active mod status for monitoring of Apache
@@ -162,26 +163,31 @@ class cloud::dashboard(
     vhost_extra_params      => $vhost_extra_params,
     openstack_endpoint_type => $os_endpoint_type,
     allowed_hosts           => $allowed_hosts,
+    # need to disable offline compression due to
+    # https://bugs.launchpad.net/ubuntu/+source/horizon/+bug/1424042
+    compress_offline        => $compress_offline,
+
   }
 
   class { '::cloud::dashboard::gwdg_theme':
-    require => Class['::horizon'],
+    require => Package['horizon'],
+    compress_offline => true,
   }
 
   class { '::cloud::dashboard::overrides':
-    require => Class['::horizon'],
+    require => Package['horizon'],
   }
 
-  if ($::osfamily == 'Debian') {
-    # TODO(Goneri): HACK to ensure Horizon can cache its files
-    $horizon_var_dir = [ '/var/lib/openstack-dashboard/static', '/var/lib/openstack-dashboard/static/js', '/var/lib/openstack-dashboard/static/css']
-    file {$horizon_var_dir:
-      ensure    => directory,
-      owner     => 'horizon',
-      group     => 'horizon',
-      require   => Class['horizon'],
-    }
-  }
+#  if ($::osfamily == 'Debian') {
+#    # TODO(Goneri): HACK to ensure Horizon can cache its files
+#    $horizon_var_dir = [ '/var/lib/openstack-dashboard/static', '/var/lib/openstack-dashboard/static/js', '/var/lib/openstack-dashboard/static/css']
+#    file {$horizon_var_dir:
+#      ensure    => directory,
+#      owner     => 'horizon',
+#      group     => 'horizon',
+#      require   => Class['horizon'],
+#    }
+#  }
 
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow horizon access':
