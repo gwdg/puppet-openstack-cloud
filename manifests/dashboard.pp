@@ -129,6 +129,7 @@ class cloud::dashboard(
   $lb_eth                    = '127.0.0.1',
   $memcache_servers          = false,
   $compress_offline          = true,
+  $root_path                 = "/usr/share/openstack-dashboard",
 ) {
 
   # Active mod status for monitoring of Apache
@@ -145,38 +146,37 @@ class cloud::dashboard(
     $cache_server_ip    = false
     $cache_backend      = 'django.core.cache.backends.locmem.LocMemCache'
   }
-
 #  include ::cloud::util::apache_common
   class { '::horizon':
     secret_key              => $secret_key,
     servername              => $servername,
-    bind_address            => $api_eth,
-    keystone_url            => $keystone_url,
-    cache_server_ip         => $cache_server_ip,
-    cache_backend           => $cache_backend,
-    django_debug            => $debug,
-    neutron_options         => $neutron_extra_options,
+    allowed_hosts           => $allowed_hosts,
     listen_ssl              => $listen_ssl,
     horizon_cert            => $horizon_cert,
     horizon_key             => $horizon_key,
     horizon_ca              => $horizon_ca,
+    keystone_url            => hiera('cloud::global::identity::auth_uri'),
+    cache_server_ip         => $cache_server_ip,
+    cache_backend           => $cache_backend,
+    neutron_options         => $neutron_extra_options,
     vhost_extra_params      => $vhost_extra_params,
     openstack_endpoint_type => $os_endpoint_type,
-    allowed_hosts           => $allowed_hosts,
+    root_path               => $root_path,
     # need to disable offline compression due to
     # https://bugs.launchpad.net/ubuntu/+source/horizon/+bug/1424042
     compress_offline        => $compress_offline,
-
+    bind_address            => $api_eth,
+    #django_debug            => $debug,
   }
 
-  class { '::cloud::dashboard::gwdg_theme':
-    require => Package['horizon'],
-    compress_offline => true,
-  }
+#  class { '::cloud::dashboard::gwdg_theme':
+#    require => Package['horizon'],
+#    compress_offline => true,
+#  }
 
-  class { '::cloud::dashboard::overrides':
-    require => Package['horizon'],
-  }
+#  class { '::cloud::dashboard::overrides':
+#    require => Package['horizon'],
+#  }
 
 #  if ($::osfamily == 'Debian') {
 #    # TODO(Goneri): HACK to ensure Horizon can cache its files
