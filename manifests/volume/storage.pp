@@ -148,13 +148,6 @@ class cloud::volume::storage(
 
     # Make sure Cinder::Type is only run after cinder.conf is setup correctly (else resource prefetch will fail due to missing cinder.conf)
     Cinder_config<||> -> Cinder::Type <| |>
-
-    Cinder::Type <| |> {
-      os_tenant_name => $ks_admin_tenant,
-      os_username    => $ks_cinder_user,
-      os_password    => $ks_cinder_password,
-      os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v2.0"
-    }
     
     # Cloud::Volume::Qos::Create requires keystone credentials
     Cloud::Volume::Qos::Create <| |> {
