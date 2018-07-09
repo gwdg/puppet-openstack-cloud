@@ -1,0 +1,34 @@
+[
+    {
+        "local": [
+            {
+                "user": {
+                    "name": "{0}",
+                    "domain": {"name": "fedcloud"} 
+                },
+                "group": {
+                    "name": "ops",
+                    "domain": {"name": "fedcloud"}
+                }
+            }
+        ],
+        "remote": [
+            {
+                "type": "HTTP_OIDC_SUB"
+            },
+            {
+                "type": "HTTP_OIDC_ISS",
+                "any_one_of": [
+                    "https://aai-dev.egi.eu/oidc/"
+                ]
+            },
+            {
+                "type": "OIDC-edu_person_entitlements",
+                "regex": true,
+                "any_one_of": [
+                    "^urn:mace:egi.eu:group:ops:role=vm_operator#aai.egi.eu$"
+                ]
+            }
+        ]
+    }
+]
