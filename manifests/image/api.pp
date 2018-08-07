@@ -19,10 +19,6 @@
 #
 # === Parameters:
 #
-# [*ks_glance_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Glance
-#   Defaults to '127.0.0.1'
-#
 # [*ks_glance_api_internal_port*]
 #   (optional) TCP port to connect to Glance API from internal network
 #   Defaults to '9292'
@@ -93,12 +89,6 @@
 #
 class cloud::image::api(
 
-  $auth_uri                          = 'http://127.0.0.1:5000/',
-  $identity_uri                      = 'http://127.0.0.1:35357/',
-
-  $memcache_servers                  = [],
-
-  $ks_glance_internal_host           = '127.0.0.1',
   $ks_glance_api_internal_port       = '9292',
   $ks_glance_registry_internal_port  = '9191',
   $ks_glance_registry_internal_proto = 'http',
@@ -128,14 +118,6 @@ class cloud::image::api(
 
     registry_host            => $openstack_vip,
     registry_port            => $ks_glance_registry_internal_port,
-
-    auth_uri                 => $auth_uri,
-    identity_uri             => $identity_uri,
-    keystone_password        => $ks_glance_password,
-    keystone_tenant          => 'services',
-    keystone_user            => 'glance',
- 
-    memcached_servers        => $memcache_servers,
 
     registry_client_protocol => $ks_glance_registry_internal_proto,
     show_image_direct_url    => true,
