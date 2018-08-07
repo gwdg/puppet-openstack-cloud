@@ -19,17 +19,9 @@
 #
 # === Parameters:
 #
-# [*ks_glance_internal_host*]
-#   (optional) Internal Hostname or IP to connect to Glance
-#   Defaults to '127.0.0.1'
-#
 # [*ks_glance_registry_internal_port*]
 #   (optional) TCP port to connect to Glance Registry from internal network
 #   Defaults to '9191'
-#
-# [*ks_glance_password*]
-#   (optional) Password used by Glance to connect to Keystone API
-#   Defaults to 'glancepassword'
 #
 # [*api_eth*]
 #   (optional) Which interface we bind the Glance API server.
@@ -42,14 +34,7 @@
 #
 class cloud::image::registry(
 
-  $auth_uri                         = 'http://127.0.0.1:5000/',
-  $identity_uri                     = 'http://127.0.0.1:35357/',
-
-  $memcache_servers                 = [],
-
-  $ks_glance_internal_host          = '127.0.0.1',
   $ks_glance_registry_internal_port = '9191',
-  $ks_glance_password               = 'glancepassword',
 
   $api_eth                          = '127.0.0.1',
   $firewall_settings                = {},
@@ -59,19 +44,8 @@ class cloud::image::registry(
   include ::mysql::client
 
   class { '::glance::registry':
-
-    auth_uri              => $auth_uri, 
-    identity_uri          => $identity_uri,
-
-    memcached_servers     => $memcache_servers,
-
-    keystone_password     => $ks_glance_password,
-    keystone_tenant       => 'services',
-    keystone_user         => 'glance',
-
     bind_host             => $api_eth,
     bind_port             => $ks_glance_registry_internal_port,
-
     sync_db               => true,
   }
 
