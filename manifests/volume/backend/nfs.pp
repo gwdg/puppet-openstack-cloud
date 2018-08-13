@@ -69,20 +69,17 @@ define cloud::volume::backend::nfs(
 ) {
 
   cinder::backend::nfs { $name:
-    volume_backend_name  => $volume_backend_name,
-    nfs_servers          => $nfs_servers,
-    nfs_mount_options    => $nfs_mount_options,
-    nfs_disk_util        => $nfs_disk_util,
-    nfs_sparsed_volumes  => $nfs_sparsed_volumes,
-    nfs_mount_point_base => $nfs_mount_point_base,
-    nfs_shares_config    => $nfs_shares_config,
-    nfs_used_ratio       => $nfs_used_ratio,
-    nfs_oversub_ratio    => $nfs_oversub_ratio,
-
-    # Prevent permission problems by disabling nas_secure_file_* stuff
-    extra_options        => { "${name}/nas_secure_file_operations"  => { 'value' => false },
-                              "${name}/nas_secure_file_permissions" => { 'value' => false },
-                            }
+    volume_backend_name         => $volume_backend_name,
+    nfs_servers                 => $nfs_servers,
+    nfs_mount_options           => $nfs_mount_options,
+    nfs_disk_util               => $nfs_disk_util,
+    nfs_sparsed_volumes         => $nfs_sparsed_volumes,
+    nfs_mount_point_base        => $nfs_mount_point_base,
+    nfs_shares_config           => $nfs_shares_config,
+    nfs_used_ratio              => $nfs_used_ratio,
+    nfs_oversub_ratio           => $nfs_oversub_ratio,
+    nas_secure_file_operations  => false,
+    nas_secure_file_permissions => false,
   }
 
   @cinder::type { $volume_backend_name:
