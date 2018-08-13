@@ -48,7 +48,8 @@ define cloud::volume::qos::create (
   $qos_name = $name
 
   $qos_env = [
-    "OS_TENANT_NAME=${os_tenant_name}",
+    "OS_IDENTITY_API_VERSION=3",
+    "OS_PROJECT_NAME=${os_tenant_name}",
     "OS_USERNAME=${os_username}",
     "OS_PASSWORD=${os_password}",
     "OS_AUTH_URL=${os_auth_url}",
