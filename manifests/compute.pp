@@ -101,7 +101,6 @@ class cloud::compute(
   }
 
   nova_config {
-    'DEFAULT/resume_guests_state_on_host_boot': value => true;
     'DEFAULT/servicegroup_driver':              value => 'mc';
     'DEFAULT/glance_num_retries':               value => '10';
 
