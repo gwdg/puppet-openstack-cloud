@@ -346,10 +346,6 @@ class cloud::compute::hypervisor(
     libvirt_service_name        => $::cloud::params::libvirt_service_name,
     libvirt_inject_key          => false,
     libvirt_inject_partition    => '-2',
-
-    # Recheck / remove for Mitaka+ or Ubuntu Xenial
-    virtlock_service_name       => '',
-    virtlog_service_name        => '',
   }
 
   # Extra config for nova-compute
