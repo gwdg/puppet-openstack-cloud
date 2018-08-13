@@ -85,9 +85,9 @@ class cloud::volume::storage(
   $ks_glance_api_internal_port             = '9292',
   $ks_glance_internal_host                 = '127.0.0.1',
 
-  $ks_cinder_password                      = 'secrete',
-  $ks_cinder_user                          = 'cinder',
-  $ks_admin_tenant                         = 'services',
+  $ks_cinder_password                      = hiera('cinder::keystone::authtoken::password'),
+  $ks_cinder_user                          = hiera('cinder::keystone::authtoken::username'),
+  $ks_admin_tenant                         = hiera('cinder::keystone::authtoken::project_name'),
 
   $cinder_rbd_pool                         = 'volumes',
   $cinder_rbd_user                         = 'cinder',
@@ -103,6 +103,8 @@ class cloud::volume::storage(
 
   # Needed as dep. of cinder::type
   include ::cinder::client
+
+  class { '::cinder::keystone::authtoken': }
 
   if $cinder_backends {
 
