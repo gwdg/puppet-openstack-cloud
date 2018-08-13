@@ -68,7 +68,7 @@ define cloud::volume::qos::create (
     command     => "openstack volume qos create ${qos_name} --consumer=front-end",
     unless      => "openstack volume qos list -c Name -f value | grep -qE '\\b${qos_name}\\b'",
     environment => concat($qos_env, $region_env),
-    require     => Package['python-cinderclient'],
+    require     => [Anchor['cinder::service::end'], Package['python-cinderclient']],
     path        => ['/usr/bin', '/bin'],
     tries       => '2',
     try_sleep   => '5',

@@ -84,7 +84,6 @@ define cloud::volume::backend::nfs(
   }
 
   if $qos and has_key($qos, 'frontend') {
-    Cinder::Type[$volume_backend_name] ->
     cloud::volume::qos::create { "qos_${volume_backend_name}":
       properties => $qos['frontend'],
       consumer => 'front-end',

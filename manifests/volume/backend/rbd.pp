@@ -89,7 +89,6 @@ define cloud::volume::backend::rbd (
   Concat::Fragment <<| title == 'ceph-client-os' |>>
 
   if $qos and has_key($qos, 'frontend') {
-    Cinder::Type[$volume_backend_name] ->
     cloud::volume::qos::create { "qos_${volume_backend_name}":
       properties => $qos['frontend'],
       consumer => 'front-end',

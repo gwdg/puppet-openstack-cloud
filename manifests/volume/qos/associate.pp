@@ -61,6 +61,6 @@ define cloud::volume::qos::associate (
     command     => "openstack volume qos associate ${qos_name} ${volume_type}",
     unless      => "openstack volume qos show ${qos_name} -f value -c associations | grep -Eq '\\b${volume_type}\\b'",
     environment => concat($qos_env, $region_env),
-    require     => Package['python-cinderclient']
+    require     => [Anchor['cinder::service::end'], Package['python-cinderclient']],
   }
 }
