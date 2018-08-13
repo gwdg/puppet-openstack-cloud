@@ -73,7 +73,7 @@ define cloud::volume::backend::rbd (
     rbd_flatten_volume_from_snapshot => $rbd_flatten_volume_from_snapshot,
     rbd_max_clone_depth              => $rbd_max_clone_depth,
     volume_tmp_dir                   => '/tmp'
-    
+    manage_volume_type               => true
     extra_options                    => { 
         "${volume_backend_name}/glance_api_version" => { 'value' => 2 },}
   }
@@ -87,12 +87,6 @@ define cloud::volume::backend::rbd (
   }
 
   Concat::Fragment <<| title == 'ceph-client-os' |>>
-
-  @cinder::type { $volume_backend_name:
-    set_key   => 'volume_backend_name',
-    set_value => $volume_backend_name,
-    notify    => Service['cinder-volume']
-  }
 
   if $qos and has_key($qos, 'frontend') {
     Cinder::Type[$volume_backend_name] ->

@@ -80,12 +80,7 @@ define cloud::volume::backend::nfs(
     nfs_oversub_ratio           => $nfs_oversub_ratio,
     nas_secure_file_operations  => false,
     nas_secure_file_permissions => false,
-  }
-
-  @cinder::type { $volume_backend_name:
-    set_key   => 'volume_backend_name',
-    set_value => $volume_backend_name,
-    notify    => Service['cinder-volume']
+    manage_volume_type          => true,
   }
 
   if $qos and has_key($qos, 'frontend') {
