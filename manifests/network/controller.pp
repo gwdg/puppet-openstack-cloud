@@ -144,6 +144,8 @@ class cloud::network::controller(
   $l3_ha                            = false,
   $router_distributed               = false,
   $allow_automatic_l3agent_failover = false,
+  $allow_automatic_dhcp_failover    = false,
+  $network_auto_schedule            = false,
 
   # only needed by ml2 plugin
   $tunnel_id_ranges                 = ['1:10000'],
@@ -177,6 +179,8 @@ class cloud::network::controller(
     l3_ha                               => $l3_ha,
     router_distributed                  => $router_distributed,
     allow_automatic_l3agent_failover    => $allow_automatic_l3agent_failover,
+    allow_automatic_dhcp_failover       => $allow_automatic_dhcp_failover,
+    network_auto_schedule               => $network_auto_schedule,
 
     sync_db                             => true,
   }
