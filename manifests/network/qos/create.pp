@@ -52,6 +52,7 @@ define cloud::network::qos::create(
     $os_password,
     $os_auth_url          = 'http://127.0.0.1:5000/v2.0/',
     $os_region_name       = undef,
+    $os_endpoint_type     = 'internal',
 ) {
   $policy_name = $name
 
@@ -62,6 +63,7 @@ define cloud::network::qos::create(
     "OS_USER_DOMAIN_ID=${os_user_domain_id}",
     "OS_PASSWORD=${os_password}",
     "OS_AUTH_URL=${os_auth_url}",
+    "OS_ENDPOINT_TYPE=${os_endpoint_type}",
   ]
 
   if $os_region_name {
