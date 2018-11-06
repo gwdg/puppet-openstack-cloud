@@ -648,7 +648,7 @@ class cloud::loadbalancer(
 
   $keepalived_preempt_delay         = undef,
 
-  $haproxy_certs                    = 'api.dev.cloud.gwdg.de_20150716_all.pem',
+  $haproxy_certs                    = 'api.dev.cloud.gwdg.de-20181106.pem',
 ){
 
   include ::cloud::params
