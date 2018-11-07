@@ -348,6 +348,8 @@ class cloud::compute::hypervisor(
     libvirt_inject_partition    => '-2',
   }
 
+  class { '::nova::compute::libvirt::qemu': }
+
   # Extra config for nova-compute
   nova_config {
     'libvirt/live_migration_flag':  value => 'VIR_MIGRATE_UNDEFINE_SOURCE,VIR_MIGRATE_PEER2PEER,VIR_MIGRATE_LIVE,VIR_MIGRATE_PERSIST_DEST';
