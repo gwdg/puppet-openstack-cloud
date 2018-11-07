@@ -339,8 +339,6 @@ class cloud::compute::hypervisor(
 
   class { '::nova::compute::libvirt':
     libvirt_virt_type           => $libvirt_virt_type,
-    # Needed to support migration but we still use Spice:
-    vncserver_listen            => '0.0.0.0',
     migration_support           => true,
     libvirt_disk_cachemodes     => $libvirt_disk_cachemodes_real,
     libvirt_service_name        => $::cloud::params::libvirt_service_name,
