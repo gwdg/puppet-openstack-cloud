@@ -67,16 +67,12 @@ class cloud::compute::api(
   class { '::nova::api': }
 
   # Use WSGI
-  class {'::nova::wsgi::apache':
- 
+  class {'::nova::wsgi::apache_api':
     servername  => $::fqdn,
-
-    api_port    => $ks_nova_public_port,
-
-    # Use multiprocessing defaults
+    api_port    =>  $ks_nova_public_port,
     workers     => 1,
+    # Use multiprocessing defaults
     threads     => $::processorcount,
-
     ssl         => false
   }
   
