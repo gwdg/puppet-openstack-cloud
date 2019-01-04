@@ -34,7 +34,7 @@ class AggregateDomainIsolation(filters.BaseHostFilter):
         novaconfig = ConfigParser.ConfigParser()
         novaconfig.read("/etc/nova/nova.conf")
 
-        admin_auth_password     = novaconfig.get("keystone_authtoken","admin_password")
+        admin_auth_password     = novaconfig.get("keystone_authtoken","password")
         auth_url                = novaconfig.get("keystone_authtoken","auth_uri") + "/v3/"
 
         admin_auth_username     = "admin"
@@ -58,9 +58,6 @@ class AggregateDomainIsolation(filters.BaseHostFilter):
     # Aggregate data and tenant do not change within a request
     run_filter_once_per_request = True
 
-    #LOG.debug("Admin password" + admin_auth_password)
-    #LOG.debug("Admin username" + admin_auth_username)
-    #LOG.debug("Admin url" + auth_url)
 
     def host_passes(self, host_state, spec_obj):
         """If a host is in an aggregate that has the metadata key
@@ -70,12 +67,10 @@ class AggregateDomainIsolation(filters.BaseHostFilter):
         If a host doesn't belong to an aggregate with the metadata key
         "filter_domain_id" it can create instances from all tenants.
         """
-        tenant_id = spec_obj.project_id
-        #LOG.debug("lgx: The tenant_id is: " + tenant_id)
+        project_id = spec_obj.project_id
 
-        project_obj       = self.keystone.projects.get(tenant_id)
+        project_obj       = self.keystone.projects.get(project_id)
         domain_id = project_obj.domain_id
-        #LOG.debug("lgx: The domain_id is: " + domain_id)
 
         metadata = utils.aggregate_metadata_get_by_host(host_state,
                                                         key="filter_domain_id")
