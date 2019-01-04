@@ -68,8 +68,6 @@ class cloud::compute(
 
   $memcache_servers         = ['127.0.0.1:11211'],
   $availability_zone        = 'RegionOne',
-
-  $upgrade_level            = undef,
 ) {
   
   class { '::nova':
@@ -77,17 +75,6 @@ class cloud::compute(
     
     cinder_catalog_info         => 'volumev2:cinderv2:internalURL',
 #    nova_shell                  => '/bin/bash',
-
-    # Set upgrade levels
-    upgrade_level_cells         => $upgrade_level,
-    upgrade_level_cert          => $upgrade_level,
-    upgrade_level_compute       => $upgrade_level,
-    upgrade_level_conductor     => $upgrade_level,
-    upgrade_level_console       => $upgrade_level,
-    upgrade_level_consoleauth   => $upgrade_level,
-    upgrade_level_intercell     => $upgrade_level,
-    upgrade_level_network       => $upgrade_level,
-    upgrade_level_scheduler     => $upgrade_level,
   }
 
   class { '::nova::cache': }
