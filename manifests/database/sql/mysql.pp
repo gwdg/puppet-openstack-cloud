@@ -255,6 +255,11 @@ class cloud::database::sql::mysql (
     $ceilometer_db_password          = 'ceilometerpassword',
     $ceilometer_db_allowed_hosts     = ['127.0.0.1'],
 
+    $rally_db_host                   = '127.0.0.1',
+    $rally_db_user                   = 'rally',
+    $rally_db_password               = 'rallypassword',
+    $rally_db_allowed_hosts          = ['127.0.0.1'],
+
     $mysql_root_password             = 'rootpassword',
 
     $mysql_sys_maint_password        = 'sys_maint',
@@ -376,6 +381,14 @@ class cloud::database::sql::mysql (
       password      => $ceilometer_db_password,
       host          => $ceilometer_db_host,
       allowed_hosts => $ceilometer_db_allowed_hosts,
+    }
+
+    class { '::rally::db::mysql':
+      dbname        => 'rally',
+      user          => $rally_db_user,
+      password      => $rally_db_password,
+      host          => $rally_db_host,
+      allowed_hosts => $rally_db_allowed_hosts,
     }
 
     # Monitoring DB
