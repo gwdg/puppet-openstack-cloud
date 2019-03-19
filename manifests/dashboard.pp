@@ -130,6 +130,7 @@ class cloud::dashboard(
   $memcache_servers          = false,
   $compress_offline          = true,
   $root_path                 = "/usr/share/openstack-dashboard",
+  $ssh_redirect_url          = undef,
 ) {
 
   # Active mod status for monitoring of Apache
@@ -167,7 +168,14 @@ class cloud::dashboard(
     compress_offline        => $compress_offline,
     bind_address            => $api_eth,
     #django_debug            => $debug,
+    allowed_hosts           => $allowed_hosts,
+    ssl_forward             => $ssl_forward,
+    ssh_redirect_url        => $ssh_redirect_url,
   }
+ #  notify {"parameter value : $ssh_redirect_url ":}
+#  class { '::horizon::wsgi::apache':
+#    root_url                => $root_url,
+#  }
 
 #  class { '::cloud::dashboard::gwdg_theme':
 #    require => Package['horizon'],
