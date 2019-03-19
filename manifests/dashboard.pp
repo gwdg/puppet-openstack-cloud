@@ -148,6 +148,16 @@ class cloud::dashboard(
     $cache_backend      = 'django.core.cache.backends.locmem.LocMemCache'
   }
 #  include ::cloud::util::apache_common
+  if ! $::cloud::production {
+       #redirect address in vagrant (with port)
+       $part1 = $ssh_redirect_url[0,-9]
+       $part2 = $ssh_redirect_url[-8,8]
+       $ssh_redirect_url_real = "$part1:58080$part2"
+  }
+  else{
+       #redirect address in production (withouth port)
+       $ssh_redirect_url_real = $ssh_redirect_url
+  }
   class { '::horizon':
     secret_key              => $secret_key,
     servername              => $servername,
@@ -170,12 +180,8 @@ class cloud::dashboard(
     #django_debug            => $debug,
     allowed_hosts           => $allowed_hosts,
     ssl_forward             => $ssl_forward,
-    ssh_redirect_url        => $ssh_redirect_url,
+    ssh_redirect_url        => $ssh_redirect_url_real,
   }
- #  notify {"parameter value : $ssh_redirect_url ":}
-#  class { '::horizon::wsgi::apache':
-#    root_url                => $root_url,
-#  }
 
 #  class { '::cloud::dashboard::gwdg_theme':
 #    require => Package['horizon'],
