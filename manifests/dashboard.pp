@@ -129,6 +129,7 @@ class cloud::dashboard(
   # New parameters
   $lb_eth                    = '127.0.0.1',
   $memcache_servers          = false,
+  $ssh_redirect_url          = undef,
 ) {
 
   # Active mod status for monitoring of Apache
@@ -164,7 +165,12 @@ class cloud::dashboard(
     openstack_endpoint_type => $os_endpoint_type,
     allowed_hosts           => $allowed_hosts,
     ssl_forward             => $ssl_forward,
+    ssh_redirect_url        => $ssh_redirect_url,
   }
+ #  notify {"parameter value : $ssh_redirect_url ":}
+#  class { '::horizon::wsgi::apache':
+#    root_url                => $root_url,
+#  }
 
   class { '::cloud::dashboard::gwdg_theme':
     require => Class['::horizon'],
@@ -218,3 +224,4 @@ class cloud::dashboard(
     }
   }
 }
+
