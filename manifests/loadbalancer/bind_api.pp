@@ -42,6 +42,9 @@ define cloud::loadbalancer::bind_api(
           # Internal binding via http
           "${::cloud::loadbalancer::vip_internal_ip}:${port}"               => [],
 
+          # Public binding via http
+          "${::cloud::loadbalancer::vip_public_ip}:${port}"               => [],
+
           # Public binding always via https
           "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
         },
