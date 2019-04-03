@@ -1,78 +1,80 @@
-<%- if @enable_swift_api -%>
+<%- if @haproxy_bindings_http['swift_api']['enable'] -%>
 acl swift_api_dead nbsrv(swift_api) lt 1
 monitor fail if swift_api_dead
 <%- end -%>
-<%- if @enable_keystone_api -%>
+<%# if @enable_keystone_api %>
+<%- if @haproxy_bindings_http['keystone_api']['enable'] -%>
 acl keystone_api_dead nbsrv(keystone_api) lt 1
 monitor fail if keystone_api_dead
 <% end -%>
-<%- if @enable_keystone_api_admin -%>
+<%- if @haproxy_bindings_http['keystone_api_admin']['enable'] -%>
 acl keystone_api_admin_dead nbsrv(keystone_api_admin) lt 1
 monitor fail if keystone_api_admin_dead
 <% end -%>
-<%- if @enable_galera -%>
+<%- if @haproxy_bindings_tcp['galera']['enable'] -%>
 acl galera_dead nbsrv(galera) lt 1
 monitor fail if galera_dead
 <%- end -%>
-<%- if @enable_neutron_api -%>
+<%- if @haproxy_bindings_http['neutron_api']['enable'] -%>
 acl neutron_api_dead nbsrv(neutron_api) lt 1
 monitor fail if neutron_api_dead
 <%- end -%>
-<%- if @enable_cinder_api -%>
+<%- if @haproxy_bindings_http['cinder_api']['enable'] -%>
 acl cinder_api_dead nbsrv(cinder_api) lt 1
 monitor fail if cinder_api_dead
 <%- end -%>
-<%- if @enable_nova_api -%>
+<%- if @haproxy_bindings_http['nova_api']['enable'] -%>
 acl nova_api_dead nbsrv(nova_api) lt 1
 monitor fail if nova_api_dead
 <%- end -%>
-<%- if @enable_ec2_api -%>
+<%- if @haproxy_bindings_http['ec2_api']['enable'] -%>
 acl ec2_api_dead nbsrv(ec2_api) lt 1
 monitor fail if ec2_api_dead
 <%- end -%>
-<%- if @enable_metadata_api -%>
+<%- if @haproxy_bindings_http['metadata_api']['enable'] -%>
 acl metadata_api_dead nbsrv(metadata_api) lt 1
 monitor fail if metadata_api_dead
 <%- end -%>
-<%- if @enable_spice -%>
+<%- if @haproxy_bindings_http['spice']['enable'] -%>
 acl spice_dead nbsrv(spice) lt 1
 monitor fail if spice_dead
 <%- end -%>
-<%- if @enable_rabbitmq -%>
+<%- if @haproxy_bindings_tcp['rabbitmq']['enable'] -%>
 acl rabbitmq_dead nbsrv(rabbitmq) lt 1
 monitor fail if rabbitmq_dead
 acl rabbitmq_management_dead nbsrv(rabbitmq_management) lt 1
 monitor fail if rabbitmq_management_dead
 <%- end -%>
-<%- if @enable_glance_api -%>
+<%- if @haproxy_bindings_http['glance_api']['enable'] -%>
 acl glance_api_dead nbsrv(glance_api) lt 1
 monitor fail if glance_api_dead
 <%- end -%>
-<%- if @enable_glance_registry -%>
+<%- if @haproxy_bindings_http['glance_registry']['enable'] -%>
 acl glance_registry_dead nbsrv(glance_registry) lt 1
 monitor fail if glance_registry_dead
 <%- end -%>
-<%- if @enable_ceilometer_api -%>
+<%- if @haproxy_bindings_http['ceilometer_api']['enable'] -%>
 acl ceilometer_api_dead nbsrv(ceilometer_api) lt 1
 monitor fail if ceilometer_api_dead
 <%- end -%>
-<%- if @enable_heat_api -%>
+<%- if @haproxy_bindings_http['heat_api']['enable'] -%>
 acl heat_api_dead nbsrv(heat_api) lt 1
 monitor fail if heat_api_dead
 <%- end -%>
-<%- if @enable_heat_cfn_api -%>
+<%- if @haproxy_bindings_http['heat_cfn_api']['enable'] -%>
 acl heat_cfn_api_dead nbsrv(heat_cfn_api) lt 1
 monitor fail if heat_cfn_api_dead
 <%- end -%>
-<%- if @enable_heat_cloudwatch_api -%>
+<%- if @haproxy_bindings_http['heat_cloudwatch_api']['enable'] -%>
 acl heat_cloudwatch_api_dead nbsrv(heat_cloudwatch_api) lt 1
 monitor fail if heat_cloudwatch_api_dead
 <%- end -%>
-<%- if @enable_horizon -%>
+<%# if @enable_horizon -%>
+<%- if @haproxy_bindings_http['horizon']['enable'] -%>
 acl horizon_dead nbsrv(horizon) lt 1
 monitor fail if horizon_dead
 <%- end -%>
-<%- if @enable_trove_api -%>
+<%- if @haproxy_bindings_http['trove_api']['enable'] -%>
 acl trove_api_dead nbsrv(trove_api) lt 1
 monitor fail if trove_api_dead
 <%- end -%>
