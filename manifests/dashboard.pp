@@ -152,7 +152,8 @@ class cloud::dashboard(
        #redirect address in vagrant (with port)
        $part1 = $ssh_redirect_url[0,-9]
        $part2 = $ssh_redirect_url[-8,8]
-       $ssh_redirect_url_real = "$part1:58080$part2"
+       $enviroment = lookup('vagrant::environment')
+       $ssh_redirect_url_real = "$part1:${enviroment}8080$part2"
   }
   else{
        #redirect address in production (withouth port)
