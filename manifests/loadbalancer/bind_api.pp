@@ -22,6 +22,7 @@ define cloud::loadbalancer::bind_api(
   $port             = undef,
   $public_access    = false,
   $public_port      = undef,
+  $public_port_no_ssl   = undef,
   $options          = {}
 ){
 
@@ -37,18 +38,32 @@ define cloud::loadbalancer::bind_api(
       }
 
       # Define public + internal endpoints
-      haproxy::listen { $title:
-        bind                => {
-          # Internal binding via http
-          "${::cloud::loadbalancer::vip_internal_ip}:${port}"               => [],
+      if $public_port_no_ssl {
+        haproxy::listen { $title:
+            bind                => {
+            # Internal binding via http
+            "${::cloud::loadbalancer::vip_internal_ip}:${port}"               => [],
 
-          # Public binding via http
-          "${::cloud::loadbalancer::vip_public_ip}:${port}"               => [],
+            # Public binding via http
+            "${::cloud::loadbalancer::vip_public_ip}:${public_port_no_ssl}"               => [],
 
-          # Public binding always via https
-          "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
-        },
-        options             => $options,
+            # Public binding always via https
+            "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
+            },
+            options             => $options,
+        }
+      } else {
+        haproxy::listen { $title:
+            bind                => {
+            # Internal binding via http
+            "${::cloud::loadbalancer::vip_internal_ip}:${port}"               => [],
+
+            # Public binding always via https
+            "${::cloud::loadbalancer::vip_public_ip}:${public_port_real}"     => [ 'ssl', 'crt', '/etc/haproxy/ssl/certs.pem' ],
+            },
+            options             => $options,
+        }
+
       }
     } else {
 
