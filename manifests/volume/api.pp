@@ -109,7 +109,7 @@ class cloud::volume::api(
     listening_service => 'cinder_api',
     server_names      => $::hostname,
     ipaddresses       => $api_eth,
-    ports             => $ks_cinder_internal_port,
+    ports             => $ks_cinder_port,
     options           => 'check inter 2000 rise 2 fall 5'
   }
 

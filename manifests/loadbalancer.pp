@@ -510,40 +510,6 @@
 #
 class cloud::loadbalancer(
 
-  $enable_aodh_api                  = false,
-  $enable_ceilometer_api            = false,
-  $enable_cinder_api                = false,
-  $enable_elasticsearch             = false,
-  $enable_galera                    = false,
-  $enable_galera_readonly           = false,
-  $enable_glance_api                = false,
-  $enable_glance_registry           = false,
-  $enable_gnocchi_api               = false,
-  $enable_heat_api                  = false,
-  $enable_heat_cfn_api              = false,
-  $enable_heat_cloudwatch_api       = false,
-  $enable_horizon                   = false,
-  $enable_horizon_ssl               = false,
-  $enable_influxdb                  = false,
-  $enable_influxdb_management       = false,
-  $enable_keystone_api_admin        = false,
-  $enable_keystone_api              = false,
-  $enable_kibana                    = false,
-  $enable_logstash_syslog           = false,
-  $enable_magnum_api                = false,
-  $enable_metadata_api              = false,
-  $enable_neutron_api               = false,
-  $enable_nova_api                  = false,
-  $enable_novnc                     = false,
-  $enable_rabbitmq                  = false,
-  $enable_rabbitmq_management       = false,
-  $enable_redis                     = false,
-  $enable_sensu_api                 = false,
-  $enable_sensu_dashboard           = false,
-  $enable_spice                     = false,
-  $enable_swift_api                 = false,
-  $enable_trove_api                 = false,
-
   $haproxy_auth                     = 'admin:changeme',
 
   $keepalived_state                 = 'BACKUP',
@@ -557,57 +523,6 @@ class cloud::loadbalancer(
   $keepalived_internal_id           = '2',
   $keepalived_auth_type             = false,
   $keepalived_auth_pass             = false,
-
-  $aodh_options                     = {},
-  $ceilometer_options               = {},
-  $cinder_options                   = {},
-  $elasticsearch_options            = {},
-  $galera_options                   = {},
-  $galera_readonly_options          = {},
-  $glance_api_options               = {},
-  $glance_registry_options          = {},
-  $gnocchi_options                  = {},
-  $heat_api_options                 = {},
-  $heat_cfn_options                 = {},
-  $heat_cloudwatch_options          = {},
-  $horizon_options                  = {},
-  $horizon_ssl_options              = {},
-  $influxdb_options                 = {},
-  $influxdb_management_options      = {},
-  $keystone_admin_options           = {},
-  $keystone_options                 = {},
-  $kibana_options                   = {},
-  $logstash_syslog_options          = {},
-  $magnum_api_options               = {},
-  $metadata_options                 = {},
-  $neutron_options                  = {},
-  $nova_options                     = {},
-  $novnc_options                    = {},
-  $rabbitmq_options                 = {},
-  $redis_options                    = {},
-  $sensu_api_options                = {},
-  $sensu_dashboard_options          = {},
-  $spice_options                    = {},
-  $swift_options                    = {},
-  $trove_options                    = {},
-
-  $ks_aodh_public_port              = 8042,
-  $ks_ceilometer_public_port        = 8777,
-  $ks_cinder_public_port            = 8776,
-  $ks_glance_api_public_port        = 9292,
-  $ks_glance_registry_internal_port = 9191,
-  $ks_gnocchi_public_port           = 8041,
-  $ks_heat_cfn_public_port          = 8000,
-  $ks_heat_cloudwatch_public_port   = 8003,
-  $ks_heat_public_port              = 8004,
-  $ks_keystone_admin_port           = 35357,
-  $ks_keystone_public_port          = 5000,
-  $ks_magnum_public_port            = 9511,
-  $ks_metadata_public_port          = 8775,
-  $ks_neutron_public_port           = 9696,
-  $ks_nova_public_port              = 8774,
-  $ks_swift_public_port             = 8080,
-  $ks_trove_public_port             = 8779,
 
   $elasticsearch_port               = 9200,
   $galera_port                      = 3306,
@@ -648,31 +563,17 @@ class cloud::loadbalancer(
 
   $keepalived_preempt_delay         = undef,
 
-  $haproxy_certs                    = 'api.dev.cloud.gwdg.de_20150716_all.pem',
+  $haproxy_certs                    = 'api.dev.cloud.gwdg.de-20181106_all.pem',
+
+  $haproxy_bindings_tcp             = undef,
+  $common_tcp_options               = undef,
+  $haproxy_bindings_http            = undef,
+  $common_http_options              = undef,
 ){
 
   include ::cloud::params
   include ::haproxy::params
 
-  $common_tcp_options = {
-    'mode'           => 'tcp',
-    'option'         => ['tcpka', 'tcplog'],
-    'balance'        => 'source',
-    'timeout server' => $api_timeout,
-    'timeout client' => $api_timeout,
-  }
-
-  $common_http_options = {
-    'mode'           => 'http',
-    'option'         => ['http-server-close', 'httplog', 'forwardfor'],
-    'balance'        => 'source',
-
-    # ssl specific
-    'reqadd'         => 'X-Forwarded-Proto:\ https if { ssl_fc }',
-
-    'timeout server' => $api_timeout,
-    'timeout client' => $api_timeout,
-  }
 
   # Deploy certs
   file { '/etc/haproxy/ssl':
@@ -822,273 +723,38 @@ class cloud::loadbalancer(
 
   # HAproxy bindings
 
-  cloud::loadbalancer::bind_api { 'keystone_api':
-    enable              => $enable_keystone_api,
-    public_access       => true,
-    port                => $ks_keystone_public_port,
-    options             => merge($common_http_options, $keystone_options),
+  $haproxy_bindings_http.each |$module, $value| {    
+    $haproxy_http = $value.reduce({}) |$merg , $val|{
+       if $val[0] == 'options'{
+        $merg + {$val[0] => $common_http_options + $value[$val[0]]}
+        }
+       else{
+        $merg + {$val[0] => $value[$val[0]]}
+        }
+    }
+    
+    $resource = {$module => $haproxy_http}
+    create_resources('::cloud::loadbalancer::bind_api', $resource)
+  }
+  
+  $haproxy_bindings_tcp.each |$module, $value| {
+    $haproxy_tcp = $value.reduce({}) |$merg , $val|{
+       if $val[0] == 'options'{
+        $merg + {$val[0] => $common_tcp_options + $value[$val[0]]}
+        }
+       else{
+        $merg + {$val[0] => $value[$val[0]]}
+        }
+    }
+    $resource = {$module => $haproxy_tcp}
+    create_resources('::cloud::loadbalancer::bind_api', $resource)
   }
 
-  cloud::loadbalancer::bind_api { 'keystone_api_admin':
-    enable              => $enable_keystone_api_admin,
-    public_access       => true,
-    port                => $ks_keystone_admin_port,
-    options             => merge($common_http_options, $keystone_admin_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'nova_api':
-    enable              => $enable_nova_api,
-    public_access       => true,
-    port                => $ks_nova_public_port,
-    options             => merge($common_http_options, $nova_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'metadata_api':
-    enable              => $enable_metadata_api,
-    port                => $ks_metadata_public_port,
-    options             => merge($common_http_options, $metadata_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'sensu_dashboard':
-    enable              => $enable_sensu_dashboard,
-    port                => $sensu_dashboard_port,
-    options             => merge($common_http_options, $sensu_dashboard_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'sensu_api':
-    enable              => $enable_sensu_api,
-    port                => $sensu_api_port,
-    options             => merge($common_http_options,
-                                {
-                                    'balance' => 'source',
-                                    'rspadd'  => ['Access-Control-Allow-Origin:\ *', 'Access-Control-Allow-Headers:\ origin,\ x-requested-with,\ content-type', 'Access-Control-Allow-Methods:\ PUT,\ GET,\ POST,\ DELETE,\ OPTIONS'],
-                                },
-                                $sensu_api_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'spice':
-    enable              => $enable_spice,
-    public_access       => true,
-    port                => $spice_port,
-    options             => merge($common_http_options, $spice_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'novnc':
-    enable              => $enable_novnc,
-    public_access       => true,
-    port                => $novnc_port,
-    options             => merge($common_http_options, $novnc_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'rabbitmq':
-    enable              => $enable_rabbitmq,
-    port                => $rabbitmq_port,
-    options             => merge($common_tcp_options, 
-                                {
-                                    'option'          => ['tcpka', 'tcplog', 'forwardfor', 'clitcpka'],
-                                    # Timeouts must be > /proc/sys/net/ipv4/tcp_keepalive_time (= 2h on Ubuntu 14.04), to allow for client tcp to send keepalives
-                                    'timeout server'  => $api_timeout,
-                                    'timeout client'  => $api_timeout,
-                                    'balance'         => 'roundrobin',
-                                },
-                                $rabbitmq_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'rabbitmq_management':
-    enable              => $enable_rabbitmq_management,
-    port                => $rabbitmq_management_port,
-    options             => merge($common_http_options, $rabbitmq_management_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'trove_api':
-    enable              => $enable_trove_api,
-    public_access       => true,
-    port                => $ks_trove_public_port,
-    options             => merge($common_http_options, $trove_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'glance_api':
-    enable              => $enable_glance_api,
-    public_access       => true,
-    port                => $ks_glance_api_public_port,
-    options             => merge($common_http_options, $glance_api_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'glance_registry':
-    enable              => $enable_glance_registry,
-    public_access       => true,
-    port                => $ks_glance_registry_internal_port,
-    options             => merge($common_http_options, $glance_registry_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'neutron_api':
-    enable              => $enable_neutron_api,
-    public_access       => true,
-    port                => $ks_neutron_public_port,
-    options             => merge($common_http_options, $neutron_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'cinder_api':
-    enable              => $enable_cinder_api,
-    public_access       => true,
-    port                => $ks_cinder_public_port,
-    options             => merge($common_http_options, $cinder_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'ceilometer_api':
-    enable              => $enable_ceilometer_api,
-    public_access       => true,
-    port                => $ks_ceilometer_public_port,
-    options             => merge($common_http_options, $ceilometer_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'aodh_api':
-    enable              => $enable_aodh_api,
-    public_access       => true,
-    port                => $ks_aodh_public_port,
-    options             => merge($common_http_options, $aodh_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'gnocchi_api':
-    enable              => $enable_gnocchi_api,
-    public_access       => false,
-    port                => $ks_gnocchi_public_port,
-    options             => merge($common_http_options, $gnocchi_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'magnum_api':
-    enable              => $enable_magnum_api,
-    public_access       => true,
-    port                => $ks_magnum_public_port,
-    options             => merge($common_http_options, $magnum_api_options),
-  }  
-
-  cloud::loadbalancer::bind_api { 'heat_api':
-    enable              => $enable_heat_api,
-    public_access       => true,
-    port                => $ks_heat_public_port,
-    options             => merge($common_http_options, $heat_api_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'heat_cfn_api':
-    enable              => $enable_heat_cfn_api,
-    public_access       => true,
-    port                => $ks_heat_cfn_public_port,
-    options             => merge($common_http_options, $heat_cfn_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'heat_cloudwatch_api':
-    enable              => $enable_heat_cloudwatch_api,
-    public_access       => true,
-    port                => $ks_heat_cloudwatch_public_port,
-    options             => merge($common_http_options, $heat_cloudwatch_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'horizon':
-    enable              => $enable_horizon,
-    port                => $horizon_port,
-    public_port         => $horizon_ssl_port,
-    options             => merge($common_http_options,
-                                {
-                                    'cookie'        => 'sessionid prefix',
-                                    'option'        => ['http-server-close', 'httplog', 'forwardfor', "httpchk GET  /${::cloud::params::horizon_auth_url}  HTTP/1.0\\r\\nUser-Agent:\ HAproxy-${::hostname}"],
-                                    'http-check'    => 'expect ! rstatus ^5',
-                                    # Needs to match with SECURE_PROXY_SSL_HEADER in /etc/openstack-dashboard/local_settings.py
-                                    'reqadd'        => 'X-Forwarded-Protocol:\ https if { ssl_fc }',
-                                },
-                                $horizon_options),
-
-#    httpchk           => "httpchk GET  /${::cloud::params::horizon_auth_url}  \"HTTP/1.0\\r\\nUser-Agent: HAproxy-${::hostname}\"",
-  }
-
-  cloud::loadbalancer::bind_api { 'elasticsearch':
-    enable              => $enable_elasticsearch,
-    port                => $elasticsearch_port,
-    options             => merge($common_http_options, $elasticsearch_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'kibana':
-    enable              => $enable_kibana,
-    port                => $kibana_port,
-    options             => merge($common_http_options, 
-                                {
-                                    'cookie'      => 'JSESSIONID prefix indirect nocache',
-                                    'http-check'  => 'expect ! rstatus ^5',
-                                    'balance'     => 'source',
-                                },
-                                $kibana_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'logstash_syslog':
-    enable              => $enable_logstash_syslog,
-    port                => $logstash_syslog_port,
-    options             => merge($common_tcp_options, $logstash_syslog_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'influxdb':
-    enable              => $enable_influxdb,
-    port                => $influxdb_port,
-    options             => merge($common_tcp_options, $influxdb_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'influxdb_management':
-    enable              => $enable_influxdb_management,
-    port                => $influxdb_management_port,
-    options             => merge($common_http_options, $influxdb_management_options),
-  }
-
-  cloud::loadbalancer::bind_api { 'redis':
-    enable              => $enable_redis,
-    port                => $redis_port,
-    options             => merge($common_tcp_options, 
-                                {
-                                    'balance'   => 'first',
-                                    'option'    => ['tcp-check',],
-                                    'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
-                                },
-                                $redis_options),
-  }
 
   if (member(any2array($keepalived_public_ipvs), $galera_ip)) {
     warning('Exposing Galera to public network is a security issue.')
   }
 
-  cloud::loadbalancer::bind_api { 'galera':
-    enable              => $enable_galera,
-    port                => $galera_port,
-    options             => merge($common_tcp_options,
-                                {
-                                    'maxconn'        => $galera_connections,
-                                    'mode'           => 'tcp',
-                                    'balance'        => 'roundrobin',
-                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9200
-                                    'timeout client' => $galera_timeout,
-                                    'timeout server' => $galera_timeout,
-                                },
-                                $galera_options),
-  }
-
-#  if $::cloud::manage_firewall {
-#    cloud::firewall::rule{ '100 allow galera-slave binding access':
-#      port   => '3307',
-#      extras => $firewall_settings,
-#    }
-#  }
-
-  cloud::loadbalancer::bind_api { 'galera_readonly':
-    enable              => $enable_galera_readonly,
-    port                => $galera_readonly_port,
-    options             => merge($common_tcp_options,
-                                {   
-                                    'maxconn'        => $galera_connections,
-                                    'mode'           => 'tcp',
-                                    'balance'        => 'roundrobin',
-                                    'option'         => ['tcpka', 'tcplog', 'httpchk'],   # httpchk mandatory expect 200 on port 9200
-                                    'timeout client' => $galera_timeout,
-                                    'timeout server' => $galera_timeout,
-                                },
-                                $galera_readonly_options),
-  }
 
   # Allow HAProxy to bind to a non-local IP address
   $haproxy_sysctl_settings = {

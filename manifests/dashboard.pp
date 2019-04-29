@@ -129,6 +129,7 @@ class cloud::dashboard(
   # New parameters
   $lb_eth                    = '127.0.0.1',
   $memcache_servers          = false,
+  $ssh_redirect_url          = undef,
 ) {
 
   # Active mod status for monitoring of Apache
@@ -147,6 +148,17 @@ class cloud::dashboard(
   }
 
 #  include ::cloud::util::apache_common
+  if ! $::cloud::production {
+       #redirect address in vagrant (with port)
+       $part1 = $ssh_redirect_url[0,-9]
+       $part2 = $ssh_redirect_url[-8,8]
+       $enviroment = lookup('vagrant::environment')
+       $ssh_redirect_url_real = "$part1:${enviroment}8080$part2"
+  }
+  else{
+       #redirect address in production (withouth port)
+       $ssh_redirect_url_real = $ssh_redirect_url
+  }
   class { '::horizon':
     secret_key              => $secret_key,
     servername              => $servername,
@@ -164,6 +176,7 @@ class cloud::dashboard(
     openstack_endpoint_type => $os_endpoint_type,
     allowed_hosts           => $allowed_hosts,
     ssl_forward             => $ssl_forward,
+    ssh_redirect_url        => $ssh_redirect_url_real,
   }
 
   class { '::cloud::dashboard::gwdg_theme':
@@ -218,3 +231,4 @@ class cloud::dashboard(
     }
   }
 }
+
