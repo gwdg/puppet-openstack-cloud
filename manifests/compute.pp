@@ -90,9 +90,6 @@ class cloud::compute(
   nova_config {
     'DEFAULT/servicegroup_driver':              value => 'mc';
     'DEFAULT/glance_num_retries':               value => '10';
-
-    # Currently not set in nova module
-    'upgrade_levels/baseapi':                   value => $upgrade_level;
   }
 
 }
