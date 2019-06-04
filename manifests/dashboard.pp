@@ -162,7 +162,6 @@ class cloud::dashboard(
   class { '::horizon':
     secret_key              => $secret_key,
     servername              => $servername,
-    allowed_hosts           => $allowed_hosts,
     listen_ssl              => $listen_ssl,
     horizon_cert            => $horizon_cert,
     horizon_key             => $horizon_key,
