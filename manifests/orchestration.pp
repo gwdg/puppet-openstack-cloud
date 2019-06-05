@@ -39,10 +39,6 @@
 #   (optional) Password to connect to heat queues.
 #   Defaults to 'rabbitpassword'
 #
-# [*os_endpoint_type*]
-#   (optional) The type of the OpenStack endpoint (public/internal/admin) URL
-#   Defaults to 'publicURL'
-#
 class cloud::orchestration(
 
   $ks_heat_public_host        = '127.0.0.1',
@@ -51,8 +47,6 @@ class cloud::orchestration(
 
   $rabbit_hosts               = ['127.0.0.1:5672'],
   $rabbit_password            = 'rabbitpassword',
-
-  $os_endpoint_type           = 'publicURL'
 ) {
 
   include ::mysql::client
@@ -71,8 +65,4 @@ class cloud::orchestration(
   }
 
   class { '::heat::client': }
-
-  heat_config {
-    'clients/endpoint_type': value => $os_endpoint_type;
-  }
 }
