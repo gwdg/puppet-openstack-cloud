@@ -54,7 +54,6 @@ class cloud::orchestration::api(
 ) {
 
   include ::cloud::orchestration
-  include ::apache
 
   class { '::heat::api':
     bind_host => $api_eth,
