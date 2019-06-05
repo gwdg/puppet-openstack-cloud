@@ -54,23 +54,33 @@ class cloud::orchestration::api(
 ) {
 
   include ::cloud::orchestration
+  include ::apache
 
   class { '::heat::api':
+    service_name => 'http',
+  }
+
+  class { '::heat::wsgi::apache_api':
     bind_host => $api_eth,
-    bind_port => $ks_heat_internal_port,
-    workers   => $workers
+    workers   => 2,
   }
 
   class { '::heat::api_cfn':
+    service_name => 'httpd',
+  }
+
+  class { '::heat::wsgi::apache_api_cfn':
     bind_host => $api_eth,
-    bind_port => $ks_heat_cfn_internal_port,
-    workers   => $workers
+    workers   => 2,
   }
 
   class { '::heat::api_cloudwatch':
+    service_name => 'http',
+  }
+
+  class { 'heat::wsgi::apache_api_cloudwatch':
     bind_host => $api_eth,
-    bind_port => $ks_heat_cloudwatch_internal_port,
-    workers   => $workers
+    workers   => 2
   }
 
   if $::cloud::manage_firewall {
