@@ -57,7 +57,7 @@ class cloud::orchestration::api(
   include ::apache
 
   class { '::heat::api':
-    service_name => 'http',
+    service_name => 'httpd',
   }
 
   class { '::heat::wsgi::apache_api':
@@ -75,7 +75,7 @@ class cloud::orchestration::api(
   }
 
   class { '::heat::api_cloudwatch':
-    service_name => 'http',
+    service_name => 'httpd',
   }
 
   class { 'heat::wsgi::apache_api_cloudwatch':
