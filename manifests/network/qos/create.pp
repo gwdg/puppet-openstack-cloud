@@ -52,6 +52,7 @@ define cloud::network::qos::create(
     $os_password,
     $os_auth_url          = 'http://127.0.0.1:5000/v2.0/',
     $os_region_name       = undef,
+    $os_endpoint_type     = 'internal',
 ) {
   $policy_name = $name
 
@@ -62,6 +63,7 @@ define cloud::network::qos::create(
     "OS_USER_DOMAIN_ID=${os_user_domain_id}",
     "OS_PASSWORD=${os_password}",
     "OS_AUTH_URL=${os_auth_url}",
+    "OS_ENDPOINT_TYPE=${os_endpoint_type}",
   ]
 
   if $os_region_name {
@@ -83,7 +85,7 @@ define cloud::network::qos::create(
     command     => "neutron qos-bandwidth-limit-rule-create --max-kbps ${max_kbps} --max-burst-kbps ${max_burst_kbps} ${policy_name}",
     unless      => "neutron qos-bandwidth-limit-rule-list ${policy_name} -c id -f value | grep -qE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'",
     environment => $env,
-    require     => Anchor['neutron::service::end'],
+    require     => [ Anchor['neutron::service::end'], Exec["neutron qos-policy-create ${policy_name}"] ],
     path        => ['/usr/bin', '/bin'],
     try_sleep   => 5,
     tries       => 10,
