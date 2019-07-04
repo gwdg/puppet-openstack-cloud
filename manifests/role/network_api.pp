@@ -5,7 +5,5 @@ class cloud::role::network_api inherits ::cloud::role::base {
 
     class { '::cloud::profile::memcache': }             ->
     
-    class { '::cloud::network::controller': }           ->
-    
-    class { '::cloud::network::qos': }
+    class { '::cloud::network::controller': } 
 }
