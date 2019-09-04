@@ -183,11 +183,11 @@ class cloud::dashboard(
     ssh_redirect_url        => $ssh_redirect_url_real,
   }
 
-#  class { '::cloud::dashboard::gwdg_theme':
-#    require => Package['horizon'],
-#    compress_offline => true,
-#  }
-
+  class { '::cloud::dashboard::gwdg_theme':
+    require => Package['horizon'],
+    before  => [ Service[$::horizon::params::http_service], Exec['refresh_horizon_django_compress'] ],
+    compress_offline => $compress_offline,
+  }
 #  class { '::cloud::dashboard::overrides':
 #    require => Package['horizon'],
 #  }
