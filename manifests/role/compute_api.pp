@@ -8,5 +8,6 @@ class cloud::role::compute_api inherits ::cloud::role::base {
     class { '::cloud::compute::consoleauth': }          ->
     class { '::cloud::compute::consoleproxy': }         ->
     class { '::cloud::compute::api': }                  ->
+    class { '::cloud::compute::placement': }                  ->
     class { '::cloud::compute::scheduler': }
 }
