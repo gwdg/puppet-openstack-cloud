@@ -19,7 +19,8 @@
 #
 #
 class cloud::compute::placement(
-  $ks_nova_public_port                  = '8774',
+  $public_port = '8778',
+  $bind_address = undef,
 ){
   include ::nova::params
   include ::nova::db
@@ -33,10 +34,17 @@ class cloud::compute::placement(
 
   class {'::nova::wsgi::apache_placement':
     servername  => $::fqdn,
-    api_port    =>  $ks_nova_public_port,
+    api_port    => $public_port,
     workers     => 1,
     threads     => $::processorcount,
     ssl         => false
- }
-  
+  }
+
+  @@haproxy::balancermember{"${::fqdn}-compute_api_nova_placement_api":
+    listening_service => 'nova_placement_api',
+    server_names      => $::hostname,
+    ipaddresses       => $bind_address,
+    ports             => $public_port,
+    options           => 'check inter 2000 rise 2 fall 5'
+  }
 }
