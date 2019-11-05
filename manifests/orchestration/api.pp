@@ -95,13 +95,4 @@ class cloud::orchestration::api(
     ports             => $ks_heat_cfn_internal_port,
     options           => 'check inter 2000 rise 2 fall 5'
   }
-
-  @@haproxy::balancermember{"${::fqdn}-heat_cloudwatch_api":
-    listening_service => 'heat_cloudwatch_api',
-    server_names      => $::hostname,
-    ipaddresses       => $api_eth,
-    ports             => $ks_heat_cloudwatch_internal_port,
-    options           => 'check inter 2000 rise 2 fall 5'
-  }
-
 }
