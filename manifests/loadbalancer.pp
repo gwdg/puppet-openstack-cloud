@@ -517,10 +517,10 @@ class cloud::loadbalancer(
   $keepalived_vrrp_interface        = false,
   $keepalived_public_interface      = 'eth0',
   $keepalived_public_ipvs           = ['127.0.0.1'],
-  $keepalived_public_id             = '1',
+  $keepalived_public_id             = 1,
   $keepalived_internal_interface    = 'eth1',
   $keepalived_internal_ipvs         = false,
-  $keepalived_internal_id           = '2',
+  $keepalived_internal_id           = 2,
   $keepalived_auth_type             = false,
   $keepalived_auth_pass             = false,
 
@@ -631,7 +631,7 @@ class cloud::loadbalancer(
     weight              => 2,
   }
 
-  keepalived::vrrp::instance { $keepalived_public_id:
+  keepalived::vrrp::instance { "${keepalived_public_id}":
     interface               => $keepalived_vrrp_interface_real,
     virtual_ipaddress       => $keepalived_public_ipvs,
     virtual_router_id       => $keepalived_public_id,
@@ -668,7 +668,7 @@ class cloud::loadbalancer(
       content   => template('cloud/loadbalancer/keepalived_setup_routing.sh'),
       require   => Package['keepalived'],
       mode      => '0775',
-      before    => Keepalived::Vrrp::Instance[$keepalived_internal_id],
+      before    => Keepalived::Vrrp::Instance["${keepalived_internal_id}"],
     }
 
     # Then we validate this is not the same as public binding
@@ -678,7 +678,7 @@ class cloud::loadbalancer(
       } else {
         $keepalived_vrrp_interface_internal = $keepalived_vrrp_interface
       }
-      keepalived::vrrp::instance { $keepalived_internal_id:
+      keepalived::vrrp::instance { "${keepalived_internal_id}":
         interface               => $keepalived_vrrp_interface_internal,
         virtual_ipaddress       => $keepalived_internal_ipvs,
         virtual_router_id       => $keepalived_internal_id,
