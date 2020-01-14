@@ -411,8 +411,6 @@ class cloud::database::sql::mysql (
 
     status_password                 => $galera_clustercheck_dbpassword,
 
-    vendor_type                     => 'codership',
-
     # These options are only used for the firewall - 
     # to change the my.cnf settings, use the override options
     # described below
