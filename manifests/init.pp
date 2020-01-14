@@ -206,7 +206,7 @@ class cloud(
 #  include ::sudo
 #  include ::sudo::configs
   
-  include ::telegraf
+  #include ::telegraf
 
   # NTP (do not install for containers)
   if ! ($::virtual == 'lxc')  {
@@ -237,7 +237,6 @@ class cloud(
 #  }
 
   # sysctl values
-  include ::sysctl::base
   create_resources('::sysctl::value', $sysctl)
 
   # SELinux
