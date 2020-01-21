@@ -17,10 +17,6 @@
 #
 # === Parameters:
 #
-# [*ks_neutron_password*]
-#   (optional) Password used by Neutron to connect to Keystone API
-#   Defaults to 'neutronpassword'
-#
 # [*ks_neutron_public_port*]
 #   (optional) TCP port to connect to Neutron API from public network
 #   Defaults to '9696'
@@ -29,18 +25,9 @@
 #   (optional) Which interface we bind the Neutron server.
 #   Defaults to '127.0.0.1'
 #
-# [*nova_url*]
-#   (optional) URL for connection to nova (Only supports one nova region
-#   currently).
-#   Defaults to 'http://127.0.0.1:8774/v2'
-#
 # [*nova_admin_auth_url*]
 #   (optional) Authorization URL for connection to nova in admin context.
 #   Defaults to 'http://127.0.0.1:5000/v2.0'
-#
-# [*nova_admin_username*]
-#   (optional) Username for connection to nova in admin context
-#   Defaults to 'nova'
 #
 # [*nova_admin_tenant_name*]
 #   (optional) The name of the admin nova tenant
@@ -117,17 +104,8 @@
 #
 class cloud::network::controller(
 
-  $ks_neutron_password              = 'neutronpassword',
-
   $ks_neutron_public_port           = 9696,
   $api_eth                          = '127.0.0.1',
-
-  $nova_url                         = 'http://127.0.0.1:8774/v2',
-
-  $auth_uri                         = 'http://localhost:5000/',
-  $auth_url                         = 'http://localhost:35357/',
-  $username                         = 'nova',
-  $password                         = 'novapassword',
 
   $tenant_name                      = 'services',
   $region_name                      = 'RegionOne',
@@ -168,11 +146,6 @@ class cloud::network::controller(
 
   class { '::neutron::server':
 
-    auth_uri                            => $auth_uri,
-    auth_url                            => $auth_url,
-    username                            => 'neutron',
-    password                            => $ks_neutron_password,
-
     api_workers                         => $::neutron::server::api_workers,
     rpc_workers                         => $::neutron::server::rpc_workers,
 
@@ -206,11 +179,7 @@ class cloud::network::controller(
   }
 
   class { '::neutron::server::notifications':
-    nova_url            => $nova_url,
-    auth_url            => $auth_url,
-    username            => $username,
     tenant_name         => $tenant_name,
-    password            => $password,
     region_name         => $region_name
   }
 
