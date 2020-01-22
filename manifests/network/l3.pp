@@ -84,14 +84,10 @@ class cloud::network::l3(
       ensure => present,
       bridge => 'br-ex'
     }
-    $external_network_bridge_real = 'br-ex'
-  } else {
-    $external_network_bridge_real = ''
-  }
+  } 
 
   class { '::neutron::agents::l3':
     debug                            => $debug,
-    external_network_bridge          => $external_network_bridge_real,
     ha_enabled                       => $ha_enabled,
     ha_vrrp_auth_type                => $ha_vrrp_auth_type,
     ha_vrrp_auth_password            => $ha_vrrp_auth_password,
