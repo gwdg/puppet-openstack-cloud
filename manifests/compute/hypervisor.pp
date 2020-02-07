@@ -341,7 +341,6 @@ class cloud::compute::hypervisor(
     libvirt_virt_type           => $libvirt_virt_type,
     migration_support           => true,
     libvirt_disk_cachemodes     => $libvirt_disk_cachemodes_real,
-    libvirt_service_name        => $::cloud::params::libvirt_service_name,
     libvirt_inject_key          => false,
     libvirt_inject_partition    => '-2',
   }

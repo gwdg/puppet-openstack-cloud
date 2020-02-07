@@ -38,40 +38,9 @@ class cloud::params {
 
   $puppetmaster_service_name = 'puppetmaster'
 
-  case $::osfamily {
-    'RedHat': {
-      # Specific to Red Hat
-#      $start_haproxy_service      = '"/usr/bin/systemctl start haproxy"'
-      $horizon_auth_url           = 'dashboard'
-      $libvirt_service_name       = 'libvirtd'
-#      $keepalived_name_is_process = false
-#      $keepalived_vrrp_script     = 'systemctl status haproxy.service'
-      $puppetmaster_package_name  = 'puppet-server'
-      $redis_service_name         = 'redis'
-      $service_provider           = 'systemd'
-    } # RedHat
-    'Debian': {
-      # Specific to Debian / Ubuntu
-#      $start_haproxy_service      = '"/etc/init.d/haproxy start"'
-      $horizon_auth_url           = 'horizon'
-#      $keepalived_name_is_process = true
-#      $keepalived_vrrp_script     = undef
-      $puppetmaster_package_name  = 'puppetmaster'
-      $redis_service_name         = 'redis-server'
-      case $::operatingsystem {
-        'Ubuntu': {
-          $libvirt_service_name = 'libvirt-bin'
-          $service_provider     = 'upstart'
-        }
-        default: {
-          $libvirt_service_name = 'libvirtd'
-          $service_provider     = 'lsb'
-        }
-      }
-    } # Debian
-    default: {
-      fail("Unsupported osfamily (${::osfamily})")
-    }
-  }
-
+  $horizon_auth_url           = 'horizon'
+  $puppetmaster_package_name  = 'puppetmaster'
+  $redis_service_name         = 'redis-server'
+  $libvirt_service_name       = 'libvirt-bin'
+  $service_provider           = 'systemd'
 }
