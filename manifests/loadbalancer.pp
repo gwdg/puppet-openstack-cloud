@@ -563,7 +563,7 @@ class cloud::loadbalancer(
 
   $keepalived_preempt_delay         = undef,
 
-  $haproxy_certs                    = 'api.dev.cloud.gwdg.de-20181106_all.pem',
+  $haproxy_certs                    = 'horizon.dev.cloud.gwdg.de-03032020.pem',
 
   $haproxy_bindings_tcp             = undef,
   $common_tcp_options               = undef,
