@@ -129,7 +129,7 @@ class cloud::dashboard(
   $lb_eth                    = '127.0.0.1',
   $memcache_servers          = false,
   $compress_offline          = true,
-  $root_path                 = "/usr/share/openstack-dashboard",
+  $root_path                 = "/var/lib/openstack-dashboard",
   $ssh_redirect_url          = undef,
 ) {
 
