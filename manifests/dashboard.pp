@@ -183,6 +183,9 @@ class cloud::dashboard(
     ssh_redirect_url        => $ssh_redirect_url_real,
   }
 
+  class {'::cloud::dashboard::lbaas_dashboard':
+    require => Package['horizon'],
+  }
   class { '::cloud::dashboard::gwdg_theme':
     require => Package['horizon'],
     before  => [ Service[$::horizon::params::http_service], Exec['refresh_horizon_django_compress'] ],
