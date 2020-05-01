@@ -29,13 +29,14 @@
 #   Default to {}
 #
 class cloud::database::nosql::memcached (
-  $listen_ip         = '127.0.0.1',
-  $firewall_settings = {},
+  $listen_ip            = '127.0.0.1',
+  $max_memory           = '256',
+  $firewall_settings    = {},
 ){
 
   class { '::memcached':
     listen_ip  => $listen_ip,
-    max_memory => '60%',
+    max_memory => $max_memory,
   }
 
   if $::cloud::manage_firewall {
