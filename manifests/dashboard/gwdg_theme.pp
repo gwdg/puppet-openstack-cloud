@@ -2,7 +2,7 @@
 class cloud::dashboard::gwdg_theme (
 
   $home_dir         = '/usr/share/openstack-dashboard/openstack_dashboard',
-  $static_dir       = '/usr/share/openstack-dashboard',
+  $static_dir       = '/var/lib/openstack-dashboard',
   $theme_tar        = 'themes/gwdg_theme_13052020.tar',
   $compress_offline = true,
 
