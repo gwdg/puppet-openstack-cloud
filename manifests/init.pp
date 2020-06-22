@@ -150,6 +150,7 @@ class cloud(
   }
 
   Apt::Source <| |> -> Exec['apt_update'] -> Package <| |>
+#    Exec['apt_update'] -> Package <| |>
 
   # Activate Force-Yes "true", so that downgrades from aptly work in puppet
   file { '/etc/apt/apt.conf.d/99aptly':
@@ -205,8 +206,8 @@ class cloud(
   # SUDO (don't use for now, kills vagrant)
 #  include ::sudo
 #  include ::sudo::configs
-  
-  #include ::telegraf
+
+  include ::telegraf
 
   # NTP (do not install for containers)
   if ! ($::virtual == 'lxc')  {
