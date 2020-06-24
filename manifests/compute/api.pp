@@ -67,14 +67,19 @@ class cloud::compute::api(
   class { '::nova::api': }
 
   # Use WSGI
-  class {'::nova::wsgi::apache_api':
-    servername  => $::fqdn,
-    api_port    =>  $ks_nova_public_port,
-    workers     => 1,
-    # Use multiprocessing defaults
-    threads     => $::processorcount,
-    ssl         => false
+  # wsgi is not supported for nova-api since ocata - we must check this again for pike 
+  file { ['/etc/apache2/sites-enabled/10-nova_api_wsgi.conf', '/etc/apache2/sites-available/10-nova_api_wsgi.conf']:
+    ensure => absent,
+    before => Class['::nova::api'], 
   }
+  #class {'::nova::wsgi::apache_api':
+  #  servername  => $::fqdn,
+  #  api_port    =>  $ks_nova_public_port,
+  #  workers     => 1,
+  #  # Use multiprocessing defaults
+  #  threads     => $::processorcount,
+  #  ssl         => false
+  #}
   
   if $::cloud::manage_firewall {
     cloud::firewall::rule{ '100 allow nova-api access':
