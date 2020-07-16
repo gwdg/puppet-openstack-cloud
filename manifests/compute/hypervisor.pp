@@ -228,7 +228,6 @@ class cloud::compute::hypervisor(
 
     virtio_nic                    => false,
     neutron_enabled               => true,
-    default_availability_zone     => $::cloud::compute::availability_zone,
   }
 
   # Disabling TSO/GSO/GRO
