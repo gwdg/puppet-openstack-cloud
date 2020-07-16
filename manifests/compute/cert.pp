@@ -19,9 +19,9 @@ class cloud::compute::cert {
 
   include ::cloud::compute
 
-  class { '::nova::cert': # remove deprecated nova-cert service - class should fully removed in ocata
-    enabled => false, 
-    ensure_package => absent,
-  }
+#  class { '::nova::cert': # remove deprecated nova-cert service - class should fully removed in ocata
+#    enabled => false, 
+#    ensure_package => absent,
+#  }
 
 }
