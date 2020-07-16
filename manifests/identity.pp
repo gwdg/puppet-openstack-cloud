@@ -249,7 +249,4 @@ class cloud::identity (
     options           => 'check inter 2000 rise 2 fall 5'
   }
 
-  class { '::keystone::policy':
-    policies => $custom_policies
-  }
 }
