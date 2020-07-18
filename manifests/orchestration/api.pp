@@ -44,25 +44,53 @@
 #   Should be an hash.
 #   Default to {}
 #
+
 class cloud::orchestration::api(
   $ks_heat_internal_port            = 8004,
   $ks_heat_cfn_internal_port        = 8000,
   $ks_heat_cloudwatch_internal_port = 8003,
   $api_eth                          = '127.0.0.1',
-  $workers                          = $::processorcount,
+  $workers                          = 2,
   $firewall_settings                = {},
+  $ssl                              = false,
 ) {
 
   include ::cloud::orchestration
 
-  class { '::heat::api':
+  # WSGI setup for APIs
+
+  include ::apache
+
+  class { '::heat::wsgi::apache_api':
     bind_host => $api_eth,
-    workers   => 2,
+    threads   => $workers,
+    ssl       => $ssl,
+  }
+
+  class { '::heat::api':
+    service_name => 'httpd',  
+  }
+
+  # Cloudwatch API is currently unused
+
+#  class { '::heat::wsgi::apache_api_cloudwatch':
+#    bind_host => $api_eth,
+#    threads   => $workers,
+#    ssl       => $ssl,
+#  }
+
+#  class { '::heat::api_cloudwatch':
+#    service_name => 'httpd',
+#  }
+
+  class { '::heat::wsgi::apache_api_cfn':
+    bind_host => $api_eth,
+    threads   => $workers,
+    ssl       => $ssl,
   }
 
   class { '::heat::api_cfn':
-    bind_host => $api_eth,
-    workers   => 2,
+    service_name => 'httpd',
   }
 
   if $::cloud::manage_firewall {
@@ -74,10 +102,10 @@ class cloud::orchestration::api(
       port   => $ks_heat_cfn_internal_port,
       extras => $firewall_settings,
     }
-    cloud::firewall::rule{ '100 allow heat-cloudwatch access':
-      port   => $ks_heat_cloudwatch_internal_port,
-      extras => $firewall_settings,
-    }
+#    cloud::firewall::rule{ '100 allow heat-cloudwatch access':
+#      port   => $ks_heat_cloudwatch_internal_port,
+#      extras => $firewall_settings,
+#    }
   }
 
   @@haproxy::balancermember{"${::fqdn}-heat_api":
