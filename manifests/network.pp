@@ -19,14 +19,6 @@
 #
 # === Parameters:
 #
-# [*rabbit_hosts*]
-#   (optional) List of RabbitMQ servers. Should be an array.
-#   Defaults to ['127.0.0.1:5672']
-#
-# [*rabbit_password*]
-#   (optional) Password to connect to nova queues.
-#   Defaults to 'rabbitpassword'
-#
 # [*api_eth*]
 #   (optional) Which interface we bind the Neutron API server.
 #   Defaults to '127.0.0.1'
@@ -45,6 +37,7 @@
 #   service_plugins namespace
 #   Defaults to ['neutron.services.loadbalancer.plugin.LoadBalancerPlugin','neutron.services.metering.metering_plugin.MeteringPlugin','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin']
 #
+
 class cloud::network(
   $api_eth                    = '127.0.0.1',
   $dhcp_lease_duration        = '120',

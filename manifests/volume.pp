@@ -20,14 +20,6 @@
 #
 # === Parameters:
 #
-# [*rabbit_hosts*]
-#   (optional) List of RabbitMQ servers. Should be an array.
-#   Defaults to ['127.0.0.1:5672']
-#
-# [*rabbit_password*]
-#   (optional) Password to connect to cinder queues.
-#   Defaults to 'rabbitpassword'
-#
 # [*storage_availability_zone*]
 #   (optional) The storage availability zone
 #   Defaults to 'nova'

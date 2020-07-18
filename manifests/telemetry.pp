@@ -24,14 +24,6 @@
 #   Secret key for signing messages.
 #   Defaults to 'ceilometersecret'
 #
-# [*rabbit_hosts*]
-#   (optional) List of RabbitMQ servers. Should be an array.
-#   Defaults to ['127.0.0.1:5672']
-#
-# [*rabbit_password*]
-#   (optional) Password to connect to nova queues.
-#   Defaults to 'rabbitpassword'
-#
 # [*ks_keystone_internal_host*]
 #   (optional) Internal Hostname or IP to connect to Keystone API
 #   Defaults to '127.0.0.1'
@@ -67,9 +59,6 @@
 class cloud::telemetry(
   $ceilometer_secret          = 'ceilometersecret',
 
-  $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword' ,
-
   $auth_uri                   = false,
   $memcache_servers           = [],
 
@@ -83,13 +72,7 @@ class cloud::telemetry(
   class { '::ceilometer':
 
     metering_secret         => $ceilometer_secret,
-
     memcached_servers       => $memcache_servers,
-
-    rabbit_hosts            => $rabbit_hosts,
-    rabbit_password         => $rabbit_password,
-    rabbit_userid           => 'ceilometer',
-
     metering_time_to_live   => $metering_time_to_live,
   }
 

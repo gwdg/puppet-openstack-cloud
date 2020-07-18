@@ -31,31 +31,19 @@
 #   (optional) Password used by Heat to connect to Keystone API
 #   Defaults to 'heatpassword'
 #
-# [*rabbit_hosts*]
-#   (optional) List of RabbitMQ servers. Should be an array.
-#   Defaults to ['127.0.0.1:5672']
-#
-# [*rabbit_password*]
-#   (optional) Password to connect to heat queues.
-#   Defaults to 'rabbitpassword'
-#
+
 class cloud::orchestration(
 
   $ks_heat_public_host        = '127.0.0.1',
   $ks_heat_public_proto       = 'http',
   $ks_heat_password           = 'heatpassword',
 
-  $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword',
 ) {
 
   include ::mysql::client
   include ::heat::db
 
   class { '::heat':
-    rabbit_hosts          => $rabbit_hosts,
-    rabbit_password       => $rabbit_password,
-    rabbit_userid         => 'heat',
   }
 
   class { '::heat::keystone::domain': 

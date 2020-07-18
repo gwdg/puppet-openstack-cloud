@@ -17,9 +17,6 @@
 #
 class cloud::telemetry::alarming::engine(
 
-  $rabbit_hosts               = ['127.0.0.1:5672'],
-  $rabbit_password            = 'rabbitpassword',
-
   $auth_url                   = 'http://localhost:5000/v2.0',
   $ks_aodh_password           = 'aodhpassword',
 
@@ -32,9 +29,6 @@ class cloud::telemetry::alarming::engine(
   include ::cloud::telemetry
 
   class { '::aodh': 
-    rabbit_hosts            => $rabbit_hosts,
-    rabbit_password         => $rabbit_password,
-    rabbit_userid           => 'aodh',
     gnocchi_url             => $gnocchi_url,
   }
 
