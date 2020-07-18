@@ -50,15 +50,16 @@ class cloud::volume::api(
 
   $default_volume_type,
 
-  $ks_cinder_port              = 8776,
+  $ks_cinder_port               = 8776,
+  $ks_glance_internal_host      = '127.0.0.1',
+  $ks_glance_internal_proto     = 'http',
+  $ks_glance_api_internal_port  = 9292,
+  $api_eth                      = '127.0.0.1',
 
-  $ks_glance_internal_host     = '127.0.0.1',
-  $ks_glance_internal_proto    = 'http',
-  $ks_glance_api_internal_port = 9292,
+  $ssl                          = false,
+  $workers                      = 2,
 
-  $api_eth                     = '127.0.0.1',
-
-  $firewall_settings           = {},
+  $firewall_settings            = {},
 ) {
 
   include ::cloud::volume
@@ -71,31 +72,22 @@ class cloud::volume::api(
   }
 
   class { '::cinder::api':
-
-    bind_host              => $api_eth,
-
-    service_name           => 'httpd',
-
-    default_volume_type    => $default_volume_type,
+    bind_host               => $api_eth,
+    default_volume_type     => $default_volume_type,
+    service_name            => 'httpd',
   }
 
   class {'::cinder::wsgi::apache':
- 
-    servername  => $::fqdn,
-
-    port        => $ks_cinder_port,
-
-    # Use multiprocessing defaults
-    workers     => 1,
-    threads     => $::processorcount,
-
-    ssl         => false
+    port                    => $ks_cinder_port,
+    workers                 => $workers,
+    threads                 => 1,
+    ssl                     => $ssl,
   }
 
   class { '::cinder::glance':
-    glance_api_servers     => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}",
-    glance_request_timeout => '10',
-    glance_num_retries     => '10'
+    glance_api_servers      => "${ks_glance_internal_proto}://${ks_glance_internal_host}:${ks_glance_api_internal_port}",
+    glance_request_timeout  => '10',
+    glance_num_retries      => '10'
   }
 
   if $::cloud::manage_firewall {
@@ -112,5 +104,4 @@ class cloud::volume::api(
     ports             => $ks_cinder_port,
     options           => 'check inter 2000 rise 2 fall 5'
   }
-
 }

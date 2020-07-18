@@ -19,8 +19,10 @@
 #
 #
 class cloud::compute::placement(
-  $public_port = '8778',
+  $public_port  = '8778',
   $bind_address = undef,
+  $workers      = 2,
+  $ssl          = false,
 ){
   include ::nova::params
   include ::nova::db
@@ -28,16 +30,14 @@ class cloud::compute::placement(
   include ::cloud::compute
   include ::cloud::params
   include ::apache::mod::status
-
   
   class { '::nova::placement': }
 
   class {'::nova::wsgi::apache_placement':
-    servername  => $::fqdn,
     api_port    => $public_port,
-    workers     => 1,
-    threads     => $::processorcount,
-    ssl         => false
+    workers     => $workers,
+    threads     => 1,
+    ssl         => $ssl,
   }
 
   @@haproxy::balancermember{"${::fqdn}-compute_api_nova_placement_api":
