@@ -29,6 +29,9 @@ class cloud::telemetry::tsdb(
 
   $api_eth                      = '127.0.0.1',
   $region                       = 'RegionOne',
+
+  $workers                      = 2,
+  $ssl                          = false,
 ){
 
   include ::cloud::telemetry
@@ -58,15 +61,10 @@ class cloud::telemetry::tsdb(
   }
 
   class {'::gnocchi::wsgi::apache':
-
-    servername  => $::fqdn,
     port        => $ks_gnocchi_internal_port,
-
-    # Use multiprocessing defaults
-    workers     => 1,
-    threads     => $::processorcount,
-
-    ssl         => false
+    workers     => $workers,
+    threads     => 1,
+    ssl         => $ssl,
   }
 
   # Fix: create default archive policies (this is done automatically in newer versions of Gnocch [v2.0+])

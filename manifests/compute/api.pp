@@ -54,6 +54,9 @@ class cloud::compute::api(
   $ks_nova_public_port                  = '8774',
   $ks_metadata_public_port              = '8775',
 
+  $workers                              = 2,
+  $ssl                                  = false,
+
   $firewall_settings                    = {},
 ){
 
@@ -73,12 +76,10 @@ class cloud::compute::api(
     before => Class['::nova::api'], 
   }
   #class {'::nova::wsgi::apache_api':
-  #  servername  => $::fqdn,
-  #  api_port    =>  $ks_nova_public_port,
-  #  workers     => 1,
-  #  # Use multiprocessing defaults
-  #  threads     => $::processorcount,
-  #  ssl         => false
+  #  api_port    => $ks_nova_public_port,
+  #  workers     => $workers,
+  #  threads     => 1,
+  #  ssl         => $ssl,
   #}
   
   if $::cloud::manage_firewall {

@@ -63,7 +63,8 @@ class cloud::orchestration::api(
 
   class { '::heat::wsgi::apache_api':
     bind_host => $api_eth,
-    threads   => $workers,
+    threads   => 1,
+    workers   => $workers,
     ssl       => $ssl,
   }
 
@@ -75,7 +76,8 @@ class cloud::orchestration::api(
 
 #  class { '::heat::wsgi::apache_api_cloudwatch':
 #    bind_host => $api_eth,
-#    threads   => $workers,
+#    threads   => 1,
+#    workers   => $workers,
 #    ssl       => $ssl,
 #  }
 
@@ -85,7 +87,8 @@ class cloud::orchestration::api(
 
   class { '::heat::wsgi::apache_api_cfn':
     bind_host => $api_eth,
-    threads   => $workers,
+    threads   => 1,
+    workers   => $workers,
     ssl       => $ssl,
   }
 

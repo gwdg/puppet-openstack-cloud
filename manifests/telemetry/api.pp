@@ -57,6 +57,8 @@ class cloud::telemetry::api(
   $api_eth                      = '127.0.0.1',
   $firewall_settings            = {},
 
+  $workers                      = 2,
+  $ssl                          = false,
 ){
   include ::ceilometer::db
   include ::cloud::telemetry
@@ -80,15 +82,10 @@ class cloud::telemetry::api(
 
   # Use WSGI for Ceilometer API
   class {'::ceilometer::wsgi::apache':
-
-    servername  => $::fqdn,
     port        => $ks_ceilometer_internal_port,
-
-    # Use multiprocessing defaults
-    workers     => 1,
-    threads     => $::processorcount,
-
-    ssl         => false
+    workers     => $workers,
+    threads     => 1,
+    ssl         => $ssl,
   }
 
 # Configure TTL for samples

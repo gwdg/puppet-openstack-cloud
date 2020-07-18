@@ -91,6 +91,9 @@ class cloud::identity (
   $ldap_backends                = {},
   $custom_policies              = {},
 
+  $workers                      = 2,
+  $ssl                          = false,
+
   $endpoints                    = undef,
 ){
 
@@ -132,16 +135,13 @@ class cloud::identity (
   # Configure keystone to use apache/wsgi
   class {'::keystone::wsgi::apache':
 
-    servername  => $::fqdn,
-
     admin_port  => $ks_keystone_admin_port,
     public_port => $ks_keystone_public_port,
 
-    # Use multiprocessing defaults
-    workers     => 1,
-    threads     => $::processorcount,
+    workers     => $workers,
+    threads     => 1,
 
-    ssl         => false
+    ssl         => $ssl,
   }
 
   # Deploy ssh keys for keystone account to allow remote access via scp
