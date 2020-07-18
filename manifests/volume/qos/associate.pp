@@ -46,7 +46,7 @@ define cloud::volume::qos::associate (
     "OS_USERNAME=${os_username}",
     "OS_PASSWORD=${os_password}",
     "OS_AUTH_URL=${os_auth_url}",
-    "OS_VOLUME_API_VERSION=1",
+    "OS_VOLUME_API_VERSION=3",
     "OS_PROJECT_DOMAIN_ID=${os_project_domain_id}",
     "OS_USER_DOMAIN_ID=${os_user_domain_id}",
   ]
