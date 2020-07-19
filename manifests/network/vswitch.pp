@@ -49,56 +49,6 @@
 #   (optional) Enable support for distributed routing on L2 agent.
 #   Defaults to false.
 #
-# [*host_mgmt_intf*]
-#   (required) Management Interface of node where VEM will be installed.
-#   Defaults to eth1
-#
-# [*uplink_profile*]
-#   (optional) Uplink Interfaces that will be managed by VEM. The uplink
-#      port-profile that configures these interfaces should also be specified.
-#   (format)
-#    $uplink_profile = { 'eth1' => 'profile1',
-#                        'eth2' => 'profile2'
-#                       },
-#   Defaults to empty
-#
-# [*vtep_config*]
-#   (optional) Virtual tunnel interface configuration.
-#              Eg:VxLAN tunnel end-points.
-#   (format)
-#   $vtep_config = { 'vtep1' => { 'profile' => 'virtprof1',
-#                                 'ipmode'  => 'dhcp'
-#                               },
-#                    'vtep2' => { 'profile'   => 'virtprof2',
-#                                 'ipmode'    => 'static',
-#                                 'ipaddress' => '192.168.1.1',
-#                                 'netmask'   => '255.255.255.0'
-#                               }
-#                  },
-#   Defaults to empty
-#
-# [*node_type*]
-#   (optional). Specify the type of node: 'compute' (or) 'network'.
-#   Defaults to 'compute'
-#
-# [*vteps_in_same_subnet*]
-#   (optional)
-#   The VXLAN tunnel interfaces created on VEM can belong to same IP-subnet.
-#   In such case, set this parameter to true. This results in below
-#   'sysctl:ipv4' values to be modified.
-#     rp_filter (reverse path filtering) set to 2(Loose).Default is 1(Strict)
-#     arp_ignore (arp reply mode) set to 1:reply only if target ip matches
-#                                that of incoming interface. Default is 0
-#   Please refer Linux Documentation for detailed description
-#   http://lxr.free-electrons.com/source/Documentation/networking/ip-sysctl.txt
-#
-#   If the tunnel interfaces are not in same subnet set this parameter to false.
-#   Note that setting to false causes no change in the sysctl settings and does
-#   not revert the changes made if it was originally set to true on a previous
-#   catalog run.
-#
-#   Defaults to false
-#
 # [*tunnel_types*]
 #   (optional) List of types of tunnels to use when utilizing tunnels.
 #   Supported tunnel types are: vxlan.
@@ -135,16 +85,12 @@ class cloud::network::vswitch(
   # ml2_ovs
   $provider_bridge_mappings   = ['public:br-pub'],
   $enable_distributed_routing = false,
-  $host_mgmt_intf             = 'eth1',
-  $uplink_profile             = {},
-  $vtep_config                = {},
-  $node_type                  = 'compute',
-  $vteps_in_same_subnet       = false,
 ) {
 
   include ::cloud::network
 
   case $driver {
+
     'ml2_ovs': {
       class { '::neutron::agents::ml2::ovs':
         enable_tunneling           => $enable_tunneling,
