@@ -37,27 +37,6 @@
 #  (optional) A string used in the top of the server's motd
 #  Defaults to 'eNovance IT Operations'
 #
-# [*selinux_mode*]
-#   (optional) SELinux mode the system should be in
-#   Defaults to 'permissive'
-#   Possible values : disabled, permissive, enforcing
-#
-# [*selinux_directory*]
-#   (optional) Path where to find the SELinux modules
-#   Defaults to '/usr/share/selinux'
-#
-# [*selinux_booleans*]
-#   (optional) Set of booleans to persistently enables
-#   SELinux booleans are the one getsebool -a returns
-#   Defaults []
-#   Example: ['rsync_full_access', 'haproxy_connect_any']
-#
-# [*selinux_modules*]
-#   (optional) Set of modules to load on the system
-#   Defaults []
-#   Example: ['module1', 'module2']
-#   Note: Those module should be in the $directory path
-#
 # [*limits*]
 #   (optional) Set of limits to set in /etc/security/limits.d/
 #   Defaults {}
@@ -113,10 +92,6 @@ class cloud(
   $dns_ips                  = ['8.8.8.8', '8.8.4.4'],
   $site_domain              = 'mydomain',
   $motd_title               = 'eNovance IT Operations',
-  $selinux_mode             = 'permissive',
-  $selinux_directory        = '/usr/share/selinux',
-  $selinux_booleans         = [],
-  $selinux_modules          = [],
   $limits                   = {},
   $sysctl                   = {},
   $manage_firewall          = false,
@@ -159,10 +134,6 @@ class cloud(
 
   class {'::apt':
 
-    # For apt-cacher-ng
-#   proxy_host => 'puppetmaster.cloud.gwdg.de',
-#   proxy_port => '3142',
-
     # Purge all repos not managed by puppet
     purge => { 'sources.list' => true , 'sources.list.d' => true },
   }
@@ -196,16 +167,6 @@ class cloud(
 # ${motd_title} # This node is under the control of Puppet ${::puppetversion} #
   }
 
-  # DNS (does not work with resolvconf on ubuntu)
-#  class { 'dnsclient':
-#    nameservers => $dns_ips,
-#    domain      => $site_domain
-#  }
-
-  # SUDO (don't use for now, kills vagrant)
-#  include ::sudo
-#  include ::sudo::configs
-
   include ::telegraf
 
   # NTP (do not install for containers)
@@ -228,27 +189,8 @@ class cloud(
   include ::limits
   create_resources('::limits::limits', $limits)
 
-  # Some Ubuntu specific stuff
-#  if $::operatingsystem == 'Ubuntu' {
-
-    # Add cloud archive for Juno
-#    apt::ppa { 'cloud-archive:juno': }
-
-#  }
-
-  # sysctl values
+  # Sysctl values
   create_resources('::sysctl::value', $sysctl)
-
-  # SELinux
-#  if $::osfamily == 'RedHat' {
-#    class {'::cloud::selinux' :
-#      mode      => $selinux_mode,
-#      booleans  => $selinux_booleans,
-#      modules   => $selinux_modules,
-#      directory => $selinux_directory,
-#      stage     => 'setup',
-#    }
-#  }
 
   # Strong root password for all servers
   if $manage_root_password {
