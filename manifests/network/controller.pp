@@ -128,9 +128,6 @@ class cloud::network::controller(
   # only needed by ml2 plugin
   $tunnel_id_ranges                 = ['1:10000'],
   $vni_ranges                       = ['1:10000'],
-
-  $workers                          = 2,
-  $ssl                              = false,
 ) {
 
   include ::mysql::client
@@ -147,15 +144,6 @@ class cloud::network::controller(
     fail 'l3_ha does not work with l2population mechanism driver in Juno.'
   }
 
-  # Use WSGI for Neutron server
-  include ::apache
-  class { '::neutron::wsgi::apache':
-    port                    => $ks_neutron_public_port,
-    workers                 => $workers,
-    threads                 => 1,
-    ssl                     => $ssl,
-  }
-
   class { '::neutron::server':
 
     api_workers                         => $::neutron::server::api_workers,
@@ -168,7 +156,6 @@ class cloud::network::controller(
     network_auto_schedule               => $network_auto_schedule,
 
     sync_db                             => true,
-    service_name                        => 'httpd',
   }
 
   case $plugin {
