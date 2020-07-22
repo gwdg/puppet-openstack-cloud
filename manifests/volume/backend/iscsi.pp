@@ -31,6 +31,8 @@ define cloud::volume::backend::iscsi (
 
   $volume_group        = 'cinder-volumes',
   $volume_backend_name = $name,
+
+  $is_public            = true,
 ) {
 
   cinder::backend::iscsi { $name:
@@ -38,9 +40,10 @@ define cloud::volume::backend::iscsi (
     volume_group     => $volume_group,
   }
 
-  @cinder::type { $volume_backend_name:
-    set_key   => 'volume_backend_name',
-    set_value => $volume_backend_name,
-    notify    => Service['cinder-volume']
+  cinder_type { $volume_backend_name:
+    ensure     => present,
+    properties => ["volume_backend_name=${volume_backend_name}"],
+    is_public  => $is_public, 
   }
+
 }
