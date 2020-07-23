@@ -36,7 +36,7 @@ define cloud::volume::backend::iscsi (
 ) {
 
   cinder::backend::iscsi { $name:
-    volume_backend_name => volume_backend_name,
+    volume_backend_name => $volume_backend_name,
     iscsi_ip_address => $iscsi_ip_address,
     volume_group     => $volume_group,
   }
