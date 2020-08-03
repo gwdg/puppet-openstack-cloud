@@ -274,7 +274,7 @@ class cloud::database::sql::mysql (
 ) {
 
   # Specific to the Galera master node
-  if $::fqdn == $galera_master_name {
+#  if $::fqdn == $galera_master_name {
 
 #    Mysql_user <| |> -> File['/root/.my.cnf'] 
 
@@ -401,13 +401,13 @@ class cloud::database::sql::mysql (
 
 #    Mysql_user<<| |>>
 
-  }
+#  }
 
   # Galera setup
   class { '::galera':
 
     galera_servers                  => $galera_internal_ips,
-    galera_master                   => $galera_master_name,
+#    galera_master                   => $galera_master_name,
 
     status_password                 => $galera_clustercheck_dbpassword,
 
@@ -463,16 +463,16 @@ class cloud::database::sql::mysql (
     server_names      => $::hostname,
     ipaddresses       => $local_ip,
     ports             => '3306',
-    options           =>
-      inline_template('check inter 2000 rise 2 fall 5 port 9200 <% if @fqdn != @galera_master_name -%>backup<% end %> on-marked-down shutdown-sessions')
+    options           => 'check inter 2000 rise 2 fall 5 port 9200 on-marked-down shutdown-sessions'
+#      inline_template('check inter 2000 rise 2 fall 5 port 9200 <% if @fqdn != @galera_master_name -%>backup<% end %> on-marked-down shutdown-sessions')
   }
 
-  @@haproxy::balancermember{"${::fqdn}-readonly":
-    listening_service => 'galera_readonly',
-    server_names      => $::hostname,
-    ipaddresses       => $local_ip,
-    ports             => '3306',
-    options           =>
-      inline_template('check inter 2000 rise 2 fall 5 port 9200 <% if @fqdn == @galera_master_name -%>backup<% end %> on-marked-down shutdown-sessions')
-  }
+#  @@haproxy::balancermember{"${::fqdn}-readonly":
+#    listening_service => 'galera_readonly',
+#    server_names      => $::hostname,
+#    ipaddresses       => $local_ip,
+#    ports             => '3306',
+#    options           =>
+#      inline_template('check inter 2000 rise 2 fall 5 port 9200 <% if @fqdn == @galera_master_name -%>backup<% end %> on-marked-down shutdown-sessions')
+#  }
 }
