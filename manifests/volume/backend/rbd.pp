@@ -39,11 +39,6 @@
 #   (optional) A required parameter to use cephx.
 #   Defaults to false
 #
-# [*volume_tmp_dir*]
-#   (optional) Location to store temporary image files if the volume
-#   driver does not write them directly to the volume
-#   Defaults to false
-#
 # [*rbd_max_clone_depth*]
 #   (optional) Maximum number of nested clones that can be taken of a
 #   volume before enforcing a flatten prior to next clone.
@@ -56,9 +51,10 @@ define cloud::volume::backend::rbd (
   $rbd_key,
   $volume_backend_name              = $name,
   $rbd_ceph_conf                    = '/etc/ceph/ceph.conf',
-  $rbd_flatten_volume_from_snapshot = false,
   $rbd_secret_uuid                  = false,
-  $rbd_max_clone_depth              = '5',
+#  $rbd_max_clone_depth              = 5,
+#  $rbd_store_chunk_size             = 4,
+#  $rbd_flatten_volume_from_snapshot = false,
   $qos = undef,
 ) {
 
@@ -70,12 +66,14 @@ define cloud::volume::backend::rbd (
     rbd_user                         => $rbd_user,
     rbd_secret_uuid                  => $rbd_secret_uuid,
     rbd_ceph_conf                    => $rbd_ceph_conf,
-    rbd_flatten_volume_from_snapshot => $rbd_flatten_volume_from_snapshot,
-    rbd_max_clone_depth              => $rbd_max_clone_depth,
-    volume_tmp_dir                   => '/tmp',
+#    rbd_max_clone_depth              => $rbd_max_clone_depth,
+#    rbd_store_chunk_size             => $rbd_store_chunk_size,
+#    rbd_flatten_volume_from_snapshot => $rbd_flatten_volume_from_snapshot,
     manage_volume_type               => true,
-    extra_options                    => { 
-        "${volume_backend_name}/glance_api_version" => { 'value' => 2 },}
+
+    # Should be set globaly in [DEFAULT] section
+#    extra_options                    => { 
+#        "${volume_backend_name}/glance_api_version" => { 'value' => 2 },}
   }
 
   # Configure Ceph keyring
@@ -92,9 +90,9 @@ define cloud::volume::backend::rbd (
     cloud::volume::qos::create { "qos_${volume_backend_name}":
       properties => $qos['frontend'],
       consumer => 'front-end',
-    }->
+    } ->
 
-    #associate with volume type
+    # Associate with volume type
     cloud::volume::qos::associate { "association_qos_${volume_backend_name}": 
       qos_name => "qos_${volume_backend_name}",
       volume_type => $volume_backend_name
