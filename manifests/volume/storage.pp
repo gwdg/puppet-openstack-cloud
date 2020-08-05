@@ -47,32 +47,6 @@
 #   }
 #   Defaults to undef
 #
-# [*cinder_rbd_pool*]
-#   (optional) Name of the Ceph pool which which store the cinder images
-#   Defaults to 'volumes'
-#
-# [*cinder_rbd_user*]
-#   (optional) User name used to acces to the cinder rbd pool
-#   Defaults to 'cinder'
-#
-# [*cinder_rbd_secret_uuid*]
-#   (optional) A required parameter to use cephx.
-#   Defaults to false
-#
-# [*cinder_rbd_conf*]
-#   (optional) Path to the ceph configuration file to use
-#   Defaults to '/etc/ceph/ceph.conf'
-#
-# [*cinder_rbd_flatten_volume_from_snapshot*]
-#   (optional) Enable flatten volumes created from snapshots.
-#   Defaults to false
-#
-# [*cinder_rbd_max_clone_depth*]
-#   (optional) Maximum number of nested clones that can be taken of a
-#   volume before enforcing a flatten prior to next clone.
-#   A value of zero disables cloning
-#   Defaults to '5'
-#
 class cloud::volume::storage(
 
   $cinder_backends                         = undef,
@@ -89,12 +63,6 @@ class cloud::volume::storage(
   $ks_cinder_user                          = hiera('cinder::keystone::authtoken::username'),
   $ks_admin_tenant                         = hiera('cinder::keystone::authtoken::project_name'),
 
-  $cinder_rbd_pool                         = 'volumes',
-  $cinder_rbd_user                         = 'cinder',
-  $cinder_rbd_secret_uuid                  = undef,
-  $cinder_rbd_conf                         = '/etc/ceph/ceph.conf',
-  $cinder_rbd_flatten_volume_from_snapshot = false,
-  $cinder_rbd_max_clone_depth              = '5',
 ) {
 
   include ::cloud::volume
