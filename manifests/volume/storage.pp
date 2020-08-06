@@ -78,66 +78,59 @@ class cloud::volume::storage(
 
   class { '::cinder::keystone::authtoken': }
 
-  if $cinder_backends {
+  if has_key($cinder_backends, 'rbd') {
+    $rbd_backends = $cinder_backends['rbd']
+    create_resources('::cloud::volume::backend::rbd', $rbd_backends)
+  } else {
+    $rbd_backends = { }
+  }
 
-    if has_key($cinder_backends, 'rbd') {
-      $rbd_backends = $cinder_backends['rbd']
-      create_resources('::cloud::volume::backend::rbd', $rbd_backends)
-    }
-    else {
-      $rbd_backends = { }
-    }
+  if has_key($cinder_backends, 'netapp') {
+    $netapp_backends = $cinder_backends['netapp']
+    create_resources('::cloud::volume::backend::netapp', $netapp_backends)
+  } else {
+    $netapp_backends = { }
+  }
 
-    if has_key($cinder_backends, 'netapp') {
-      $netapp_backends = $cinder_backends['netapp']
-      create_resources('::cloud::volume::backend::netapp', $netapp_backends)
-    }
-    else {
-      $netapp_backends = { }
-    }
+  if has_key($cinder_backends, 'iscsi') {
+    $iscsi_backends = $cinder_backends['iscsi']
+    create_resources('::cloud::volume::backend::iscsi', $iscsi_backends)
+  } else {
+    $iscsi_backends = { }
+  }
 
-    if has_key($cinder_backends, 'iscsi') {
-      $iscsi_backends = $cinder_backends['iscsi']
-      create_resources('::cloud::volume::backend::iscsi', $iscsi_backends)
-    }
-    else {
-      $iscsi_backends = { }
-    }
+  if has_key($cinder_backends, 'nfs') {
+    $nfs_backends = $cinder_backends['nfs']
+    create_resources('::cloud::volume::backend::nfs', $nfs_backends)
+  } else {
+    $nfs_backends = { }
+  }
 
-    if has_key($cinder_backends, 'nfs') {
-      $nfs_backends = $cinder_backends['nfs']
-      create_resources('::cloud::volume::backend::nfs', $nfs_backends)
-    }
-    else {
-      $nfs_backends = { }
-    }
+  class { '::cinder::backends':
+    enabled_backends => keys(merge($rbd_backends, $netapp_backends, $iscsi_backends, $nfs_backends))
+  }
 
-    class { '::cinder::backends':
-      enabled_backends => keys(merge($rbd_backends, $netapp_backends, $iscsi_backends, $nfs_backends))
-    }
+  # Manage Volume types.
+  # It allows to the end-user to choose from which backend he would like to provision a volume.
+  # Cinder::Type requires keystone credentials
 
-    # Manage Volume types.
-    # It allows to the end-user to choose from which backend he would like to provision a volume.
-    # Cinder::Type requires keystone credentials
-
-    # Make sure Cinder::Type is only run after cinder.conf is setup correctly (else resource prefetch will fail due to missing cinder.conf)
-    Cinder_config<||> -> Cinder::Type <| |>
+  # Make sure Cinder::Type is only run after cinder.conf is setup correctly (else resource prefetch will fail due to missing cinder.conf)
+  Cinder_config<||> -> Cinder::Type <| |>
     
-    # Cloud::Volume::Qos::Create requires keystone credentials
-    Cloud::Volume::Qos::Create <| |> {
-      os_tenant_name => $ks_admin_tenant,
-      os_username    => $ks_cinder_user,
-      os_password    => $ks_cinder_password,
-      os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3"
-    }
+  # Cloud::Volume::Qos::Create requires keystone credentials
+  Cloud::Volume::Qos::Create <| |> {
+    os_tenant_name => $ks_admin_tenant,
+    os_username    => $ks_cinder_user,
+    os_password    => $ks_cinder_password,
+    os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3"
+  }
     
-    # Cloud::Volume::Qos::Associate requires keystone credentials
-    Cloud::Volume::Qos::Associate <| |> {
-      os_tenant_name => $ks_admin_tenant,
-      os_username    => $ks_cinder_user,
-      os_password    => $ks_cinder_password,
-      os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3"
-    }
+  # Cloud::Volume::Qos::Associate requires keystone credentials
+  Cloud::Volume::Qos::Associate <| |> {
+    os_tenant_name => $ks_admin_tenant,
+    os_username    => $ks_cinder_user,
+    os_password    => $ks_cinder_password,
+    os_auth_url    => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:${ks_keystone_internal_port}/v3"
   }
 
   cinder_config {
