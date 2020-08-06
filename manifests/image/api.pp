@@ -43,51 +43,14 @@
 #   (optional) Hostname of IP used to connect to Glance registry
 #   Defaults to '127.0.0.1'
 #
-# [*glance_rbd_pool*]
-#   (optional) Name of the Ceph pool which which store the glance images
-#   Defaults to 'images'
-#
-# [*glance_rbd_user*]
-#   (optional) User name used to acces to the glance rbd pool
-#   Defaults to 'glance'
-#
-# [*backend*]
-#   (optionnal) Backend to use to store images
-#   Can be 'rbd', 'file', 'nfs' or 'swift'
-#   Defaults to 'rbd'
-#
-# [*known_stores*]
-#   (optionnal) Tell to Glance API which backends can be used
-#   Can be 'rbd', 'http', 'file', or and 'swift'.
-#   Should be an array.
-#   Defaults to ['rbd', 'http']
-#
-# [*filesystem_store_datadir*]
-#   (optional) Full path of data directory to store the images.
-#   Defaults to '/var/lib/glance/images/'
-#
-# [*nfs_server*]
-#   (optionnal) NFS device to mount
-#   Example: 'nfs.example.com:/vol1'
-#   Required when running 'nfs' backend.
-#   Defaults to false
-#
-# [*nfs_options*]
-#   (optional) NFS mount options
-#   Example: 'nfsvers=3,noacl'
-#   Defaults to 'defaults'
-#
-# [*pipeline*]
-#   (optional) Partial name of a pipeline in your paste configuration file with the
-#   service name removed.
-#   Defaults to 'keystone'.
-#
 # [*firewall_settings*]
 #   (optional) Allow to add custom parameters to firewall rules
 #   Should be an hash.
 #   Default to {}
 #
 class cloud::image::api(
+
+  $glance_backends                   = undef,
 
   $ks_glance_api_internal_port       = '9292',
   $ks_glance_registry_internal_port  = '9191',
@@ -97,22 +60,25 @@ class cloud::image::api(
   $api_eth                           = '127.0.0.1',
   $openstack_vip                     = '127.0.0.1',
 
-  $glance_rbd_pool                   = 'images',
-  $glance_rbd_user                   = 'glance',
-  $glance_rbd_key                    = 'key',
-
-  $backend                           = 'rbd',
-  $known_stores                      = ['rbd', 'http'],
-  $filesystem_store_datadir          = '/var/lib/glance/images/',
-  $nfs_server                        = false,
-  $nfs_share                         = undef,
-  $nfs_options                       = 'defaults',
-  $pipeline                          = 'keystone',
   $firewall_settings                 = {},
   $container_formats                 = 'ami,ari,aki,bare,ovf,ova',
 ) {
 
   include ::glance::api::db
+
+  if has_key($glance_backends, 'rbd') {
+    $rbd_backends = $glance_backends['rbd']
+    create_resources('::cloud::image::backend::rbd', $rbd_backends)
+  } else {
+    $rbd_backends = { }
+  }
+
+  if has_key($glance_backends, 'file') {
+    $file_backends = $glance_backends['file']
+    create_resources('::cloud::image::backend::file', $file_backends)
+  } else {
+    $file_backends = { }
+  }
 
   class { '::glance::api':
 
@@ -124,99 +90,12 @@ class cloud::image::api(
     bind_host                => $api_eth,
     bind_port                => $ks_glance_api_internal_port,
     pipeline                 => 'keystone',
-    known_stores             => $known_stores,
+    known_stores             => keys(merge($rbd_backends, $file_backends)),
   }
 
-  # Make sure Memcache Python module is available (will be made obsolete with use of oslo.cache puppet module)
-  #include ::oslo::params
-  #ensure_packages('python-memcache', {
-  #  ensure => present,
-  #  name   => $::oslo::params::python_memcache_package_name,
-  #  tag    => ['openstack'],
-  #})
-  
   glance_api_config {
     'DEFAULT/notifier_driver':      value => 'noop';
     'DEFAULT/container_formats':    value => $container_formats;
-  }
-
-  if ($backend == 'rbd') {
-
-    # Handle ceph.conf + ceph packages
-    include ::cloud::storage::rbd
-
-    # Configure Glance rbd backend
-    class { '::glance::backend::rbd':
-      rbd_store_user            => $glance_rbd_user,
-      rbd_store_pool            => $glance_rbd_pool,
-      rbd_store_chunk_size      => 8,
-      rados_connect_timeout     => 0,
-    }
-
-    # Set client key for cephx
-    ceph::key { "client.${glance_rbd_user}":
-        secret          => $glance_rbd_key,
-        user            => 'glance',
-        group           => 'glance',
-        keyring_path    => "/etc/ceph/ceph.client.${glance_rbd_user}.keyring",
-        notify          => Service['glance-api','glance-registry'],
-    }
-
-#    Concat::Fragment <<| title == 'ceph-client-os' |>>
-
-  } elsif ($backend == 'file') {
-
-    class { '::glance::backend::file':
-      filesystem_store_datadir => $filesystem_store_datadir
-    }
-
-  } elsif ($backend == 'swift') {
-
-    class { '::glance::backend::swift':
-      swift_store_user                    => 'services:glance',
-      swift_store_key                     => $ks_glance_password,
-      swift_store_auth_address            => "${ks_keystone_internal_proto}://${ks_keystone_internal_host}:35357/v2.0/",
-      swift_store_create_container_on_put => true,
-    }
-
-  } elsif ($backend == 'nfs') {
-
-    include ::nfs::client
-
-    nfs::client::mount { '/var/lib/glance/images':
-
-      mount     => '/var/lib/glance/images',
-
-      server    => $nfs_server,
-      share     => "${nfs_share}/images",
-      options   => $nfs_options,
-
-      owner     => 'glance',
-      group     => 'glance',
-
-      require   => Package['glance-api'],
-    }
-
-    nfs::client::mount { '/var/lib/glance/image-cache':
-      
-      mount     => '/var/lib/glance/image-cache',
-
-      server    => $nfs_server,
-      share     => "${nfs_share}/image-cache",
-      options   => $nfs_options,
-
-      owner     => 'glance',
-      group     => 'glance',
-
-      require   => Package['glance-api'],                                                                                                                                                                   
-    }
-
-    class { '::glance::backend::file':
-      filesystem_store_datadir => $filesystem_store_datadir
-    }
-
-  } else {
-    fail("${backend} is not a Glance supported backend.")
   }
 
   class { '::glance::cache::cleaner': }
