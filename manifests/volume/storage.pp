@@ -49,24 +49,28 @@
 #
 class cloud::volume::storage(
 
-  $cinder_backends                         = undef,
+  $cinder_backends                      = {},
 
-  $ks_keystone_internal_proto              = 'http',
-  $ks_keystone_internal_port               = '5000',
-  $ks_keystone_internal_host               = '127.0.0.1',
+  $ks_keystone_internal_proto           = 'http',
+  $ks_keystone_internal_port            = '5000',
+  $ks_keystone_internal_host            = '127.0.0.1',
 
-  $ks_glance_internal_proto                = 'http',
-  $ks_glance_api_internal_port             = '9292',
-  $ks_glance_internal_host                 = '127.0.0.1',
+  $ks_glance_internal_proto             = 'http',
+  $ks_glance_api_internal_port          = '9292',
+  $ks_glance_internal_host              = '127.0.0.1',
 
-  $ks_cinder_password                      = hiera('cinder::keystone::authtoken::password'),
-  $ks_cinder_user                          = hiera('cinder::keystone::authtoken::username'),
-  $ks_admin_tenant                         = hiera('cinder::keystone::authtoken::project_name'),
+  $ks_cinder_password                   = hiera('cinder::keystone::authtoken::password'),
+  $ks_cinder_user                       = hiera('cinder::keystone::authtoken::username'),
+  $ks_admin_tenant                      = hiera('cinder::keystone::authtoken::project_name'),
+
+  $image_conversion_dir                 = '/var/lib/cinder/conversion',
+  $image_conversion_nfs_server          = undef,
+  $image_conversion_nfs_share           = undef,
+  $image_conversion_nfs_share_options   = '_netdev,vers=3',
 
 ) {
 
   include ::cloud::volume
-
   include ::cinder::volume
 
   # Needed as dep. of cinder::type
@@ -141,4 +145,24 @@ class cloud::volume::storage(
     'DEFAULT/glance_host':          value => "${ks_glance_internal_host}";
   }
 
+  # Use NFS for volume conversion dir
+
+  include ::nfs::client
+
+  nfs::client::mount { "${image_conversion_dir}":
+
+    mount     => "${image_conversion_dir}",
+
+    server    => $image_conversion_nfs_server,
+    share     => $image_conversion_nfs_share,
+    options   => $image_conversion_nfs_share_options,
+
+    owner     => 'cinder',
+    group     => 'cinder',
+
+    require   => Package['cinder-volume'],
+  }
+
+  # Restart cinder volume service after making NFS available
+  nfs::client::mount["${image_conversion_dir}"] ~> Anchor['cinder::service::begin']
 }
