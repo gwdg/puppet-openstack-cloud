@@ -17,16 +17,6 @@
 #
 # === Parameters:
 #
-# [*fsid*] The cluster's fsid.
-#   Mandatory. Get one with `uuidgen -r`.
-#
-# [*cluster_network*]
-#   (optional) The cluster internal network
-#   Defaults to '127.0.0.1/24'
-#
-# [*public_network*]
-#   (optional) The cluster public (where clients are) network
-#   Defaults to '127.0.0.1/24'
 #
 class cloud::storage::rbd (
 
@@ -35,13 +25,7 @@ class cloud::storage::rbd (
   # Special ceph.conf client setup for VMs
   $compute_node         = false,
 
-  $fsid                 = undef,
-
-  $mon_initial_members  = [],
-  $mon_host             = [],
-
-  $cluster_network      = '127.0.0.1/24',
-  $public_network       = '127.0.0.1/24',
+  $ceph_confs           = {},
 
   $package_ensure       = 'latest',
 
@@ -61,10 +45,12 @@ class cloud::storage::rbd (
     }
 
     # Setup ceph.conf
-    file { '/etc/ceph/ceph.conf':
-      content => template('cloud/storage/ceph/ceph.conf.erb'),
-      require => Package['ceph']
-    }
+#    file { '/etc/ceph/ceph.conf':
+#      content => template('cloud/storage/ceph/ceph.conf.erb'),
+#      require => Package['ceph']
+#    }
+
+    create_resources(file, $ceph_confs)
 
     Exec {
       path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin'

@@ -1,0 +1,28 @@
+[global]
+fsid = 5c1ae211-6eeb-4962-a1ed-879ee766e28f
+mon_initial_members = ceph-ssd-01,ceph-ssd-04,ceph-ssd-07
+mon_host = 10.108.32.82,10.108.32.85,10.108.32.88
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+
+public_network = 10.108.32.0/24
+osd_crush_update_on_start = false
+
+<% if @compute_node -%>
+[client]
+    rbd cache = true
+    rbd cache writethrough until flush = true
+    admin socket = /var/run/ceph/guests/$cluster-$type.$id.$pid.$cctid.asok
+    log file = /var/log/qemu/qemu-guest-$pid.log
+    rbd concurrent management ops = 20
+<% end -%>
+
+[client.cinder_ssd_ec33]
+    keyring = /etc/ceph/ceph.client.cinder_ssd_ec33.keyring
+    rbd default data pool = rbd_volumes_ssd_ec33_data
+
+[client.cinder_ssd_ec83]
+    keyring = /etc/ceph/ceph.client.cinder_ssd_ec83.keyring
+    rbd default data pool = rbd_volumes_ssd_ec83_data
+
