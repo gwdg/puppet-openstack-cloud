@@ -17,40 +17,12 @@
 #
 # Orchestration common node
 #
-# === Parameters:
-#
-# [*ks_heat_public_host*]
-#   (optional) Public Hostname or IP to connect to Heat API
-#   Defaults to '127.0.0.1'
-#
-# [*ks_heat_public_proto*]
-#   (optional) Protocol used to connect to API. Could be 'http' or 'https'.
-#   Defaults to 'http'
-#
-# [*ks_heat_password*]
-#   (optional) Password used by Heat to connect to Keystone API
-#   Defaults to 'heatpassword'
-#
 
 class cloud::orchestration(
-
-  $ks_heat_public_host        = '127.0.0.1',
-  $ks_heat_public_proto       = 'http',
-  $ks_heat_password           = 'heatpassword',
-
 ) {
-
   include ::mysql::client
   include ::heat::db
-
-  class { '::heat':
-  }
-
-  class { '::heat::keystone::domain': 
-    manage_domain => false,
-    manage_user   => false,
-    manage_role   => false,
-  }
-
-  class { '::heat::client': }
+  include ::heat::client
+  include ::heat::keystone::domain
+  include ::heat
 }
