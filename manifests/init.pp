@@ -305,22 +305,23 @@ class cloud(
     })
   }
 
-  exec { 'restart_rsyslogd':
-    command     => 'service rsyslog restart',
-    path        => [ '/usr/sbin', '/sbin', '/usr/bin/', '/bin', ],
-    refreshonly => true,
-  } 
-
-  if $syslog_server {
+#  exec { 'restart_rsyslogd':
+#    command     => 'service rsyslog restart',
+#    path        => [ '/usr/sbin', '/sbin', '/usr/bin/', '/bin', ],
+#    refreshonly => true,
+#  } 
+#
+#  if $syslog_server {
 
     #*.* @@$IP_PREFIX.1.3:514 > /etc/rsyslog.d/10-logstash.conf
-    file { '/etc/rsyslog.d/10-logstash.conf':
-      ensure => file,
-      content => "*.* @@${syslog_server}:${syslog_port}",
-      owner => root,
-      group => root,
-      mode => '0644',
-      notify => Exec['restart_rsyslogd']
-    }
-  }
+#    file { '/etc/rsyslog.d/10-logstash.conf':
+#      ensure => file,
+#      content => "*.* @@${syslog_server}:${syslog_port}",
+#      owner => root,
+#      group => root,
+#      mode => '0644',
+#      notify => Exec['restart_rsyslogd']
+#    }
+#  }
+class{'cloud::rsyslog':}
 }
